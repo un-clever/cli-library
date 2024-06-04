@@ -1,5 +1,3 @@
-## Unreleased (b96521a..b96521a)
-#### Continuous Integration
-- set up cocogitto - (b96521a) - Brad Olson
+# Changelog
 
-
+## Unreleased (2024-06-04)
