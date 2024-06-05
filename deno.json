@@ -1,6 +1,6 @@
 {
   "name": "@un-clever/cli-library",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "exports": "./src/mod.ts",
   "tasks": {
     "test": "deno test --watch ./src",
