@@ -3,6 +3,7 @@
   "version": "0.2.3",
   "exports": "./src/mod.ts",
   "tasks": {
-    "test": "deno test --watch ./src"
+    "test": "deno test --watch ./src",
+    "changelog": "convco changelog --output CHANGELOG.md && less CHANGELOG.md",
   }
 }
