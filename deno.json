@@ -4,6 +4,7 @@
   "exports": "./src/mod.ts",
   "tasks": {
     "test": "deno test --watch ./src",
+    "status": "convco changelog --include-hidden-sections --no-links",
     "changelog": "convco changelog --output CHANGELOG.md && less CHANGELOG.md",
   }
 }
