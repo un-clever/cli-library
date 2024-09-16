@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-unused-vars
-import { assertEquals, assertStrictEquals, describe, it } from "./depsDev.ts";
-
-import { parseArgs, ParseOptions } from "./deps.ts";
+import { assertEquals } from "@std/assert";
+import { describe, it } from "@std/testing/bdd";
+import { parseArgs, type ParseOptions } from "@std/cli";
 
 // const problemParseOptions = {
 //   string: ["command", "depth"],

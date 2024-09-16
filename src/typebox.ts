@@ -1,15 +1,12 @@
+import { parseArgs, type ParseOptions } from "@std/cli";
 import {
   FormatRegistry,
-  parseArgs,
-  ParseOptions,
-  Static,
-  TObject,
-  TransformFunction,
-  TSchema,
-  Type,
-  Value,
-} from "./deps.ts";
-import { ArgList, CommandHandler, Env, Parser } from "./types.ts";
+  type Static,
+  type TObject,
+  type TSchema,
+} from "@sinclair/typebox";
+import { Value } from "@sinclair/typebox/value";
+import type { ArgList, CommandHandler, Env, Parser } from "./types.ts";
 import { Command } from "./Command.ts";
 
 export function initializeTypebox(): void {
@@ -70,7 +67,7 @@ function cliArgSpecs(propname: string, prop: TSchema): string[] {
 }
 
 export function typeboxOptionDocumentation<S extends TObject>(
-  schema: S
+  schema: S,
 ): string {
   const properties = Object.entries(schema.properties).map(([propname, prop]) =>
     cliArgSpecs(propname, prop)
@@ -83,7 +80,7 @@ export function typeboxOptionDocumentation<S extends TObject>(
 export function typeboxCommand<S extends TObject>(
   commandSchema: S,
   handler: TypeboxHandler<S>,
-  semver = "0.0.0"
+  semver = "0.0.0",
 ): Command<Static<S>> {
   const parser = typeboxParser(commandSchema);
   const command = commandSchema.title
@@ -94,7 +91,7 @@ export function typeboxCommand<S extends TObject>(
   return new Command(
     { command, semver, description, optionsDocumentation },
     parser,
-    handler
+    handler,
   );
 }
 
@@ -154,14 +151,14 @@ export function typeboxParser<S extends TObject>(schema: S): Parser<Static<S>> {
     // TODO treat "" args as null (empty string args validate now, add test)
     const args = parseArgs(raw, options);
     const parsed = Value.Cast(schema, Value.Clean(schema, args));
-    if (Value.Check(schema, args))
+    if (Value.Check(schema, args)) {
       return {
         raw,
         parsed, // coerced, validated and with extra properties removed
         positional: args._ || [],
         afterDashDash: args["--"] || [],
       };
-    else {
+    } else {
       const errors = Value.Errors(schema, args);
       let message = `Invalid arguments trying to parse CLI:`;
       for (const error of errors) {

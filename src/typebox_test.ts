@@ -1,12 +1,8 @@
 // deno-lint-ignore-file no-unused-vars
-import { FormatRegistry, Type, Value } from "./deps.ts";
-import {
-  assert,
-  assertEquals,
-  assertStrictEquals,
-  describe,
-  it,
-} from "./depsDev.ts";
+import { Type } from "@sinclair/typebox";
+import { Value } from "@sinclair/typebox/value";
+import { assert, assertEquals } from "@std/assert";
+import { describe, it } from "@std/testing/bdd";
 import { initializeTypebox } from "./typebox.ts";
 
 const typeNeedingConversions = Type.Object({
@@ -184,14 +180,16 @@ const dateStringTests: TestCase[] = [
 ];
 
 describe("Decoding Param Types", () => {
-  for (const { name, input, expected } of [
-    ...numbersTests,
-    ...integersTests,
-    ...booleanTests,
-    // ...builtinDateTypeTests,
-    // ...dateStringTests,
-    // ...customDateTests, TOO unintuitive with timezones
-  ]) {
+  for (
+    const { name, input, expected } of [
+      ...numbersTests,
+      ...integersTests,
+      ...booleanTests,
+      // ...builtinDateTypeTests,
+      // ...dateStringTests,
+      // ...customDateTests, TOO unintuitive with timezones
+    ]
+  ) {
     it(name, () => {
       const parsed = Value.Convert(typeNeedingConversions, input);
 
@@ -199,18 +197,18 @@ describe("Decoding Param Types", () => {
         assertEquals(
           parsed,
           expected,
-          "expected converted (coerced) value to match expected"
+          "expected converted (coerced) value to match expected",
         );
         assertEquals(
           Value.Check(typeNeedingConversions, parsed),
           true,
-          "expected type to validate"
+          "expected type to validate",
         );
       } else {
         assertEquals(
           Value.Check(typeNeedingConversions, parsed),
           false,
-          "expected type to NOT validate"
+          "expected type to NOT validate",
         );
       }
     });
