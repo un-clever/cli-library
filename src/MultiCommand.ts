@@ -1,13 +1,16 @@
-import { ArgList, Env, CommandMetadata } from "./types.ts";
-import { Command } from "./Command.ts";
+import type { ArgList, CommandMetadata, Env } from "./types.ts";
+import type { Command } from "./Command.ts";
 
 export class MultiCommand {
   constructor(
     private metadata: Omit<CommandMetadata, "optionsDocumentation">,
     // deno-lint-ignore no-explicit-any
-    private commands: Command<any>[]
+    private commands: Command<any>[],
   ) {
     // TODO: confirm no duplicate command names or aliases. Handle aliases
+    // TODO: add hook to allow registering more parsers
+    // TODO: functional typing to extract typebox--test what it does, not it's
+    // internals, such that Zod could also be used. Or lighter, isString and isNumber
   }
 
   usage(): string {
@@ -37,7 +40,7 @@ export class MultiCommand {
     }
     const commandName = arglist[0];
     const command = this.commands.find(
-      (c) => c.metadata.command === commandName
+      (c) => c.metadata.command === commandName,
     );
     if (!command) {
       console.log(`Unknown command: ${commandName}`);
