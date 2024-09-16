@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.3.2 - 2024-09-16
+#### Bug Fixes
+- more changelog maintenance - (f50e2d9) - Brad Olson
+
+- - -
+
 ## v0.3.1 - 2024-09-16
 #### Bug Fixes
 - more changelog maintenance - (3b3ef43) - Brad Olson
