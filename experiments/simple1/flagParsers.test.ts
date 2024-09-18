@@ -7,7 +7,7 @@ import {
   intFlag,
   negatedFlag,
   stringFlag,
-} from "./parsers.ts";
+} from "./flagParsers.ts";
 import type { FlagParser } from "./flags.ts";
 
 type testCase1<T> = [FlagParser<T>, T | undefined, string[], string[]];
