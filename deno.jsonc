@@ -13,6 +13,7 @@
     "@std/cli": "jsr:@std/cli@^1.0.6",
     "@std/expect": "jsr:@std/expect@^1.0.3",
     "@std/testing": "jsr:@std/testing@^1.0.2",
+    // for cross-platform testing, import from here rather than @std/assert,expect,testing
     "testlib": "./testlib_deno.ts"
   }
 }
