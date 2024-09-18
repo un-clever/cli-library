@@ -36,13 +36,23 @@ export const stringFlag: FlagParser<string> = (args: string[]) => {
   return { value: args[0], tail: args.slice(1) };
 };
 
-export const numberFlag: FlagParser<number> = (args: string[]) => {
+/**
+ * Parse a decimal floating point number into a JavaScript number
+ * @param args
+ * @returns
+ */
+export const floatFlag: FlagParser<number> = (args: string[]) => {
   const value = parseFloat(args[0]);
   if (isNaN(value)) return { tail: args };
   return { value, tail: args.slice(1) };
 };
 
-export const integerFlag: FlagParser<number> = (args: string[]) => {
+/**
+ * Parse a decimal integer into a JavaScript number
+ * @param args
+ * @returns
+ */
+export const intFlag: FlagParser<number> = (args: string[]) => {
   const value = parseInt(args[0]);
   if (isNaN(value)) return { tail: args };
   return { value, tail: args.slice(1) };
