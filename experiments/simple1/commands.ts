@@ -1,4 +1,4 @@
-import { Failable } from "./Failable.ts";
+import { hasAdvice, hasFailed, hasSuccess } from "./failable.ts";
 
 /**
  * Pargs ("parsed args") represents the results of successfully parsing a full
@@ -33,7 +33,7 @@ export interface Command<Flags> {
   slug: () => string;
   description: () => string;
   help: () => string;
-  parse: (args: string[]) => Pargs<Flags>;
+  parse: (args: string[]) => PargsResult<Flags>;
   execute: (args: Pargs<Flags>) => Promise<number>; // exit status
 
   // utility mothods
@@ -45,10 +45,14 @@ export interface Command<Flags> {
 
 export async function run<T>(cmd: Command<T>, args: string[]) {
   try {
-    const pargs = cmd.parse(args);
-    const exitCode = await cmd.execute(pargs);
-    // warn if exit code? No function should except
-    return Deno.exit(exitCode);
+    const pargsResult = cmd.parse(args);
+    if (hasAdvice(pargsResult)) console.error(pargsResult.advice);
+    if (hasFailed(pargsResult)) throw hasFailed(pargsResult);
+    if (hasSuccess(pargsResult)) {
+      const exitCode = await cmd.execute(pargsResult.value as Pargs<T>);
+      // warn if exit code? No function should except
+      return Deno.exit(exitCode);
+    }
   } catch (err) {
     // await cmd.output(cmd.help())
     console.error("ERROR", err.message);

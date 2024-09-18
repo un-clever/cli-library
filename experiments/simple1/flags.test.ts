@@ -32,16 +32,16 @@ export const simpleFlagSpec = {
 };
 
 // the type of that FlagSpec
-type SimpleFlagSpec = typeof simpleFlagSpec;
+export type SimpleFlagSpec = typeof simpleFlagSpec;
 
 // the type of the flags we expect that FlagSpec to parse
-export interface SimpleFlags {
+export type SimpleFlags = {
   one: string;
   dos: string;
   three: boolean;
   four: number;
   cinco: number;
-}
+};
 
 // We can extract types from a single flag
 type StringFlag = SimpleFlagSpec["one"];
