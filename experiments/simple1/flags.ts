@@ -11,7 +11,10 @@ export interface FlagParsing<T> {
  * They can presume that they receive all the args AFTER the flag,
  * that is, the flag is already stripped off
  */
-export type FlagParser<T> = (args: string[]) => FlagParsing<T>;
+export interface FlagParser<T> {
+  (args: string[]): FlagParsing<T>;
+  default?: T; // mostly used for boolean flags, that must have a default value
+}
 
 /**
  * A flag that knows how to parse itself;
