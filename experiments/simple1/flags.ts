@@ -1,10 +1,7 @@
-/**
- * A parsed flag with parsing source included
- */
-export interface FlagParseAttempt<T> {
-  value?: T;
-  tail: string[];
-}
+import type { Failable } from "./Failable.ts";
+
+// The partial result for parsing a single flag
+type FlagParseAttempt<T> = Failable<T>;
 
 /**
  * FlagParsers take a list of strings and attempt to parse a flag off the front of it
@@ -18,7 +15,6 @@ export interface FlagParser<T> {
 
 /**
  * A flag that knows how to parse itself;
- * Hint: if you're implementing, start with strings;
  */
 export interface Flag<T> {
   description: string;
@@ -29,11 +25,11 @@ export interface Flag<T> {
   parser: FlagParser<T>;
 }
 
-export const dashdash: Flag<string[]> = {
-  description: "ignore params after --",
-  slugs: ["--"],
-  shortcuts: [],
-  required: false,
-  default: [],
-  parser: (args: string[]) => ({ value: args, tail: [] }),
-};
+// export const dashdash: Flag<string[]> = {
+//   description: "ignore params after --",
+//   slugs: ["--"],
+//   shortcuts: [],
+//   required: false,
+//   default: [],
+//   parser: (args: string[]) => ({ value: args, tail: [] }),
+// };

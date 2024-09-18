@@ -8,6 +8,7 @@ export { describe, it } from "@std/testing/bdd";
  */
 export { assert, assertEquals, assertThrows } from "@std/assert";
 export { assertType } from "@std/testing/types";
+export type { IsExact, IsNever, IsNullable } from "@std/testing/types";
 
 // seems *almost* compatible with node's testing
 // as of 18 Sep 2024 defined in

@@ -1,11 +1,22 @@
+import { Failable } from "./Failable.ts";
+
 /**
- * Parsed Args
+ * Pargs ("parsed args") represents the results of successfully parsing a full
+ * set of command-line arguments
  */
-interface Pargs<F> {
+export interface Pargs<F> {
   args: string[]; // positional args
   dashdash?: string[]; // args after --
   flags: F;
 }
+
+/**
+ * PargsResult is the intermediate or final result of parsing a full command line.
+ * - It might have finished successfully.
+ * - It might be in the middle of a successful parse.
+ * - It might be errored, in which case it might have error advice.
+ */
+export type PargsResult<F> = Failable<Pargs<F>>;
 
 /**
  * Single commands and multi-commands both present this functional interface.
