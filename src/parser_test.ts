@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { assertEquals } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { assertEquals, describe, it } from "testlib";
 import { parseArgs, type ParseOptions } from "@std/cli";
 
 // const problemParseOptions = {

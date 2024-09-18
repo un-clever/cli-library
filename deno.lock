@@ -9,6 +9,7 @@
       "jsr:@std/cli@0.224.4": "jsr:@std/cli@0.224.4",
       "jsr:@std/cli@^1.0.6": "jsr:@std/cli@1.0.6",
       "jsr:@std/data-structures@^1.0.2": "jsr:@std/data-structures@1.0.3",
+      "jsr:@std/expect@^1.0.3": "jsr:@std/expect@1.0.3",
       "jsr:@std/fs@^1.0.3": "jsr:@std/fs@1.0.3",
       "jsr:@std/internal@^1.0.0": "jsr:@std/internal@1.0.0",
       "jsr:@std/internal@^1.0.3": "jsr:@std/internal@1.0.3",
@@ -41,6 +42,13 @@
       },
       "@std/data-structures@1.0.3": {
         "integrity": "b14b8ad2333f7f595ad736ed6a0953a7f58a58b5c9fa4343dff3b2eb754a7c85"
+      },
+      "@std/expect@1.0.3": {
+        "integrity": "d9cbd03323ef7feafd1e969ed85d5edb04ebbd9937b0fe7a52d5ff53be8e913a",
+        "dependencies": [
+          "jsr:@std/assert@^1.0.5",
+          "jsr:@std/internal@^1.0.3"
+        ]
       },
       "@std/fs@1.0.3": {
         "integrity": "3cb839b1360b0a42d8b367c3093bfe4071798e6694fa44cf1963e04a8edba4fe",
@@ -133,6 +141,7 @@
     "dependencies": [
       "jsr:@std/assert@^1.0.5",
       "jsr:@std/cli@^1.0.6",
+      "jsr:@std/expect@^1.0.3",
       "jsr:@std/testing@^1.0.2",
       "npm:@sinclair/typebox@^0.33.11"
     ]

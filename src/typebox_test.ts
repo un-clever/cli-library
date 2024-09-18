@@ -1,8 +1,7 @@
 // deno-lint-ignore-file no-unused-vars
+import { assert, assertEquals, describe, it } from "testlib";
 import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
-import { assert, assertEquals } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
 import { initializeTypebox } from "./typebox.ts";
 
 const typeNeedingConversions = Type.Object({
