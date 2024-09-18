@@ -1,7 +1,7 @@
 /**
- * parsed flag with parsing source included
+ * A parsed flag with parsing source included
  */
-export interface FlagParsing<T> {
+export interface FlagParseAttempt<T> {
   value?: T;
   tail: string[];
 }
@@ -12,7 +12,7 @@ export interface FlagParsing<T> {
  * that is, the flag is already stripped off
  */
 export interface FlagParser<T> {
-  (args: string[]): FlagParsing<T>;
+  (args: string[]): FlagParseAttempt<T>;
   default?: T; // mostly used for boolean flags, that must have a default value
 }
 
@@ -20,7 +20,6 @@ export interface FlagParser<T> {
  * A flag that knows how to parse itself;
  * Hint: if you're implementing, start with strings;
  */
-
 export interface Flag<T> {
   description: string;
   slugs: string[]; // command names
