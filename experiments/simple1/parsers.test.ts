@@ -1,11 +1,12 @@
 // deno-lint-ignore-file no-explicit-any
 import { it } from "@std/testing/bdd";
 import { assertEquals, assertThrows, describe } from "testlib";
-import { booleanFlag, negatedFlag } from "./parsers.ts";
+import { booleanFlag, negatedFlag, stringFlag } from "./parsers.ts";
 import type { FlagParser } from "./flags.ts";
 
 type testCase1<T> = [FlagParser<T>, T | undefined, string[], string[]];
 const testTable1: Record<string, testCase1<any>> = {
+  //===== BOOLEAN TYPE FLAGS
   "boolean flags don't need extra args": [booleanFlag, true, [], []],
   "boolean flags don't consume args": [booleanFlag, true, ["a", "b"], [
     "a",
@@ -16,6 +17,31 @@ const testTable1: Record<string, testCase1<any>> = {
     "a",
     "b",
   ]],
+  //===== SIMPLE STRING FLAGS
+  "string flags need one argument": [stringFlag, undefined, [], []],
+  "string flags consume one argument": [stringFlag, "tree", [
+    "tree",
+    "mountain",
+    "apple",
+  ], ["mountain", "apple"]],
+  "string flags can consume one final argument": [
+    stringFlag,
+    "tree",
+    ["tree"],
+    [],
+  ],
+  "string flags can consume long, quoted arguments": [
+    // whether the cli parser supports them depends on the quality of
+    // the shell-runtime interface
+    stringFlag,
+    "tree with long long branches",
+    [
+      "tree with long long branches",
+      "mountain",
+      "apple",
+    ],
+    ["mountain", "apple"],
+  ],
 };
 
 describe("test flag mini parsers", () => {
