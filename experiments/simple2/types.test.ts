@@ -14,7 +14,7 @@ export function makeFlag<T>(
     description: `your argument named ${name}`,
     parser,
     required,
-    default: undefined,
+    // default: undefined,
   };
 }
 
@@ -29,11 +29,13 @@ export const flagset1 = {
   cinco: makeFlag<number>("cinco", intFlag, true),
 };
 
-type Flagset1 = {
-  one?: string;
+type Flagset1 = typeof flagset1;
+
+type Flagset1Flags = {
+  one: string | undefined;
   dos: string;
-  three?: boolean;
-  four?: number;
+  three: boolean | undefined;
+  four: number | undefined;
   cinco: number;
 };
 
@@ -41,14 +43,19 @@ type Flagset1 = {
 assertType<IsExact<string, string>>(true);
 assertType<IsExact<string, number>>(false);
 
-// Test single flag type extractions
+/**
+ * Test single flag type extractions
+ */
 const oneValue = flagset1.one;
 type oneType = typeof oneValue;
 assertType<IsExact<FlagType<oneType>, string | undefined>>(true);
 
 // as expected, order of union types doesn't matter
 assertType<IsExact<FlagType<oneType>, undefined | string>>(true);
-// and it should interpret optional props the same way as T | undefined
+
+/**
+ * Pointing out some nuances/bugs about testing types with optional props
+ */
 type optionalT1 = {
   one?: string;
   two: string | undefined;
@@ -62,7 +69,6 @@ type optionalT3 = {
 };
 assertType<IsExact<FlagType<oneType>, optionalT1["one"]>>(true);
 assertType<IsExact<FlagType<oneType>, optionalT1["two"]>>(true);
-
 // BUT there's a possible typetest error here:
 // I'd expect the two types, then, to be Exactly the same
 assertType<IsExact<optionalT1, optionalT2>>(false);
@@ -76,3 +82,24 @@ assertType<Has<optionalT1, optionalT3>>(true);
 assertType<Has<optionalT3, optionalT1>>(false); // !!
 // and it sees optional as a superset of T | undefined
 assertType<Has<optionalT2, optionalT1>>(false); // !!
+
+/**
+ * Testing all the fields
+ */
+type aOne = Flagset1["one"];
+type bOne = T.FlagType<aOne>;
+type cOne = T.FlagAllowableType<aOne>;
+type aDos = Flagset1["dos"];
+type bDos = T.FlagType<aDos>;
+type cDos = T.FlagAllowableType<aOne>;
+assertType<Has<FlagType<T.FlagType<Flagset1["one"]>>, Flagset1Flags["one"]>>(
+  false,
+);
+
+/**
+ * Testing inference of the types for flagsets
+ */
+// assertType<IsExact<
+
+// type huh = T.FlagsetType<Flagset1>;
+assertType<IsExact<T.FlagsetType<Flagset1>, Flagset1Flags>>(false);

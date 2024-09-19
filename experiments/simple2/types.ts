@@ -28,6 +28,8 @@
  *
  * - F: the type of the parsed command line flags, what they parse to be
  * - FT: the type of the Flag (flag specification) Flag<F> = FT
+ * - FST: the type of a Flagset (multiple flags specification)
+ * - FF: "flags," the type that a flagset parses out to
  */
 
 /**
@@ -65,7 +67,7 @@ export interface FlagParser<F> {
 /**
  * The specification for parsing a flag
  */
-export interface Flag<F> {
+export interface BaseFlag<F> {
   // the long flag slug, e.g. "keep" for a flag named --keep
   name: string;
   description: string;
@@ -73,21 +75,31 @@ export interface Flag<F> {
   parser: FlagParser<F>;
   // possible default value
   default?: F;
-  // truthy if it's an error not to supply a value for this flag
-  // ignored if there's a .default
-  required?: boolean;
-  // fancy stuff
   // alternative slugs that should be prefixed with --
   aliases?: string[];
   // single character shortcuts to be prefixed with -
   shortcuts?: string;
 }
 
-// Helpers to identify Required and optional Flags
-export type Required<T extends { required?: true }> = T;
-export type Optional<T extends { required?: false | undefined }> = T;
-// this just operates on a prop value
-export type MakeOptional<V> = V | undefined; // optional props don't typetest right
+export interface RequiredFlag<F> extends BaseFlag<F> {
+  // truthy if it's an error not to supply a value for this flag
+  // ignored if there's a .default
+  required: true;
+}
+
+export interface OptionalFlag<F> extends BaseFlag<F> {
+  // truthy if it's an error not to supply a value for this flag
+  // ignored if there's a .default
+  required: false;
+}
+
+export type Flag<F> = OptionalFlag<F> | RequiredFlag<F>;
+
+// // Helpers to identify Required and optional Flags
+// export type Required<T extends { required?: true }> = T;
+// export type Optional<T extends { required?: false | undefined }> = T;
+// // this just operates on a prop value
+// export type MakeOptional<V> = V | undefined; // optional props don't typetest right
 
 /**
  * FlagType extracts the type a Flag's parser is expected to return.
@@ -98,13 +110,45 @@ export type MakeOptional<V> = V | undefined; // optional props don't typetest ri
  * 2. If that type extends Flag, grab (infer) the type of flag it is.
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
-// export type FlagType<F> = F extends Flag<infer T> ? T : never;
-export type FlagType<FT> = FT extends Flag<infer F>
-  ? (FT extends { required: true } ? F : undefined | F)
-  : never;
+export type FlagType<FT> = FT extends BaseFlag<infer F> ? F : never;
+
+// export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? F
+//   : FT extends OptionalFlag<infer F> ? F | undefined
+//   : never;
+
+export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? boolean
+  : undefined;
 
 /**
  * Flagset is specification to document and parse a whole set
  * of named flags
  */
-// export type FlagSet<
+
+/**
+ * FlagsetType extracts the interface of the complete parsed flags
+ * produced by a flagset.
+ */
+export type FlagsetType<FST> = {
+  [K in keyof FST]: FlagType<FST[K]>;
+};
+
+// export type Flagset<>
+
+// doesn't compile
+// export type FlagsetType<FST> = {
+//   [K in keyof FST]: FST[K] extends Flag<infer F> ?
+//     FST[K]["required"] ? F : (F | undefined)
+//     : never;
+// };
+
+// compiles, but not sure it does what I want
+// export type FlagsetType<FST> = {
+//   [K in keyof FST]: FST[K] extends Flag<infer F extends { requires?: true }> ? F
+//     : FST[K] extends Flag<infer F extends { requires?: false | undefined }>
+//       ? undefined | F
+//     : never;
+// };
+
+// export type FlagsType<FS> = {
+//   [K in keyof FS]: FS[K] extends Flag<infer T> ? T : never;
+// };
