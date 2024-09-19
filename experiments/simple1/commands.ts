@@ -1,4 +1,4 @@
-import { hasAdvice, hasFailed, hasSuccess } from "./failable.ts";
+import { type Failable, hasAdvice, hasFailed, hasSuccess } from "./failable.ts";
 
 /**
  * Pargs ("parsed args") represents the results of successfully parsing a full
@@ -6,7 +6,7 @@ import { hasAdvice, hasFailed, hasSuccess } from "./failable.ts";
  */
 export interface Pargs<F> {
   args: string[]; // positional args
-  dashdash?: string[]; // args after --
+  dashdash: string[]; // args after --rest
   flags: F;
 }
 

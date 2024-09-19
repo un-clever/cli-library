@@ -3,7 +3,8 @@
  * type, it can hold the resulting value, more args to parse if there are any,
  * and rich failure information if there was a problem.
  */
-export interface Failable<V> {
+// deno-lint-ignore no-explicit-any
+export interface Failable<V extends NonNullable<any>> { // TODO ensure this is a non-nullable type
   value?: V; // the resultant value or undefined if it failed to parse
   tail: string[]; // 0..N further args to parse
   failure?: Error; // the error if there was one
@@ -41,4 +42,20 @@ export function hasCompleted(result: Failable<unknown>): boolean {
  */
 export function hasSuccess(result: Failable<unknown>): boolean {
   return (!result.failure) && !!result.value;
+}
+
+const UnwrapError = new Error(
+  "check that you don't have non-failure non-parses before using unWrap",
+);
+
+/**
+ * @param result: a Fallible value that has succeeded
+ * @returns the value or throw
+ */
+export function unWrap<T>(result: Failable<T>): NonNullable<T> {
+  // display advice maybe?
+  if (result.failure) throw result.failure;
+  const v = result.value;
+  if (v !== undefined) return v as NonNullable<T>;
+  throw UnwrapError;
 }

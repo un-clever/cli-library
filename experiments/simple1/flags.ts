@@ -1,4 +1,4 @@
-import type { Failable } from "./Failable.ts";
+import type { Failable } from "./failable.ts";
 
 // The partial result for parsing a single flag
 type FlagParseAttempt<T> = Failable<T>;
@@ -63,6 +63,8 @@ export type FlagSpec<F> = {
 /**
  * A utility to infer the type of a group of parsed flags resulting from a
  * applying a flag spec to args.
+ *
+ * TODO: derive ?'s based on required or not.
  */
 export type FlagsType<FS> = {
   [K in keyof FS]: FS[K] extends Flag<infer T> ? T : never;
