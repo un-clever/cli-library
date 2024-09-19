@@ -6,9 +6,17 @@ import { type Failable, hasAdvice, hasFailed, hasSuccess } from "./failable.ts";
  */
 export interface Pargs<F> {
   args: string[]; // positional args
-  dashdash: string[]; // args after --rest
+  dashdash: string[]; // args after --
   flags: F;
 }
+
+export interface PartialPargs<F> {
+  args: string[]; // positional args
+  dashdash: string[]; // args after --
+  flags: Partial<F>;
+}
+
+export type PartialPargsResult<F> = Failable<PartialPargs<F>>;
 
 /**
  * PargsResult is the intermediate or final result of parsing a full command line.
