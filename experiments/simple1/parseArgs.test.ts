@@ -38,7 +38,7 @@ function trialParser1<F>(
   _flagspec: FlagSpec<F>,
   _args: string[],
 ): PargsResult<F> {
-  const parsing = getPartialParseStart<F>(_args);
+  const {value} = getPartialParseStart<F>(_args);
 
   // core loop
   try {
