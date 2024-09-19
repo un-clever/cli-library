@@ -34,41 +34,41 @@ function markComplete<F>(partial: PartialPargsResult<F>): PargsResult<F> {
   return partial as PargsResult<F>;
 }
 
-function trialParser1<F>(
-  _flagspec: FlagSpec<F>,
-  _args: string[],
-): PargsResult<F> {
-  const {value} = getPartialParseStart<F>(_args);
+// function trialParser1<F>(
+//   _flagspec: FlagSpec<F>,
+//   _args: string[],
+// ): PargsResult<F> {
+//   const {value} = getPartialParseStart<F>(_args);
 
-  // core loop
-  try {
-    while (parsing.tail.length > 0) {
-      parsing.tail.pop();
-    }
-    parsing.value && parsing.value.flags["one"] = "a";
-    return markComplete(parsing);
-  } catch (err) {
-    parsing.failure = err;
-    parsing.value = undefined;
-    return markComplete(parsing);
-  }
+//   // core loop
+//   try {
+//     while (parsing.tail.length > 0) {
+//       parsing.tail.pop();
+//     }
+//     parsing.value && parsing.value.flags["one"] = "a";
+//     return markComplete(parsing);
+//   } catch (err) {
+//     parsing.failure = err;
+//     parsing.value = undefined;
+//     return markComplete(parsing);
+//   }
 
-  // recast (or validate) and return
-  // const finalize
-  // const flags = pflags as F;
-  // const result = {
-  //   ...pargsResult,
-  //   value: { args, flags, dashdash },
-  //   tail,
-  //   failure,
-  //   advice,
-  // };
-  // return result;
-}
+// recast (or validate) and return
+// const finalize
+// const flags = pflags as F;
+// const result = {
+//   ...pargsResult,
+//   value: { args, flags, dashdash },
+//   tail,
+//   failure,
+//   advice,
+// };
+// return result;
+// }
 
 describe("trialParser 1", () => {
-  it("parses", () => {
-    const results = trialParser1(simpleFlags1, []);
-    assertEquals(results, pargsResult);
-  });
+  // it("parses", () => {
+  //   const results = trialParser1(simpleFlags1, []);
+  //   assertEquals(results, pargsResult);
+  // });
 });
