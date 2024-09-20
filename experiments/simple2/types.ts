@@ -83,6 +83,25 @@ export interface Flag<F> {
   shortcuts?: string;
 }
 
+/**
+ * BaseFlag gives us type from which to narrow (discriminate) some flag types
+ * For better type inference, define flags using these tighter definitions based
+ * on a type that doesn't know about .required
+ */
+export type BaseFlag<F> = Omit<Flag<F>, "required">;
+
+/**
+ * RequiredFlag asserts that the flag must be present in the command-line args
+ * It will always infer it's parsed type as F
+ */
+export type RequiredFlag<F> = BaseFlag<F> & { required: true };
+
+/**
+ * OptionalFlag assets that the flag may be absent from the command-line args.
+ * It will infer it's parsed type as F but it's allowable type as F | undefined.
+ */
+export type OptionalFlag<F> = BaseFlag<F> & { required: false };
+
 // export interface RequiredFlag<F> extends BaseFlag<F> {
 //   // truthy if it's an error not to supply a value for this flag
 //   // ignored if there's a .default
@@ -104,7 +123,7 @@ export interface Flag<F> {
 // export type MakeOptional<V> = V | undefined; // optional props don't typetest right
 
 /**
- * FlagType extracts the type a Flag's parser is expected to return.
+ * FlagParse extracts the type a Flag's parser is expected to return.
  *
  * For those new to this format, see Typescript docs on conditional types.
  * To unpack the semantics:
@@ -112,7 +131,7 @@ export interface Flag<F> {
  * 2. If that type extends Flag, grab (infer) the type of flag it is.
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
-export type FlagType<FT> = FT extends Flag<infer F> ? F : never;
+export type FlagParse<FT> = FT extends Flag<infer F> ? F : never;
 // type FlagType<FT> = FT extends Flag<infer F> ? F : never;
 
 // export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? F
@@ -129,7 +148,7 @@ export type FlagType<FT> = FT extends Flag<infer F> ? F : never;
  * produced by a flagset.
  */
 export type FlagsetType<FST> = {
-  [K in keyof FST]: FlagType<FST[K]>;
+  [K in keyof FST]: FlagParse<FST[K]>;
 };
 
 // export type Flagset<>
