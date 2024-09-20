@@ -55,6 +55,9 @@ const cinco = {
   parser: intFlag,
 };
 
+// an untyped flagset
+const flagset1 = { one, dos, three, four, cinco };
+
 /**
  * Test single flag type typings
  */
@@ -179,6 +182,33 @@ assertType<
 assertType<Has<FlagParse2Someday, FlagParse2Expected>>(false);
 assertType<Has<FlagParse2Expected, FlagParse2Someday>>(true);
 
-// here's the basic type inferencing I think should be fixed
-// whether in tests or the type lib. I'd like this to assert true
-assertType<IsExact<{ name?: string }, { name: string | undefined }>>(false);
+/**
+ * Experimenting with a better inference
+ */
+// NOPE: removes them all
+type ReqsOfA<FST> = {
+  [K in keyof FST as { required: true } extends FST[K] ? K : never]: string;
+};
+type ops2A = ReqsOfA<typeof flagset1>;
+type ReqsOfB<FST> = Exclude<FST, { required: true }>;
+
+type optsFS2 = ReqsOfB<typeof flagset2>;
+type optsFS1 = ReqsOfB<typeof flagset1>;
+
+type ReqsOfC<FST> = {
+  [K in keyof FST as FST[K] extends RequiredFlag<unknown> ? K : never]: string;
+};
+type reqsFs2C = ReqsOfC<typeof flagset2>;
+type reqsFs1C = ReqsOfC<typeof flagset1>; // doesn't work with literal excludes it all
+
+type FlagtypeC<FST> =
+  | {
+    [K in keyof FST as FST[K] extends RequiredFlag<unknown> ? K : never]:
+      string;
+  }
+  | {
+    [K in keyof FST as FST[K] extends OptionalFlag<unknown> ? K : never]?:
+      string;
+  };
+
+type flagtype2C = FlagtypeC<typeof flagset2>;
