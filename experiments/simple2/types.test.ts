@@ -92,11 +92,51 @@ assertType<IsExact<FlagType<typeof four>, string>>(false);
 assertType<IsExact<FlagType<typeof cinco>, boolean>>(false);
 
 /**
+ * But some flags aren't required, so they might be allowed to
+ * be a type or undefined.
+ */
+// type AllowedFlagType<FT extends {required: true}> = FT extends Flag<infer F> ? F : never;
+// type q1 = AllowedFlagType<typeof one>;
+// type q2 = AllowedFlagType<typeof dos>;
+
+/**
  * We can tighten those types to reflect the .required flag
  */
 describe(
   "TODO: we can tighten those types to reflect whether they're required or not",
 );
+// type OptionalFlag<FT> = FT extends Flag<unknown> ? FT : never;
+type OptionalFlag<F> = Flag<F> & { required: false };
+type RequiredFlag<F> = Flag<F> & { required: true };
+function isOptional<X>(flag: Flag<X>): flag is OptionalFlag<X> {
+  return !flag.required;
+}
+function isRequired<X>(flag: Flag<X>): flag is OptionalFlag<X> {
+  return flag.required;
+}
+
+// We can explicitly type definitions
+const oneExplicitlyOptional: OptionalFlag<string> = {
+  name: "one",
+  description: "your argument named one",
+  required: false,
+  parser: stringFlag,
+};
+describe("there are some problems with these typings");
+// ... but the type assertion isn't specific enough. We expect these to be true
+assertType<Has<OptionalFlag<string>, typeof one>>(true);
+assertType<Has<RequiredFlag<string>, typeof dos>>(true);
+// ...but these should be false (and they're not)
+assertType<Has<OptionalFlag<string>, typeof dos>>(false);
+assertType<Has<RequiredFlag<string>, typeof one>>(false);
+
+// and unexpectedly, though 'one' is an untyped literal...
+const oneRegardless: Flag<string> = one; // the general assignment works
+if (isOptional(one)) { const optionalOne: OptionalFlag<string> = one; } // but the narrowed one needs a guard
+// and this guard fails
+if (isRequired(dos)) { const requiredDos: RequiredFlag<string> = dos; } // but the narrowed one needs a guard
+// const oneOptional: OptionalFlag<string> = one; // this won't compile (as of 20 Sep 2024)
+
 // type OptionalFlag<F> = Omit<Flag<F>, "required"> & { required: false };
 //  FT["required"] ? never : OptionalFlag<FT>;
 // const _oneOptional: OptionalFlag<Flag<string>> = one;
