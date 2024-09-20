@@ -178,3 +178,7 @@ assertType<
 // commutative (nor, in this case, intuitive)
 assertType<Has<FlagParse2Someday, FlagParse2Expected>>(false);
 assertType<Has<FlagParse2Expected, FlagParse2Someday>>(true);
+
+// here's the basic type inferencing I think should be fixed
+// whether in tests or the type lib. I'd like this to assert true
+assertType<IsExact<{ name?: string }, { name: string | undefined }>>(false);
