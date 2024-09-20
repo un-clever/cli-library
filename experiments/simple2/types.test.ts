@@ -163,6 +163,54 @@ const dosRequiredB: RequiredFlagB<string> = {
 const oneGeneralizedB: Flag<string> = oneOptionalB;
 const dosGeneralizedB: Flag<string> = oneOptionalB;
 
+// let's try extracting the flag as optional
+type SmartReqTypeB<FT> = FT extends RequiredFlagB<infer F> ? F : never;
+type checkReqDosB = SmartReqTypeB<typeof dosRequiredB>;
+type checkReqOneB = SmartReqTypeB<typeof oneOptionalB>; //never
+type SmartOptTypeB<FT> = FT extends OptionalFlagB<infer F> ? F | undefined
+  : never;
+type checkOptDosB = SmartOptTypeB<typeof dosRequiredB>; // never
+type checkOptOneB = SmartOptTypeB<typeof oneOptionalB>; //never
+
+// we can or those two and get the right answer
+type checkManualCombinationOneB = checkReqOneB | checkOptOneB;
+type SmartTypeB<FT> = SmartReqTypeB<FT> | SmartOptTypeB<FT>;
+type checkSmartOneB = SmartTypeB<typeof oneOptionalB>;
+type checkSmartDosB = SmartTypeB<typeof dosRequiredB>;
+
+// just some quick riffs on this typed flagset NOT READY YET
+const flagset2 = {
+  one: oneOptionalB,
+  dos: dosRequiredB,
+};
+// this does a werid thing
+type FlagsetTypeB<FST> = {
+  [K in keyof FST]: SmartTypeB<FST[K]>;
+};
+type f2TestB = FlagsetTypeB<typeof flagset2>;
+
+// trying this...
+type FlagsetReqC<FST> = {
+  [K in keyof FST]: FST[K] extends RequiredFlagB<infer F> ? F : never;
+};
+type FlagsetOptC<FST> = {
+  [K in keyof FST]?: FST[K] extends OptionalFlagB<infer F> ? F | undefined
+    : never;
+};
+/// WOW! this actually gets there
+type FlagsetTypeC<FST> = {
+  [K in keyof FST]: FST[K] extends OptionalFlagB<infer F> ? F | undefined
+    : FST[K] extends RequiredFlagB<infer G> ? G
+    : never;
+};
+type f2ReqC = FlagsetReqC<typeof flagset2>;
+type f2OptC = FlagsetOptC<typeof flagset2>;
+type f2ManualC = f2ReqC | f2OptC;
+type f2AutoC = FlagsetTypeC<typeof flagset2>;
+// };
+
+// type Flagset2Parsed = FlagsetTypeB<typeof flagset2>;
+
 /**
  * Flagsets
  * We can do similar operations on flagsets
