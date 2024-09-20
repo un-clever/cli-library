@@ -110,7 +110,9 @@ export type Flag<F> = OptionalFlag<F> | RequiredFlag<F>;
  * 2. If that type extends Flag, grab (infer) the type of flag it is.
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
-export type FlagType<FT> = FT extends BaseFlag<infer F> ? F : never;
+export type FlagType<FT> = FT extends RequiredFlag<infer F> ? F
+  : FT extends OptionalFlag<infer F> ? F
+  : never;
 
 // export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? F
 //   : FT extends OptionalFlag<infer F> ? F | undefined
