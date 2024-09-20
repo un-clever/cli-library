@@ -102,28 +102,8 @@ export type RequiredFlag<F> = BaseFlag<F> & { required: true };
  */
 export type OptionalFlag<F> = BaseFlag<F> & { required: false };
 
-// export interface RequiredFlag<F> extends BaseFlag<F> {
-//   // truthy if it's an error not to supply a value for this flag
-//   // ignored if there's a .default
-//   required: true;
-// }
-
-// export interface OptionalFlag<F> extends BaseFlag<F> {
-//   // truthy if it's an error not to supply a value for this flag
-//   // ignored if there's a .default
-//   required: false;
-// }
-
-// export type Flag<F> = OptionalFlag<F> | RequiredFlag<F>;
-
-// // Helpers to identify Required and optional Flags
-// export type Required<T extends { required?: true }> = T;
-// export type Optional<T extends { required?: false | undefined }> = T;
-// // this just operates on a prop value
-// export type MakeOptional<V> = V | undefined; // optional props don't typetest right
-
 /**
- * FlagParsed extracts the type a Flag's parser is expected to return.
+ * FlagType extracts the type a Flag's parser is expected to return.
  *
  * For those new to this format, see Typescript docs on conditional types.
  * To unpack the semantics:
@@ -131,7 +111,7 @@ export type OptionalFlag<F> = BaseFlag<F> & { required: false };
  * 2. If that type extends Flag, grab (infer) the type of flag it is.
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
-export type FlagParsed<FT> = FT extends Flag<infer F> ? F : never;
+export type FlagType<FT> = FT extends Flag<infer F> ? F : never;
 
 /**
  * Flagset is specification to document and parse a whole set
@@ -142,6 +122,10 @@ export type FlagParsed<FT> = FT extends Flag<infer F> ? F : never;
 // export type Flagset<FF> = {
 //   [K in keyof FF]: if FF<K> can be F | undefined ? OptionalFlag<F> : RequiredFlag<F>
 // }
+
+export type FlagsetRequired<FST> = {
+  [K in keyof FST]: FST[K] extends BaseFlag<infer F> ? F : never;
+};
 
 /**
  * FlagsetType extracts the interface of the complete parsed flags
@@ -161,24 +145,3 @@ export type FlagsetParsed<FST> = {
     : FST[K] extends RequiredFlag<infer G> ? G
     : never;
 };
-
-// export type Flagset<>
-
-// doesn't compile
-// export type FlagsetType<FST> = {
-//   [K in keyof FST]: FST[K] extends Flag<infer F> ?
-//     FST[K]["required"] ? F : (F | undefined)
-//     : never;
-// };
-
-// compiles, but not sure it does what I want
-// export type FlagsetType<FST> = {
-//   [K in keyof FST]: FST[K] extends Flag<infer F extends { requires?: true }> ? F
-//     : FST[K] extends Flag<infer F extends { requires?: false | undefined }>
-//       ? undefined | F
-//     : never;
-// };
-
-// export type FlagsType<FS> = {
-//   [K in keyof FS]: FS[K] extends Flag<infer T> ? T : never;
-// };

@@ -4,8 +4,8 @@ import { assertType } from "testlib";
 import type { Has, IsExact } from "testlib";
 import type {
   Flag,
-  FlagParsed,
   FlagsetParsed,
+  FlagType,
   OptionalFlag,
   RequiredFlag,
 } from "./types.ts";
@@ -87,18 +87,18 @@ assertType<Has<Flag<string>, typeof cinco>>(false);
  * on its .parser prop, e.g. stringFlag => string
  */
 describe("we can extract the type a flag will parse into");
-assertType<IsExact<FlagParsed<typeof one>, string>>(true);
-assertType<IsExact<FlagParsed<typeof dos>, string>>(true);
-assertType<IsExact<FlagParsed<typeof three>, boolean>>(true);
-assertType<IsExact<FlagParsed<typeof four>, number>>(true);
-assertType<IsExact<FlagParsed<typeof cinco>, number>>(true);
+assertType<IsExact<FlagType<typeof one>, string>>(true);
+assertType<IsExact<FlagType<typeof dos>, string>>(true);
+assertType<IsExact<FlagType<typeof three>, boolean>>(true);
+assertType<IsExact<FlagType<typeof four>, number>>(true);
+assertType<IsExact<FlagType<typeof cinco>, number>>(true);
 // ...and they're specific enough to fail when it's wrong
-assertType<IsExact<FlagParsed<typeof one>, boolean>>(false);
-assertType<IsExact<FlagParsed<typeof dos>, number>>(false);
-assertType<IsExact<FlagParsed<typeof three>, number>>(false);
-assertType<IsExact<FlagParsed<typeof three>, string>>(false);
-assertType<IsExact<FlagParsed<typeof four>, string>>(false);
-assertType<IsExact<FlagParsed<typeof cinco>, boolean>>(false);
+assertType<IsExact<FlagType<typeof one>, boolean>>(false);
+assertType<IsExact<FlagType<typeof dos>, number>>(false);
+assertType<IsExact<FlagType<typeof three>, number>>(false);
+assertType<IsExact<FlagType<typeof three>, string>>(false);
+assertType<IsExact<FlagType<typeof four>, string>>(false);
+assertType<IsExact<FlagType<typeof cinco>, boolean>>(false);
 
 /**
  * But some flags aren't required, so they might be allowed to
@@ -158,10 +158,16 @@ type FlagParse2Expected = {
 
 assertType<IsExact<FlagParse2Inferred, FlagParse2Expected>>(true);
 
-// IWBNI the type assertions understood the equivalence of
-// optional props with string | undefined. It is, semantically,
-// distinct that the optional prop can be missing, but neither
-// never nor undefined suffice for that,
+/**
+ * Examples for future work on typedefs.
+ *
+ * I'd erase it, but it took awhile to figure this much out.
+ *
+ * IWBNI the type assertions understood the equivalence of
+ * optional props with string | undefined. It is, semantically,
+ * distinct that the optional prop can be missing, but neither
+ * never nor undefined suffice for that,
+ */
 type FlagParse2Someday = {
   one?: string;
   dos: string;
@@ -182,33 +188,26 @@ assertType<
 assertType<Has<FlagParse2Someday, FlagParse2Expected>>(false);
 assertType<Has<FlagParse2Expected, FlagParse2Someday>>(true);
 
-/**
- * Experimenting with a better inference
- */
-// NOPE: removes them all
-type ReqsOfA<FST> = {
-  [K in keyof FST as { required: true } extends FST[K] ? K : never]: string;
-};
-type ops2A = ReqsOfA<typeof flagset1>;
-type ReqsOfB<FST> = Exclude<FST, { required: true }>;
-
-type optsFS2 = ReqsOfB<typeof flagset2>;
-type optsFS1 = ReqsOfB<typeof flagset1>;
-
-type ReqsOfC<FST> = {
+// here's an experimental approach
+export type RequiredFlagsA<FST> = {
   [K in keyof FST as FST[K] extends RequiredFlag<unknown> ? K : never]: string;
 };
-type reqsFs2C = ReqsOfC<typeof flagset2>;
-type reqsFs1C = ReqsOfC<typeof flagset1>; // doesn't work with literal excludes it all
-
-type FlagtypeC<FST> =
-  | {
+export type OptionalFlagsA<FST> = {
+  [K in keyof FST as FST[K] extends OptionalFlag<unknown> ? K : never]?: string;
+};
+// This gets closer to parsing the optionals right
+export type FullParse<FST> =
+  & {
     [K in keyof FST as FST[K] extends RequiredFlag<unknown> ? K : never]:
       string;
   }
-  | {
+  & {
     [K in keyof FST as FST[K] extends OptionalFlag<unknown> ? K : never]?:
       string;
   };
 
-type flagtype2C = FlagtypeC<typeof flagset2>;
+// type ReqsA = RequiredFlagsA<typeof flagset2>;
+// type OptsA = OptionalFlagsA<typeof flagset2>;
+// type AllA = FullParse<typeof flagset2>;
+// type ReqsANDopts = ReqsA & OptsA;
+// type ReqsORopts = ReqsA | OptsA;
