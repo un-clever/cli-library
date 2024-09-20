@@ -157,7 +157,7 @@ type Flagparse1 = {
 };
 
 // DEV STUFF: move to module once working
-// Milestone 1: I can extract the fields as all optional or all required
+// Success 1: I can extract the fields as all optional or all required
 type FlagsetTypeRequired<FST> = {
   [K in keyof FST]: FST[K] extends Flag<infer F> ? F
     : never;
@@ -168,3 +168,12 @@ type FlagsetTypePartial<FST> = {
 };
 assertType<IsExact<Required<Flagparse1>, FlagsetTypeRequired<Flagset1>>>(true);
 assertType<IsExact<Partial<Flagparse1>, FlagsetTypePartial<Flagset1>>>(true);
+
+// Failure 2: can I work it forwards? Instead of extracting, try typing the flagset
+type TypedFlagsetA<FF> = {
+  [K in keyof FF]: Flag<FF[K]>;
+};
+const flageset1Typed: TypedFlagsetA<Flagparse1> = flagset1;
+// FIX <Has<TypedFlagsetA<Flagparse1>, typeof flagset1>>(true);
+
+// Attempt 3:
