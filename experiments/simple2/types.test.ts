@@ -1,33 +1,81 @@
-import * as T from "./types.ts";
-import { assertType, describe } from "testlib";
+// deno-lint-ignore-file no-unused-vars
+// import * as T from "./types.ts";
+import { assertType } from "testlib";
 import type { Has, IsExact } from "testlib";
+import type { Flag } from "./types.ts";
 import { booleanFlag, floatFlag, intFlag, stringFlag } from "./flagParsers.ts";
-import { Flag, FlagParser, FlagType } from "./types.ts";
 
-export function makeFlag<T>(
-  name: string,
-  parser: FlagParser<T>,
-  required = false,
-): Flag<T> {
-  return {
-    name,
-    description: `your argument named ${name}`,
-    parser,
-    required,
-    // default: undefined,
-  };
-}
+// Demonstrating a simple type test. They're weird looking at first.
+assertType<IsExact<string, string>>(true);
+assertType<IsExact<string, number>>(false);
 
 /**
- * A simple FlagSpec that could drive a parser
+ * start with some hard-coded flags
  */
-export const flagset1 = {
-  one: makeFlag<string>("one", stringFlag),
-  dos: makeFlag<string>("dos", stringFlag, true),
-  three: makeFlag<boolean>("three", booleanFlag),
-  four: makeFlag<number>("four", floatFlag),
-  cinco: makeFlag<number>("cinco", intFlag, true),
+
+const one = {
+  name: "one",
+  description: "your argument named one",
+  required: false,
+  parser: stringFlag,
 };
+
+const dos = {
+  name: "dos",
+  description: "your argument named dos",
+  required: true,
+  parser: stringFlag,
+};
+
+const three = {
+  name: "three",
+  description: "your argument named three",
+  required: false,
+  parser: booleanFlag,
+};
+
+const four = {
+  name: "four",
+  description: "your argument named four",
+  required: false,
+  parser: floatFlag,
+};
+
+const cinco = {
+  name: "cinco",
+  description: "your argument named cinco",
+  required: true,
+  parser: intFlag,
+};
+
+/**
+ * Test single flag type typings
+ */
+// We can strongly type the flags, here with assignments
+const oneTyped: Flag<string> = one;
+const dosTyped: Flag<string> = dos;
+const threeTyped: Flag<boolean> = three;
+const fourTyped: Flag<number> = four;
+const cincoTyped: Flag<number> = cinco;
+// same thing but with type assertions
+assertType<Has<Flag<string>, typeof one>>(true);
+assertType<Has<Flag<string>, typeof dos>>(true);
+assertType<Has<Flag<boolean>, typeof three>>(true);
+assertType<Has<Flag<number>, typeof four>>(true);
+assertType<Has<Flag<number>, typeof cinco>>(true);
+// and the typings are strict enough to exclude mistakes
+assertType<Has<Flag<number>, typeof one>>(false);
+assertType<Has<Flag<boolean>, typeof dos>>(false);
+assertType<Has<Flag<number>, typeof three>>(false);
+assertType<Has<Flag<string>, typeof three>>(false);
+assertType<Has<Flag<boolean>, typeof four>>(false);
+assertType<Has<Flag<string>, typeof cinco>>(false);
+
+/**
+ * We can do the inverse and infer the types a flag parses to
+ */
+
+export const flagset1 = { one, dos, three, four, cinco };
 
 type Flagset1 = typeof flagset1;
 
@@ -39,16 +87,18 @@ type Flagset1Flags = {
   cinco: number;
 };
 
-// Demonstrating a simple type test. They're weird looking at first.
-assertType<IsExact<string, string>>(true);
-assertType<IsExact<string, number>>(false);
+/**
+ * IN DEV (when working, move to module!)
+ */
+type FlagType<FT> = FT extends Flag<infer F> ? F : never;
 
 /**
  * Test single flag type extractions
  */
-const oneValue = flagset1.one;
-type oneType = typeof oneValue;
-assertType<IsExact<FlagType<oneType>, string | undefined>>(true);
+// const oneValue = flagset1.one;
+// type oneType = typeof oneValue;
+// type oneResultType = FlagType<
+// assertType<IsExact<FlagType<oneType>, string | undefined>>(true);
 
 // // as expected, order of union types doesn't matter
 // assertType<IsExact<FlagType<oneType>, undefined | string>>(true);

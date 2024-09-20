@@ -29,6 +29,8 @@ cog check
 [commit_types]
 begin = { changelog_title = "Work Begun", omit_from_changelog = true }
 wip = { changelog_title = "Work in Process", omit_from_changelog = true }
+red = { changelog_title = "RED: TDD WIP", omit_from_changelog = true }
+green = { changelog_title = "GREEN: TDD WIP", omit_from_changelog = true }
 
 [changelog]
 path = "CHANGELOG.md"
@@ -40,6 +42,3 @@ authors = [
 [bump_profiles]
 
 [packages]
-  
-  
-  

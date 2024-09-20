@@ -67,12 +67,14 @@ export interface FlagParser<F> {
 /**
  * The specification for parsing a flag
  */
-export interface BaseFlag<F> {
+export interface Flag<F> {
   // the long flag slug, e.g. "keep" for a flag named --keep
   name: string;
   description: string;
   // parser function
   parser: FlagParser<F>;
+  // if true, this flag must appear in the command line
+  required: boolean;
   // possible default value
   default?: F;
   // alternative slugs that should be prefixed with --
@@ -81,19 +83,19 @@ export interface BaseFlag<F> {
   shortcuts?: string;
 }
 
-export interface RequiredFlag<F> extends BaseFlag<F> {
-  // truthy if it's an error not to supply a value for this flag
-  // ignored if there's a .default
-  required: true;
-}
+// export interface RequiredFlag<F> extends BaseFlag<F> {
+//   // truthy if it's an error not to supply a value for this flag
+//   // ignored if there's a .default
+//   required: true;
+// }
 
-export interface OptionalFlag<F> extends BaseFlag<F> {
-  // truthy if it's an error not to supply a value for this flag
-  // ignored if there's a .default
-  required: false;
-}
+// export interface OptionalFlag<F> extends BaseFlag<F> {
+//   // truthy if it's an error not to supply a value for this flag
+//   // ignored if there's a .default
+//   required: false;
+// }
 
-export type Flag<F> = OptionalFlag<F> | RequiredFlag<F>;
+// export type Flag<F> = OptionalFlag<F> | RequiredFlag<F>;
 
 // // Helpers to identify Required and optional Flags
 // export type Required<T extends { required?: true }> = T;
@@ -110,16 +112,11 @@ export type Flag<F> = OptionalFlag<F> | RequiredFlag<F>;
  * 2. If that type extends Flag, grab (infer) the type of flag it is.
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
-export type FlagType<FT> = FT extends RequiredFlag<infer F> ? F
-  : FT extends OptionalFlag<infer F> ? F
-  : never;
+export type FlagType<FT> = FT extends Flag<infer F> ? F : never;
 
 // export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? F
 //   : FT extends OptionalFlag<infer F> ? F | undefined
 //   : never;
-
-export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? boolean
-  : undefined;
 
 /**
  * Flagset is specification to document and parse a whole set
