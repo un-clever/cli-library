@@ -2,6 +2,30 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.4.0 - 2024-09-20
+#### Features
+- Strongly typed a simpler parser - (d3ea842) - Brad Olson
+- add ParsingError class - (4ed8eff) - Brad Olson
+- strongly type FlagSpec and utilities... - (2d1381f) - Brad Olson
+- finish work on mini parsers - (09751e5) - Brad Olson
+#### Miscellaneous Chores
+- move deps from deps.ts to import map - (d445e98) - Brad Olson
+- move deno config to jsonc - (7488be5) - Brad Olson
+#### Style
+- rename some files - (24cf5cb) - Brad Olson
+- pretty up test table - (28cc170) - Brad Olson
+#### Tests
+- **(green)** widening types seems to work - (aed8027) - Brad Olson
+- **(red)** going to mess with optionals again - (8d2a97a) - Brad Olson
+- wrestling with typings - (980dee1) - Brad Olson
+- Testing my way through wacked type assertions - (dc77023) - Brad Olson
+- test numeric parsers - (4119970) - Brad Olson
+- tested string flag parsers - (c101919) - Brad Olson
+- test boolean flag parsers - (e66e539) - Brad Olson
+- restructure testing imports... - (af4c3cf) - Brad Olson
+
+- - -
+
 ## v0.3.3 - 2024-09-16
 #### Bug Fixes
 - more changelog maintenance - (965b5e0) - Brad Olson
