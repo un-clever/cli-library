@@ -189,14 +189,14 @@ assertType<Has<FlagParse2Someday, FlagParse2Expected>>(false);
 assertType<Has<FlagParse2Expected, FlagParse2Someday>>(true);
 
 // here's an experimental approach
-export type RequiredFlagsA<FST> = {
+type RequiredFlagsA<FST> = {
   [K in keyof FST as FST[K] extends RequiredFlag<unknown> ? K : never]: string;
 };
-export type OptionalFlagsA<FST> = {
+type OptionalFlagsA<FST> = {
   [K in keyof FST as FST[K] extends OptionalFlag<unknown> ? K : never]?: string;
 };
 // This gets closer to parsing the optionals right
-export type FullParse<FST> =
+type FullParse<FST> =
   & {
     [K in keyof FST as FST[K] extends RequiredFlag<unknown> ? K : never]:
       string;
