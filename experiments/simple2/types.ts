@@ -38,7 +38,7 @@
  */
 export interface CliArgs<F> {
   args: string[]; // positional args
-  rest: string[]; // args after --
+  dashdash: string[]; // args after --
   flags: F;
 }
 
@@ -117,6 +117,7 @@ export type FlagType<FT> = FT extends Flag<infer F> ? F : never;
  * Flagset is specification to document and parse a whole set
  * of named flags
  */
+export type Flagset = Record<string, Flag<unknown>>;
 // TODO: I haven't found a way to express this yet
 // and haven't had a need for it yet.
 // export type Flagset<FF> = {
