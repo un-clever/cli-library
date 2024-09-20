@@ -155,3 +155,16 @@ type Flagparse1 = {
   four?: number;
   cinco: number;
 };
+
+// DEV STUFF: move to module once working
+// Milestone 1: I can extract the fields as all optional or all required
+type FlagsetTypeRequired<FST> = {
+  [K in keyof FST]: FST[K] extends Flag<infer F> ? F
+    : never;
+};
+type FlagsetTypePartial<FST> = {
+  [K in keyof FST]?: FST[K] extends Flag<infer F> ? F
+    : never;
+};
+assertType<IsExact<Required<Flagparse1>, FlagsetTypeRequired<Flagset1>>>(true);
+assertType<IsExact<Partial<Flagparse1>, FlagsetTypePartial<Flagset1>>>(true);
