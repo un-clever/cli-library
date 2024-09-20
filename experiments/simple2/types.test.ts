@@ -105,18 +105,18 @@ assertType<IsExact<FlagType<typeof cinco>, boolean>>(false);
 describe(
   "SEMI-BROKEN WIP: we can tighten those types to reflect whether they're required or not",
 );
-type OptionalFlag<F> = Flag<F> & { required: false };
-type RequiredFlag<F> = Flag<F> & { required: true };
+type OptionalFlagA<F> = Omit<Flag<F>, "required"> & { required: false };
+type RequiredFlagA<F> = Omit<Flag<F>, "required"> & { required: true };
 
-function isOptional<X>(flag: Flag<X>): flag is OptionalFlag<X> {
+function isOptional<X>(flag: Flag<X>): flag is OptionalFlagA<X> {
   return !flag.required;
 }
-function isRequired<X>(flag: Flag<X>): flag is OptionalFlag<X> {
+function isRequired<X>(flag: Flag<X>): flag is OptionalFlagA<X> {
   return flag.required;
 }
 
 // We can explicitly type definitions
-const oneExplicitlyOptional: OptionalFlag<string> = {
+const oneExplicitlyOptional: OptionalFlagA<string> = {
   name: "one",
   description: "your argument named one",
   required: false,
@@ -124,18 +124,44 @@ const oneExplicitlyOptional: OptionalFlag<string> = {
 };
 describe("there are some problems with these typings");
 // ... but the type assertion isn't specific enough. We expect these to be true
-assertType<Has<OptionalFlag<string>, typeof one>>(true);
-assertType<Has<RequiredFlag<string>, typeof dos>>(true);
+assertType<Has<OptionalFlagA<string>, typeof one>>(true);
+assertType<Has<RequiredFlagA<string>, typeof dos>>(true);
 // ...but these should be false (and they're not)
-// FIX: assertType<Has<OptionalFlag<string>, typeof dos>>(false);
-// FIX: assertType<Has<RequiredFlag<string>, typeof one>>(false);
+// FIX: assertType<Has<OptionalFlagA<string>, typeof dos>>(false);
+// FIX: assertType<Has<RequiredFlagA<string>, typeof one>>(false);
 
 // and unexpectedly, though 'one' is an untyped literal...
 const oneRegardless: Flag<string> = one; // the general assignment works
-if (isOptional(one)) { const optionalOne: OptionalFlag<string> = one; } // but the narrowed one needs a guard
+if (isOptional(one)) { const optionalOne: OptionalFlagA<string> = one; } // but the narrowed one needs a guard
 // and this guard fails
 // FIX: if (isRequired(dos)) { const requiredDos: RequiredFlag<string> = dos; } // but the narrowed one needs a guard
 // const oneOptional: OptionalFlag<string> = one; // this won't compile (as of 20 Sep 2024)
+
+// let's try piecing out the definition
+type FlagBaseB<F> = Omit<Flag<F>, "required">;
+type OptionalFlagB<F> = FlagBaseB<F> & { required: false };
+type RequiredFlagB<F> = FlagBaseB<F> & { required: true };
+assertType<Has<OptionalFlagB<string>, typeof one>>(true);
+assertType<Has<RequiredFlagB<string>, typeof dos>>(true);
+// ...but these should be false (and they're not)
+//assertType<Has<OptionalFlagB<string>, typeof dos>>(false);
+//assertType<Has<RequiredFlagB<string>, typeof one>>(false);
+const oneOptionalB: OptionalFlagB<string> = {
+  name: "one",
+  description: "your argument named one",
+  required: false,
+  parser: stringFlag,
+};
+
+const dosRequiredB: RequiredFlagB<string> = {
+  name: "dos",
+  description: "your argument named dos",
+  required: true,
+  parser: stringFlag,
+};
+// and we can widen at will
+const oneGeneralizedB: Flag<string> = oneOptionalB;
+const dosGeneralizedB: Flag<string> = oneOptionalB;
 
 /**
  * Flagsets
