@@ -123,7 +123,7 @@ export type OptionalFlag<F> = BaseFlag<F> & { required: false };
 // export type MakeOptional<V> = V | undefined; // optional props don't typetest right
 
 /**
- * FlagParse extracts the type a Flag's parser is expected to return.
+ * FlagParsed extracts the type a Flag's parser is expected to return.
  *
  * For those new to this format, see Typescript docs on conditional types.
  * To unpack the semantics:
@@ -131,24 +131,35 @@ export type OptionalFlag<F> = BaseFlag<F> & { required: false };
  * 2. If that type extends Flag, grab (infer) the type of flag it is.
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
-export type FlagParse<FT> = FT extends Flag<infer F> ? F : never;
-// type FlagType<FT> = FT extends Flag<infer F> ? F : never;
-
-// export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? F
-//   : FT extends OptionalFlag<infer F> ? F | undefined
-//   : never;
+export type FlagParsed<FT> = FT extends Flag<infer F> ? F : never;
 
 /**
  * Flagset is specification to document and parse a whole set
  * of named flags
  */
+// TODO: I haven't found a way to express this yet
+// and haven't had a need for it yet.
+// export type Flagset<FF> = {
+//   [K in keyof FF]: if FF<K> can be F | undefined ? OptionalFlag<F> : RequiredFlag<F>
+// }
 
 /**
  * FlagsetType extracts the interface of the complete parsed flags
  * produced by a flagset.
+ *
+ * BUG: note that this will produce inferred types with
+ *      prop: F | undefined
+ * ...which the TypeScript type engine can treat subtly different from
+ *      prop?: F
+ *
+ * See the tests file for a little more investigation into this.
+ *
+ * MEANWHILE: you can use this to infer which props might be undefined
  */
-export type FlagsetType<FST> = {
-  [K in keyof FST]: FlagParse<FST[K]>;
+export type FlagsetParsed<FST> = {
+  [K in keyof FST]: FST[K] extends OptionalFlag<infer F> ? F | undefined
+    : FST[K] extends RequiredFlag<infer G> ? G
+    : never;
 };
 
 // export type Flagset<>
