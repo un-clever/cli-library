@@ -113,6 +113,7 @@ export interface Flag<F> {
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
 export type FlagType<FT> = FT extends Flag<infer F> ? F : never;
+// type FlagType<FT> = FT extends Flag<infer F> ? F : never;
 
 // export type FlagAllowableType<FT> = FT extends RequiredFlag<infer F> ? F
 //   : FT extends OptionalFlag<infer F> ? F | undefined
