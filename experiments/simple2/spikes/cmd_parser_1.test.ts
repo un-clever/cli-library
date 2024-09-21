@@ -30,11 +30,27 @@ const flagsetJPcases = [
 ];
 
 function parse(flagset: any, rawargs: string[]): CliArgs<{ one?: string }> {
-  return {
-    flags: {},
-    args: rawargs,
-    dashdash: [],
-  };
+  // initialie
+  let tail = rawargs.slice(0);
+  const flags = {};
+  const args: string[] = [];
+  let dashdash: string[] = [];
+
+  // main parse loop
+  while (tail.length > 0) {
+    // console.debug(tail, tail.length, args, args.length);
+    const arg1 = tail.shift() as string;
+    // console.debug(tail, arg1, args);
+    if (arg1 === "---") {
+      dashdash = tail;
+      tail = [];
+    } else if (arg1.startsWith("-")) args.push("flag");
+    else args.push(arg1);
+    // console.debug(tail, tail.length, args, args.length);
+  }
+
+  // clean and return
+  return { flags, args, dashdash };
 }
 
 describe("command line parsings", () => {
