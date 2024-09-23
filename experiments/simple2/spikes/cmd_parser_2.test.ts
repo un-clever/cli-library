@@ -19,8 +19,13 @@ import type * as v1 from "../types.ts";
 type Flag<V> = v1.Flag<V>;
 type FlagType<F> = v1.FlagType<F>;
 
-// Flagsets parse to a structured Result which can also be extracted (ignoring requireds for now)
-type Flagset<R> = {
+// Flagsets parse to a structured Result when all props are required
+type FlagsetRequired<R> = {
+  [k in keyof R]: Flag<R[k]>;
+};
+// Flagsets parse to a structured Result when all Result props are required
+// tricky because Flag is not optional, but it's .required if false
+type FlagsetOptional<R> = {
   [k in keyof R]: Flag<R[k]>;
 };
 
@@ -70,7 +75,7 @@ describe("command line parsings with a new take on typing", () => {
 
   it("Flagset types round trip when everything is required", () => {
     assertType<
-      IsExact<Flagset<Required<flagresult>>, Required<typeof flagset>>
+      IsExact<FlagsetRequired<Required<flagresult>>, Required<typeof flagset>>
     >(true);
   });
   it("Flagset types round trip when everything is optional", () => {
