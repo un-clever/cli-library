@@ -52,7 +52,13 @@ function getFlagset() {
     parser: stringFlag,
     required: false,
   };
-  return { assist, believe };
+  const care: Flag<string> = {
+    name: "believe",
+    description: "a required string flag",
+    parser: stringFlag,
+    required: true,
+  };
+  return { assist, believe, care };
 }
 
 /**
@@ -66,6 +72,7 @@ describe("command line parsings with a new take on typing", () => {
   interface flagresult {
     assist?: boolean;
     believe?: string;
+    care: string;
   }
 
   it("Flag types round trip (declare and extract)", () => {
@@ -96,7 +103,7 @@ describe("command line parsings with a new take on typing", () => {
       IsExact<FlagsetOptional<flagresult>, typeof flagset>
     >(true);
     assertType<
-      IsExact<FlagsetReturnOptional<typeof flagset>, flagresult>
+      IsExact<FlagsetReturnOptional<typeof flagset>, Partial<flagresult>>
     >(
       true,
     );
