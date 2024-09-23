@@ -3,6 +3,9 @@
  * An experiment in trying to get a simple parser to work
  * starting just with positional args, then trying to add
  * typed flag parsing
+ *
+ * RESULTS: I was able to get the simple parser working, but had to
+ * hard code parts of the flag parser to get types working.
  */
 import { assertEquals, describe, it } from "testlib";
 import {
