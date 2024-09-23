@@ -50,9 +50,19 @@ type Flagset<R> = {
 // CONCLUSION: playing with this, I see that the discriminant (in this
 // case, .required), has to be part of the type. So I'd need a OptionalFlag
 // and RequiredFlag as I did in simple2 for inference to work out right.
-type FlagsetReturn<FS> = {
-  [k in keyof FS]: FS extends Flagset<infer R> ? R
-    : number;
+type Optionalize<
+  Required extends boolean | void,
+  T,
+> = Required extends true ? T : T | undefined;
+
+type OptKeys<FS extends Flagset<unknown>> = keyof FS;
+
+type StrongFlag<F> = F extends v1.RequiredFlag<infer V> ? v1.RequiredFlag<V>
+  : v1.OptionalFlag<FlagType<F>>;
+
+type FlagsetReturn<FS extends Flagset<unknown>> = {
+  // [k in keyof FS as Exclude<k, "care">]: FlagType<FS[k]>;
+  [k in keyof FS]: FS[k] extends v1.RequiredFlag<infer V> ? V : never;
 };
 
 /**
@@ -133,6 +143,9 @@ describe("command line parsings with a new take on typing", () => {
     >(true);
 
     type chk = FlagsetReturn<typeof flagset>;
+    type chk2 = OptKeys<typeof flagset>;
+    type fchk = StrongFlag<typeof assist>;
+
     // see CONCLUSION, I want this true, but it can't be dynamically
     assertType<
       IsExact<FlagsetReturn<typeof flagset>, flagresult>
