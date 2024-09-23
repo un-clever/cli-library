@@ -69,6 +69,6 @@ describe("command line parsings with a new take on typing", () => {
   });
 
   it("Flagset types round trip when everything is optional", () => {
-    // assertType<IsExact<Flagset<flagresult>, typeof flagset>>(true);
+    assertType<IsExact<Flagset<flagresult>, typeof flagset>>(true);
   });
 });
