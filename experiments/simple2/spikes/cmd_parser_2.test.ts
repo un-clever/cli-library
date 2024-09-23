@@ -74,6 +74,6 @@ describe("command line parsings with a new take on typing", () => {
     >(true);
   });
   it("Flagset types round trip when everything is optional", () => {
-    // assertEquals("todo", "");
+    assertEquals("todo", "");
   });
 });
