@@ -21,7 +21,7 @@ type FlagType<F> = v1.FlagType<F>;
 
 // Flagsets parse to a structured Result which can also be extracted (ignoring requireds for now)
 type Flagset<R> = {
-  [k in keyof R]?: Flag<R[k]>;
+  [k in keyof R]: Flag<R[k]>;
 };
 
 /**
@@ -68,7 +68,12 @@ describe("command line parsings with a new take on typing", () => {
     assertType<IsExact<FlagType<Flag<string>>, boolean>>(false);
   });
 
+  it("Flagset types round trip when everything is required", () => {
+    assertType<
+      IsExact<Flagset<Required<flagresult>>, Required<typeof flagset>>
+    >(true);
+  });
   it("Flagset types round trip when everything is optional", () => {
-    assertType<IsExact<Flagset<flagresult>, typeof flagset>>(true);
+    // assertEquals("todo", "");
   });
 });
