@@ -2,7 +2,7 @@
 /**
  * An experiment in trying to apply some type learnings from m-dressler and others.
  */
-import { assertEquals, describe, it } from "testlib";
+import { assertEquals, assertType, describe, IsExact, it } from "testlib";
 import { booleanFlag, stringFlag } from "../flagParsers.ts";
 import type * as v1 from "../types.ts";
 
@@ -27,27 +27,48 @@ type Flagset<R> = {
 /**
  * A flagset with simple flags args
  */
-const assist: Flag<boolean> = {
-  name: "assist",
-  description: "an optional boolean flag",
-  parser: booleanFlag,
-  required: false, // ignored for boolean
-};
-const believe: Flag<string> = {
-  name: "believe",
-  description: "an optional string flag",
-  parser: stringFlag,
-  required: false,
-};
-const flagset = { assist, believe };
-
-interface flagresult {
-  assist?: boolean;
-  believe?: string;
+function getFlagset() {
+  const assist: Flag<boolean> = {
+    name: "assist",
+    description: "an optional boolean flag",
+    parser: booleanFlag,
+    required: false, // ignored for boolean
+  };
+  const believe: Flag<string> = {
+    name: "believe",
+    description: "an optional string flag",
+    parser: stringFlag,
+    required: false,
+  };
+  return { assist, believe };
 }
 
 /**
  * Start of Tests
  */
 describe("command line parsings with a new take on typing", () => {
+  const flagset = getFlagset();
+  const { assist, believe } = flagset;
+
+  // expected type the flagset will produce
+  interface flagresult {
+    assist?: boolean;
+    believe?: string;
+  }
+
+  it("Flag types round trip (declare and extract)", () => {
+    // check explicit flags we've declared
+    assertType<IsExact<FlagType<typeof assist>, boolean>>(true);
+    assertType<IsExact<FlagType<typeof believe>, string>>(true);
+    // check more complex round tripping
+    assertType<IsExact<FlagType<Flag<boolean>>, boolean>>(true);
+    assertType<IsExact<FlagType<Flag<string>>, string>>(true);
+    // check that the typings are are not too loose
+    assertType<IsExact<FlagType<Flag<boolean>>, string>>(false);
+    assertType<IsExact<FlagType<Flag<string>>, boolean>>(false);
+  });
+
+  it("Flagset types round trip when everything is optional", () => {
+    // assertType<IsExact<Flagset<flagresult>, typeof flagset>>(true);
+  });
 });
