@@ -1,8 +1,14 @@
 // deno-lint-ignore-file no-unused-vars no-explicit-any
 /**
  * An experiment in trying to apply some type learnings from m-dressler and others.
+ *
+ * CONCLUSION: playing with this, I see that the discriminant (in this
+ * case, .required), has to be part of the type. So I'd need a OptionalFlag
+ * and RequiredFlag as I did in simple2 for inference to work out right.
+ *
+ * See FlagSetReturn<FS> test (set to false to pass, but should be true)
  */
-import { assertEquals, assertType, describe, IsExact, it } from "testlib";
+import { assertType, describe, type IsExact, it } from "testlib";
 import { booleanFlag, stringFlag } from "../flagParsers.ts";
 import type * as v1 from "../types.ts";
 
@@ -34,6 +40,19 @@ type FlagsetOptional<R> = {
 };
 type FlagsetReturnOptional<FS> = {
   [k in keyof FS]?: FlagType<FS[k]>;
+};
+
+// Now trying it with both optionaal and required
+// First part is the same a FlagsetOptional, we're ignoring the required field
+type Flagset<R> = {
+  [k in keyof R]-?: Flag<NonNullable<R[k]>>;
+};
+// CONCLUSION: playing with this, I see that the discriminant (in this
+// case, .required), has to be part of the type. So I'd need a OptionalFlag
+// and RequiredFlag as I did in simple2 for inference to work out right.
+type FlagsetReturn<FS> = {
+  [k in keyof FS]: FS extends Flagset<infer R> ? R
+    : number;
 };
 
 /**
@@ -106,6 +125,19 @@ describe("command line parsings with a new take on typing", () => {
       IsExact<FlagsetReturnOptional<typeof flagset>, Partial<flagresult>>
     >(
       true,
+    );
+  });
+  it("Flagset types round trip with mixed optional and required", () => {
+    assertType<
+      IsExact<Flagset<flagresult>, typeof flagset>
+    >(true);
+
+    type chk = FlagsetReturn<typeof flagset>;
+    // see CONCLUSION, I want this true, but it can't be dynamically
+    assertType<
+      IsExact<FlagsetReturn<typeof flagset>, flagresult>
+    >(
+      false,
     );
   });
 });
