@@ -65,6 +65,11 @@ type FlagsetReturn<FS extends Flagset<unknown>> = {
   [k in keyof FS]: FS[k] extends v1.RequiredFlag<infer V> ? V : never;
 };
 
+type FlagReturn<F extends Flag<unknown>> = Optionalize<
+  F["required"],
+  FlagType<F>
+>;
+
 /**
  * A flagset with simple flags args
  */
@@ -75,12 +80,14 @@ function getFlagset() {
     parser: booleanFlag,
     required: false, // ignored for boolean
   };
+
   const believe: Flag<string> = {
     name: "believe",
     description: "an optional string flag",
     parser: stringFlag,
     required: false,
   };
+
   const care: Flag<string> = {
     name: "believe",
     description: "a required string flag",
@@ -95,7 +102,7 @@ function getFlagset() {
  */
 describe("command line parsings with a new take on typing", () => {
   const flagset = getFlagset();
-  const { assist, believe } = flagset;
+  const { assist, believe, care } = flagset;
 
   // expected type the flagset will produce
   interface flagresult {
@@ -144,7 +151,10 @@ describe("command line parsings with a new take on typing", () => {
 
     type chk = FlagsetReturn<typeof flagset>;
     type chk2 = OptKeys<typeof flagset>;
-    type fchk = StrongFlag<typeof assist>;
+    type fchk = FlagReturn<typeof assist>;
+    type fchk2 = FlagReturn<typeof care>;
+    // this demonstrates the problem
+    // const f1: v1.OptionalFlag<string> = believe;
 
     // see CONCLUSION, I want this true, but it can't be dynamically
     assertType<
