@@ -26,7 +26,7 @@ type FlagsetRequired<R> = {
 // Flagsets parse to a structured Result when all Result props are required
 // tricky because Flag is not optional, but it's .required if false
 type FlagsetOptional<R> = {
-  [k in keyof R]: Flag<R[k]>;
+  [k in keyof R]-?: Flag<NonNullable<R[k]>>;
 };
 
 /**
@@ -74,11 +74,14 @@ describe("command line parsings with a new take on typing", () => {
   });
 
   it("Flagset types round trip when everything is required", () => {
+    type resultWithNoOptionals = Required<flagresult>;
     assertType<
-      IsExact<FlagsetRequired<Required<flagresult>>, Required<typeof flagset>>
+      IsExact<FlagsetRequired<resultWithNoOptionals>, typeof flagset>
     >(true);
   });
   it("Flagset types round trip when everything is optional", () => {
-    assertEquals("todo", "");
+    assertType<
+      IsExact<FlagsetOptional<flagresult>, typeof flagset>
+    >(true);
   });
 });
