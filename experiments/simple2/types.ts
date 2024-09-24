@@ -26,21 +26,11 @@
  *
  * I try to use these generic type abbreviations to mean:
  *
- * - F: the type of the parsed command line flags, what they parse to be
- * - FT: the type of the Flag (flag specification) Flag<F> = FT
- * - FST: the type of a Flagset (multiple flags specification)
- * - FF: "flags," the type that a flagset parses out to
+ * - V: the type of the parsed command line flags, what they parse to be
+ * - F: the type of the Flag (flag specification) Flag<F> = FT
+ * - FF: the type of a Flagset (multiple flags specification)
+ * - VV: "flags," the type that a flagset parses out to
  */
-
-/**
- * ParsedArgs represents the results of successfully parsing a full
- * set of command-line arguments
- */
-export interface CliArgs<F> {
-  args: string[]; // positional args
-  dashdash: string[]; // args after --
-  flags: F;
-}
 
 /**
  * FlagParsers take a list of strings and attempt to parse a flag off the front
@@ -59,24 +49,22 @@ export interface CliArgs<F> {
  *    decide how to handle it.
  * 4. throw an Error if there's a reason to stop all parsing (other than #3)
  */
-export interface FlagParser<F> {
-  (args: string[]): { tail: string[]; value?: F };
-  default?: F; // mostly used for boolean flags, that must have a default value
+export interface FlagParser<V> {
+  (args: string[]): { tail: string[]; value?: V };
+  default?: V; // mostly used for boolean flags, that must have a default value
 }
 
 /**
  * The specification for parsing a flag
  */
-export interface Flag<F> {
+export interface BaseFlag<V> {
   // the long flag slug, e.g. "keep" for a flag named --keep
   name: string;
   description: string;
   // parser function
-  parser: FlagParser<F>;
-  // if true, this flag must appear in the command line
-  required: boolean;
+  parser: FlagParser<V>;
   // possible default value
-  default?: F;
+  default?: V;
   // alternative slugs that should be prefixed with --
   aliases?: string[];
   // single character shortcuts to be prefixed with -
@@ -84,23 +72,18 @@ export interface Flag<F> {
 }
 
 /**
- * BaseFlag gives us type from which to narrow (discriminate) some flag types
- * For better type inference, define flags using these tighter definitions based
- * on a type that doesn't know about .required
- */
-export type BaseFlag<F> = Omit<Flag<F>, "required">;
-
-/**
  * RequiredFlag asserts that the flag must be present in the command-line args
  * It will always infer it's parsed type as F
  */
-export type RequiredFlag<F> = BaseFlag<F> & { required: true };
+export type RequiredFlag<V> = BaseFlag<V> & { required: true };
 
 /**
  * OptionalFlag assets that the flag may be absent from the command-line args.
  * It will infer it's parsed type as F but it's allowable type as F | undefined.
  */
 export type OptionalFlag<F> = BaseFlag<F> & { required: false };
+
+export type Flag<V> = RequiredFlag<V> | OptionalFlag<V>;
 
 /**
  * FlagType extracts the type a Flag's parser is expected to return.
@@ -111,38 +94,79 @@ export type OptionalFlag<F> = BaseFlag<F> & { required: false };
  * 2. If that type extends Flag, grab (infer) the type of flag it is.
  * 3. And if it doesn't extend Flag it's an error (should never happen)
  */
-export type FlagType<FT> = FT extends Flag<infer F> ? F : never;
+export type FlagType<F> = F extends Flag<infer V> ? V : never;
+
+/**
+ * FlagReturn takes into account that an optional flag might not appear
+ * in the final flag results.
+ */
+export type FlagReturn<F> = F extends RequiredFlag<infer V> ? V
+  : F extends OptionalFlag<infer V> ? V | undefined
+  : never;
 
 /**
  * Flagset is specification to document and parse a whole set
  * of named flags
  */
-export type Flagset = Record<string, Flag<unknown>>;
+export type Flagset<VV> = {
+  // "{} extends Pick<VV, K>" is an okay test for an optional props
+  // creds to https://blog.beraliv.dev/2021-12-07-get-optional
+  // deno-lint-ignore ban-types
+  [K in keyof VV]-?: {} extends Pick<VV, K> ? OptionalFlag<Required<VV>[K]>
+    : RequiredFlag<VV[K]>;
+};
+
+// export type Flagset = Record<string, Flag<unknown>>;
 // TODO: I haven't found a way to express this yet
 // and haven't had a need for it yet.
 // export type Flagset<FF> = {
 //   [K in keyof FF]: if FF<K> can be F | undefined ? OptionalFlag<F> : RequiredFlag<F>
 // }
 
-export type FlagsetRequired<FST> = {
-  [K in keyof FST]: FST[K] extends BaseFlag<infer F> ? F : never;
+// export type FlagsetRequired<FST> = {
+//   [K in keyof FST]: FST[K] extends BaseFlag<infer F> ? F : never;
+// };
+
+/**
+ * FlagsetReturn extracts the interface of the complete parsed flags produced by
+ * a flagset, treating OptionalFlag's as optional props.
+ *
+ * LATER: This type could be done more easily like this...
+ *
+ * type EasyFlagsetReturn<FF> = { [K in keyof FF]: FlagReturn<FF[K]> };
+ *
+ * ...which would probably be faster as well as simpler, but doesn't exactly
+ * match optional types because a prop that can be absent isn't the same as a
+ * prop that must be T | Undefined
+ */
+export type FlagsetReturn<FF> =
+  & FlagsetOptionalProps<FF>
+  & FlagsetRequiredProps<FF>;
+
+// a couple helper types for FlagsetReturn
+type FlagsetOptionalProps<FF> = {
+  // uses "as" to remap/exclude keys that don't match a particular pattern
+  // so we can add the "?:" optional token to the definition. There might
+  // (someday) be a better way to do this conditionally and avoid the later
+  // union type, but for now, it passes the tests.
+  [K in keyof FF as FF[K] extends OptionalFlag<unknown> ? K : never]?:
+    FF[K] extends OptionalFlag<infer V> ? V : never;
+};
+type FlagsetRequiredProps<FF> = {
+  // uses "as" to remap/exclude keys that don't match a particular pattern
+  [K in keyof FF as FF[K] extends RequiredFlag<unknown> ? K : never]:
+    FF[K] extends RequiredFlag<infer V> ? V : never;
 };
 
 /**
- * FlagsetType extracts the interface of the complete parsed flags
- * produced by a flagset.
+ * CliArgs represents the results of successfully parsing a full
+ * set of command-line arguments
  *
- * BUG: note that this will produce inferred types with
- *      prop: F | undefined
- * ...which the TypeScript type engine can treat subtly different from
- *      prop?: F
- *
- * See the tests file for a little more investigation into this.
- *
- * MEANWHILE: you can use this to infer which props might be undefined
+ * Some parsers may choose to handle -- differently, ignoring or failing,
+ * but this structure makes space for those args to be returned.
  */
-export type FlagsetParsed<FST> = {
-  [K in keyof FST]: FST[K] extends OptionalFlag<infer F> ? F | undefined
-    : FST[K] extends RequiredFlag<infer G> ? G
-    : never;
-};
+export interface CliArgs<VV> {
+  args: string[]; // positional args
+  dashdash: string[]; // args after --, useful mostly for commands that call another command
+  flags: VV;
+}
