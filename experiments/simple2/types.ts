@@ -33,19 +33,20 @@
  */
 
 /**
- * A parse function takes a list of strings and attempts to parse a flag off the
- * front of that list. They can presum that the flag (e.g. --flag1) has already
- * been removed from the args list.
+ * A parse function takes a list of strings and the index of the element to
+ * begin parsing at and attempts to parse a flag off the front of that list.
+ * They can presum that the flag (e.g. --flag1) has already been removed from
+ * the args list.
  *
  * If successful it returns [parsedValue: V, numberOfArgsConsumed: number].
  *
  * If unsuccessful, it returns [undefined, 0] and lets the higher-level parsing
  * loop decide what to do.
  */
-export type ParseFunction<V> = (args: string[]) => [
-  V | undefined, // the resultant value if success, otherwise undefined
-  number, // the number of args consumed;
-];
+export type ParseFunction<V> = (i: number, args: string[]) => {
+  n: number; // the number of args consumed;
+  value?: V; // the resultant value if success, otherwise undefined
+};
 
 /**
  * FlagParser is a ParseFunction (see above) and other metadata necessary to
@@ -60,7 +61,7 @@ export type ParseFunction<V> = (args: string[]) => [
 export interface FlagParser<V> {
   parse: ParseFunction<V>;
   default?: V;
-  preexecute?: (flagname: string, value: V) => Promise<void>;
+  // preexecute?: (flagname: string, value: V) => Promise<void>;
 }
 
 /**

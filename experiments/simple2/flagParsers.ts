@@ -1,6 +1,6 @@
 import type { FlagParser } from "./types.ts";
 
-const FailedParse = [undefined, 0];
+const FailedParse = { n: 0 };
 
 /**
  * A normal boolean flag, false by default, true if it's present: e.g. --wrap.
@@ -9,9 +9,9 @@ const FailedParse = [undefined, 0];
  * falseFlag() below.
  */
 export const booleanFlag: FlagParser<boolean> = {
-  parse(_: string[]) {
+  parse(_i: number, _: string[]) {
     // If we get here, the flag is present and already stripped off, so return true
-    return [true, 0];
+    return { n: 0, value: true };
   },
   default: false, // if it's not there, the flag is false
 };
@@ -26,8 +26,8 @@ export const booleanFlag: FlagParser<boolean> = {
  * rephrase it if you can. But, here's a helpful type if you want it.
  */
 export const negatedFlag: FlagParser<boolean> = {
-  parse(_: string[]) {
-    return [false, 0]; // negated flags are true by default, false if present
+  parse(_i: number, _: string[]) {
+    return { n: 0, value: false }; // negated flags are true by default, false if present
   },
   default: true,
 };
@@ -36,9 +36,11 @@ export const negatedFlag: FlagParser<boolean> = {
  * Parse a string flag
  */
 export const stringFlag: FlagParser<string> = {
-  parse(args: string[]) {
-    if (args.length < 1) return FailedParse;
-    return [args[0], 1];
+  parse(i: number, args: string[]) {
+    const n = 1;
+    const value = args[i];
+    if (value) return { n, value };
+    return FailedParse;
   },
 };
 
@@ -46,10 +48,11 @@ export const stringFlag: FlagParser<string> = {
  * Parse a decimal floating point number into a JavaScript number
  */
 export const floatFlag: FlagParser<number> = {
-  parse(args: string[]) {
-    const value = parseFloat(args[0]);
+  parse(i: number, args: string[]) {
+    const n = 1;
+    const value = parseFloat(args[i]);
     if (isNaN(value)) return FailedParse;
-    return [value, 1];
+    return { n, value };
   },
 };
 
@@ -57,10 +60,11 @@ export const floatFlag: FlagParser<number> = {
  * Parse a decimal integer into a JavaScript number
  */
 export const intFlag: FlagParser<number> = {
-  parse(args: string[]) {
-    const value = parseInt(args[0]);
+  parse(i: number, args: string[]) {
+    const n = 1;
+    const value = parseInt(args[i]);
     if (isNaN(value)) return FailedParse;
-    return [value, 1];
+    return { n, value };
   },
 };
 
@@ -94,15 +98,19 @@ export const intFlag: FlagParser<number> = {
  * @param args a string version of a date, preferably YYYY-MM-DD numeric
  * @returns a UTC timestamp with zeroed timefields
  */
-export const dateFlag: FlagParser<Date> = {
-  parse(args: string[]) {
-    const test = new Date(args[0]);
+// LATER: add this in a separate module as an test of extensibility
+// there are some tests that might help in the accompanying test module
+// currently commented out though
+const _dateFlag: FlagParser<Date> = {
+  parse(i: number, args: string[]) {
+    const n = 1;
+    const test = new Date(args[i]);
     if (test + "" === "Invalid Date") return FailedParse;
     const value = new Date(
       test.getUTCFullYear(),
       test.getUTCMonth(),
       test.getUTCDate(),
     );
-    return [value, 1];
+    return { n, value };
   },
 };

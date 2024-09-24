@@ -2,7 +2,6 @@
 import { assertEquals, describe, it } from "testlib";
 import {
   booleanFlag,
-  dateFlag,
   floatFlag,
   intFlag,
   negatedFlag,
@@ -50,16 +49,17 @@ const testTable1: Record<string, testCase1<any>> = {
   "intFlag grabs first integer off dates": [intFlag, 2020, ["2020-02-02"], []],
   "intFlag grabs first number off malformed numbers": [intFlag, 25.0, ["25or6to4"], []],
 
+  // LATER: move to separate module
   //===== DATE TYPES  (these aren't fancy, no time extra time-parsing lib, just whatever new Date will accept.
-  "dateFlag needs one argument": [dateFlag, undefined, [], []],
-  "dateFlag consumes one argument": [dateFlag, new Date(2020,1,2), ["2020-02-02", "fred", "4"], ["fred", "4"]],
+  // "dateFlag needs one argument": [dateFlag, undefined, [], []],
+  // "dateFlag consumes one argument": [dateFlag, new Date(2020,1,2), ["2020-02-02", "fred", "4"], ["fred", "4"]],
   // "dateFlag needs only one argument": [dateFlag, new Date(1001,1,2), ["1001-02-02"], []],
   // but beware, some runtimes add fuzz to the time
   // "dateFlag turns numbers into ambiguous dates": [dateFlag, new Date("1650"), ["1650"], []],
   // "dateFlag turns floats really ambiguous dates": [dateFlag, new Date("1650.5"), ["1650.5"], []],
   // "dateFlag parses negative numbers": [dateFlag, -1001, ["-1001"], []],
-  "dateFlag won't parse words": [dateFlag, undefined, ["zippy"], ["zippy"]],
-  "dateFlag won't parse empty strings": [dateFlag, undefined, [""], [""]],
+  // "dateFlag won't parse words": [dateFlag, undefined, ["zippy"], ["zippy"]],
+  // "dateFlag won't parse empty strings": [dateFlag, undefined, [""], [""]],
   // "dateFlag grabs first integer off dates": [dateFlag, 2020, ["2020-02-02"], []],
   // "dateFlag grabs first number off malformed numbers": [dateFlag, 25.0, ["25or6to4"], []],
 
@@ -70,9 +70,13 @@ describe("test flag mini parsers", () => {
   for (const desc in testTable1) {
     const [parser, value, argsin, tail] = testTable1[desc];
     it(desc, () => {
-      const result = parser(argsin);
+      const result = parser.parse(0, argsin);
       assertEquals(result.value, value, "parsed values should match");
-      assertEquals(result.tail, tail, "parsed tail should match expected");
+      assertEquals(
+        argsin.slice(result.n),
+        tail,
+        "parsed tail should match expected",
+      );
     });
   }
 });

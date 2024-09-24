@@ -9,7 +9,6 @@
 import { assertType, describe, Has, type IsExact, it } from "testlib";
 import { booleanFlag, stringFlag } from "../flagParsers.ts";
 import type * as v1 from "../types.ts";
-import { KeyOf } from "@sinclair/typebox";
 
 /**
  * Tweaking the simple2 typings
