@@ -1,35 +1,35 @@
 import type { Flag, FlagParser, OptionalFlag, RequiredFlag } from "./types.ts";
 
 /**
- * makeFlag() is a simple factory function to make flag structures. You don't have to
- * use it; flag specifications can be literals too.
- *
- * @param name name of the flag
- * @param parser a simple function that tries to turn the next 0-N arguments into a value
- * @param required if true, the flag must appear in the command line or the command aborts with help
- * @param defaultValue if provided, forces the flag to NOT be required and provides an argument if it's missing
- * @returns a Flag<T> structure that, when parsed, is a value of type T
+ * Create an optional flag
+ * @param name - long form "slug of the flag", --<name> signals the flag
+ * @param description - long description of the flag
+ * @param parser - parser to extract the flag's value from arguments
+ * @param defaultValue - default value of the flag (otherwise "undefined")
+ * @returns an OptionalFlag for a CLI spec
  */
-export function makeFlag<T>(
+export function optional<V>(
   name: string,
-  parser: FlagParser<T>,
-  required = false,
-  defaultValue?: T,
-): OptionalFlag<T> | RequiredFlag<T> {
-  const partial = {
-    name,
-    description: `your argument named ${name}`,
-    parser,
-  };
-  if (defaultValue !== undefined) {
-    return {
-      ...partial,
-      default: defaultValue,
-      required: false,
-    } as OptionalFlag<T>;
-  }
-  if (required) return { ...partial, required } as RequiredFlag<T>;
-  return { ...partial, required } as OptionalFlag<T>;
+  description: string,
+  parser: FlagParser<V>,
+  defaultValue?: V,
+): OptionalFlag<V> {
+  return { name, description, parser, default: defaultValue, required: false };
+}
+
+/**
+ * Create a required flag
+ * @param name - long form "slug of the flag", --<name> signals the flag
+ * @param description - long description of the flag
+ * @param parser - parser to extract the flag's value from arguments
+ * @returns an OptionalFlag for a CLI spec
+ */
+export function required<V>(
+  name: string,
+  description: string,
+  parser: FlagParser<V>,
+): RequiredFlag<V> {
+  return { name, description, parser, required: true };
 }
 
 /**
