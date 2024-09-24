@@ -28,8 +28,8 @@ type BaseFlag<V> = {
   // single character shortcuts to be prefixed with -
   shortcuts?: string;
 };
-type RequiredFlag<V> = v1.RequiredFlag<V> & { required: true };
-type OptionalFlag<V> = v1.OptionalFlag<V> & { required: false };
+type RequiredFlag<V> = BaseFlag<V> & { required: true };
+type OptionalFlag<V> = BaseFlag<V> & { required: false };
 type Flag<V> = RequiredFlag<V> | OptionalFlag<V>;
 
 type FlagType<F> = F extends Flag<infer V> ? V : never;
@@ -99,5 +99,31 @@ describe("command line parsings with a new take on typing", () => {
     assertType<IsExact<FlagReturn<typeof care>, string>>(true);
     assertType<IsExact<FlagReturn<typeof care>, undefined | string>>(false);
     assertType<IsExact<FlagReturn<typeof care>, undefined>>(false);
+  });
+
+  const miniReq = { care };
+  const miniOpt = { believe };
+
+  it("Flagset types work when every prop is required ", () => {
+    type FlagsetRequired<VV> = {
+      [K in keyof VV]-?: RequiredFlag<VV[K]>;
+    };
+    assertType<IsExact<FlagsetRequired<{ care: string }>, typeof miniReq>>(
+      true,
+    );
+    assertType<IsExact<FlagsetRequired<{ believe: string }>, typeof miniOpt>>(
+      false,
+    );
+  });
+  it("Flagset types work when every prop is optional ", () => {
+    type FlagsetOptional<VV> = {
+      [K in keyof VV]-?: OptionalFlag<VV[K]>;
+    };
+    assertType<IsExact<FlagsetOptional<{ care: string }>, typeof miniReq>>(
+      false,
+    );
+    assertType<IsExact<FlagsetOptional<{ believe: string }>, typeof miniOpt>>(
+      true,
+    );
   });
 });
