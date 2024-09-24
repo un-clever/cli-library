@@ -9,6 +9,7 @@
 import { assertType, describe, Has, type IsExact, it } from "testlib";
 import { booleanFlag, stringFlag } from "../flagParsers.ts";
 import type * as v1 from "../types.ts";
+import { KeyOf } from "@sinclair/typebox";
 
 /**
  * Tweaking the simple2 typings
@@ -102,29 +103,32 @@ describe("command line parsings with a new take on typing", () => {
   });
 
   const miniOpt = { believe };
+  type TminiOpt = { believe?: string };
   const miniReq = { care };
+  type TminiReq = { care: string };
   const miniBoth = { believe, care };
+  type TminiBoth = { believe?: string; care: string }; //TminiOpt & TminiReq;
 
   it("Flagset types work when every prop is required ", () => {
     type FlagsetRequired<VV> = {
       [K in keyof VV]-?: RequiredFlag<VV[K]>;
     };
-    assertType<IsExact<FlagsetRequired<{ care: string }>, typeof miniReq>>(
+    assertType<IsExact<FlagsetRequired<TminiReq>, typeof miniReq>>(
       true,
     );
-    assertType<IsExact<FlagsetRequired<{ believe: string }>, typeof miniOpt>>(
+    assertType<IsExact<FlagsetRequired<TminiOpt>, typeof miniOpt>>(
       false,
     );
   });
 
-  it("Flagset types work when every prop is optional ", () => {
+  it("TODO: Flagset types work when every prop is optional ", () => {
     type FlagsetOptional<VV> = {
-      [K in keyof VV]-?: OptionalFlag<VV[K]>;
+      [K in keyof VV]-?: OptionalFlag<NonNullable<VV[K]>>;
     };
-    assertType<IsExact<FlagsetOptional<{ care: string }>, typeof miniReq>>(
+    assertType<IsExact<FlagsetOptional<TminiReq>, typeof miniReq>>(
       false,
     );
-    assertType<IsExact<FlagsetOptional<{ believe: string }>, typeof miniOpt>>(
+    assertType<IsExact<FlagsetOptional<TminiOpt>, typeof miniOpt>>(
       true,
     );
   });
@@ -157,5 +161,51 @@ describe("command line parsings with a new take on typing", () => {
     >(
       true,
     );
+  });
+
+  it("We can extract the flagset return type", () => {
+    type EasyFlagsetReturn<FF> = { [K in keyof FF]: FlagReturn<FF[K]> };
+    type OptFlagsReturn<FF> = {
+      [K in keyof FF as FF[K] extends OptionalFlag<unknown> ? K : never]?:
+        FF[K] extends OptionalFlag<infer V> ? V : never;
+    };
+    type ReqFlagsReturn<FF> = {
+      // [K in keyof FF]: FlagReturn<FF[K]>;
+      [K in keyof FF as FF[K] extends RequiredFlag<unknown> ? K : never]:
+        FF[K] extends RequiredFlag<infer V> ? V : never;
+    };
+    type FlagsetReturn<FF> = OptFlagsReturn<FF> & ReqFlagsReturn<FF>;
+
+    type tmb = typeof miniBoth;
+    type chkOpt = OptFlagsReturn<tmb>;
+    type chkReq = ReqFlagsReturn<tmb>;
+    // type Reqs<T> = {
+    //   [K for keyof T as {} extends Pick<T,K> ? never : K]: T[K];
+    // }
+
+    // // deno-lint-ignore ban-types
+    // type chk1 = Reqs<flagresult>;
+
+    // Required is Easy
+    assertType<IsExact<FlagsetReturn<typeof miniReq>, TminiReq>>(true);
+
+    // Optional with T | undefined isn't hard either
+    assertType<
+      IsExact<
+        EasyFlagsetReturn<typeof miniOpt>,
+        { believe: string | undefined }
+      >
+    >(
+      true,
+    );
+    // Actual optional props are harder
+    assertType<IsExact<FlagsetReturn<typeof miniOpt>, TminiOpt>>(true);
+
+    assertType<
+      IsExact<
+        FlagsetReturn<typeof miniBoth>,
+        { believe?: string; care: string }
+      >
+    >(true);
   });
 });
