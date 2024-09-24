@@ -33,25 +33,34 @@
  */
 
 /**
- * FlagParsers take a list of strings and attempt to parse a flag off the front
- * of it They can presume that they receive all the args AFTER the flag, that
- * is, the flag is already stripped off.
+ * A parse function takes a list of strings and attempts to parse a flag off the
+ * front of that list. They can presum that the flag (e.g. --flag1) has already
+ * been removed from the args list.
  *
- * FlagParsers can simply be functions, but for boolean types (and maybe others)
- * there has to be a default to make the parser work, hence .default.
+ * If successful it returns [parsedValue: V, numberOfArgsConsumed: number].
  *
- * This concept is powerful, but precise. It's expected that the parser will:
- *
- * 1. always return tail, a list of args it hasn't consumed.
- * 2. if tail === [], we've parsed all the args
- * 3. if we couldn't parse a value, though that's probably an error, we'll
- *    just set .value to undefined and let the higher-up parsing loop
- *    decide how to handle it.
- * 4. throw an Error if there's a reason to stop all parsing (other than #3)
+ * If unsuccessful, it returns [undefined, 0] and lets the higher-level parsing
+ * loop decide what to do.
  */
+export type ParseFunction<V> = (args: string[]) => [
+  V | undefined, // the resultant value if success, otherwise undefined
+  number, // the number of args consumed;
+];
+
+/**
+ * FlagParser is a ParseFunction (see above) and other metadata necessary to
+ * parse a type of flag.
+ *
+ * .default = the default value for all flags of that type. This is NOT a
+ * default value for a particular flag, but for a whole class of flags, like
+ * boolean flags (which are presumed false if they don't appear).
+ */
+
+/** */
 export interface FlagParser<V> {
-  (args: string[]): { tail: string[]; value?: V };
-  default?: V; // mostly used for boolean flags, that must have a default value
+  parse: ParseFunction<V>;
+  default?: V;
+  preexecute?: (flagname: string, value: V) => Promise<void>;
 }
 
 /**

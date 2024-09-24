@@ -14,7 +14,13 @@ export function optional<V>(
   parser: FlagParser<V>,
   defaultValue?: V,
 ): OptionalFlag<V> {
-  return { name, description, parser, default: defaultValue, required: false };
+  return {
+    name,
+    description,
+    parser,
+    default: parser.default || defaultValue,
+    required: false,
+  };
 }
 
 /**
@@ -29,6 +35,9 @@ export function required<V>(
   description: string,
   parser: FlagParser<V>,
 ): RequiredFlag<V> {
+  const msg =
+    `Flag "--${name}" may not be required because its parser has a default type`;
+  if (parser.default) throw new Error(msg);
   return { name, description, parser, required: true };
 }
 

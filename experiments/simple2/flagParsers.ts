@@ -9,11 +9,13 @@ import type { FlagParser } from "./types.ts";
  * @param args
  * @returns
  */
-export const booleanFlag: FlagParser<boolean> = (args: string[]) => {
-  // If we get here, the flag is present and already stripped off, so return true
-  return { value: true, tail: args };
+export const booleanFlag: FlagParser<boolean> = {
+  parse(_: string[]) {
+    // If we get here, the flag is present and already stripped off, so return true
+    return [true, 0];
+  },
+  default: false, // if it's not there, the flag is false
 };
-booleanFlag.default = false; // if it's not there, the flag is false
 
 /**
  * A negatable boolean flag: e.g. --no-wrap
