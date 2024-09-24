@@ -6,7 +6,7 @@
  *
  * CONCLUSION: wip...
  */
-import { assertType, describe, type IsExact, it } from "testlib";
+import { assertType, describe, Has, type IsExact, it } from "testlib";
 import { booleanFlag, stringFlag } from "../flagParsers.ts";
 import type * as v1 from "../types.ts";
 
@@ -101,8 +101,9 @@ describe("command line parsings with a new take on typing", () => {
     assertType<IsExact<FlagReturn<typeof care>, undefined>>(false);
   });
 
-  const miniReq = { care };
   const miniOpt = { believe };
+  const miniReq = { care };
+  const miniBoth = { believe, care };
 
   it("Flagset types work when every prop is required ", () => {
     type FlagsetRequired<VV> = {
@@ -115,6 +116,7 @@ describe("command line parsings with a new take on typing", () => {
       false,
     );
   });
+
   it("Flagset types work when every prop is optional ", () => {
     type FlagsetOptional<VV> = {
       [K in keyof VV]-?: OptionalFlag<VV[K]>;
@@ -123,6 +125,36 @@ describe("command line parsings with a new take on typing", () => {
       false,
     );
     assertType<IsExact<FlagsetOptional<{ believe: string }>, typeof miniOpt>>(
+      true,
+    );
+  });
+
+  it("Flagset types work with mixed optional and required", () => {
+    type Flagset<VV> = {
+      // "{} extends Pick<VV, K>" tests for an optional prop
+      // creds to https://blog.beraliv.dev/2021-12-07-get-optional
+      // deno-lint-ignore ban-types
+      [K in keyof VV]-?: {} extends Pick<VV, K> ? OptionalFlag<VV[K]>
+        : RequiredFlag<VV[K]>;
+    };
+    // GREAT!
+    const _checkReq: Flagset<{ care: string }> = miniReq;
+    assertType<IsExact<Flagset<{ care: string }>, typeof miniReq>>(
+      true,
+    );
+
+    // SO-SO: requires explicit type
+    const _checkOpt: Flagset<{ believe?: string }> = miniOpt;
+    assertType<IsExact<Flagset<{ believe?: string }>, typeof _checkOpt>>(true);
+    // TODO: maybe BUG?: it can infer required properly but not optional
+    // changing to union of remapped keys *might* help?
+    assertType<IsExact<Flagset<{ believe?: string }>, typeof miniOpt>>(false);
+
+    // SO-SO: also requires explicit type. See TODO and BUG above
+    const _checkBoth: Flagset<{ believe?: string; care: string }> = miniBoth;
+    assertType<
+      IsExact<Flagset<{ believe?: string; care: string }>, typeof _checkBoth>
+    >(
       true,
     );
   });
