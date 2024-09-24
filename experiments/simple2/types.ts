@@ -62,6 +62,7 @@ export interface FlagParser<V> {
   parse: ParseFunction<V>;
   default?: V;
   // preexecute?: (flagname: string, value: V) => Promise<void>;
+  validate?: (value: unknown) => boolean;
 }
 
 /**

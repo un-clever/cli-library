@@ -1,5 +1,3 @@
-import type { CliArgs, Flagset } from "./types.ts";
-
 /**
  * A simple implementation of a command line interface definer
  */
@@ -22,4 +20,9 @@ export class ParsingError extends Error {
 
     return messages.join("\n") + "\n";
   }
+}
+
+export function GetHelp(err: Error | ParsingError): string {
+  if (err instanceof ParsingError) return err.help();
+  return err.message + "\n";
 }
