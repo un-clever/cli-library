@@ -11,67 +11,19 @@ import type {
   OptionalFlag,
   RequiredFlag,
 } from "./types.ts";
-import { booleanFlag, floatFlag, intFlag, stringFlag } from "./flagParsers.ts";
 import { describe } from "@std/testing/bdd";
+import {
+  getTestFlagset,
+  type TtestFlagsetReturn,
+} from "./test_helpers.test.ts";
 
 describe("Type assertions look strange at first, but they work", () => {
   assertType<IsExact<string, string>>(true);
   assertType<IsExact<string, number>>(false);
 });
 
-/**
- * start with some hard-coded flags
- */
-function getFlagset() {
-  const one: OptionalFlag<string> = {
-    name: "one",
-    description: "your optional string argument",
-    required: false,
-    parser: stringFlag,
-  };
-
-  const dos: RequiredFlag<string> = {
-    name: "dos",
-    description: "your required string",
-    required: true,
-    parser: stringFlag,
-  };
-
-  const three: OptionalFlag<boolean> = {
-    name: "three",
-    description: "your optional boolean flag (booleans must be optional)",
-    required: false,
-    parser: booleanFlag,
-  };
-
-  const four: OptionalFlag<number> = {
-    name: "four",
-    description: "your optional float flag",
-    required: false,
-    parser: floatFlag,
-  };
-
-  const cinco: RequiredFlag<number> = {
-    name: "cinco",
-    description: "your required int flag",
-    required: true,
-    parser: intFlag,
-  };
-
-  // an untyped flagset
-  return { one, dos, three, four, cinco };
-}
-
-type flagsetReturn = {
-  one?: string;
-  dos: string;
-  three?: boolean;
-  four?: number;
-  cinco: number;
-};
-
 describe("we can strongly type flags", () => {
-  const { one, dos, three, four, cinco } = getFlagset();
+  const { one, dos, three, four, cinco } = getTestFlagset();
   it("We can strongly type the flags with assignments", () => {
     const oneTyped: Flag<string> = one;
     const dosTyped: Flag<string> = dos;
@@ -104,7 +56,7 @@ describe("we can strongly type flags", () => {
 });
 
 describe("we can extract the types of a flag", () => {
-  const { one, dos, three, four, cinco } = getFlagset();
+  const { one, dos, three, four, cinco } = getTestFlagset();
   it("extracts what TypeScript type a flag parses into", () => {
     assertType<IsExact<FlagType<typeof one>, string>>(true);
     assertType<IsExact<FlagType<typeof dos>, string>>(true);
@@ -136,13 +88,13 @@ describe("we can extract the types of a flag", () => {
 });
 
 describe("we can strongly type sets of flags", () => {
-  const flagset = getFlagset();
+  const flagset = getTestFlagset();
   type flagsetT = typeof flagset;
 
-  type chk1 = Flagset<flagsetReturn>;
+  type chk1 = Flagset<TtestFlagsetReturn>;
 
   it("strongly types the flagset", () => {
-    assertType<IsExact<flagsetT, Flagset<flagsetReturn>>>(true);
+    assertType<IsExact<flagsetT, Flagset<TtestFlagsetReturn>>>(true);
 
     // here's a variation with only optionals
     assertType<
@@ -183,6 +135,6 @@ describe("we can strongly type sets of flags", () => {
   });
 
   it("can extract the type a flagset will parse to", () => {
-    assertType<IsExact<FlagsetReturn<flagsetT>, flagsetReturn>>(true);
+    assertType<IsExact<FlagsetReturn<flagsetT>, TtestFlagsetReturn>>(true);
   });
 });

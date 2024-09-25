@@ -13,6 +13,7 @@
     "@std/cli": "jsr:@std/cli@^1.0.6",
     "@std/expect": "jsr:@std/expect@^1.0.3",
     "@std/io": "jsr:@std/io@^0.224.9",
+    "@std/streams": "jsr:@std/streams@^1.0.6",
     "@std/testing": "jsr:@std/testing@^1.0.2",
     "testlib": "./testlib_deno.ts"
   }
