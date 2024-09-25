@@ -12,10 +12,7 @@ import type {
   RequiredFlag,
 } from "../types.ts";
 import { describe } from "@std/testing/bdd";
-import {
-  getTestFlagset,
-  type TtestFlagsetReturn,
-} from "./test_helpers.test.ts";
+import { getTestFlagset, type TtestFlagsetReturn } from "./testUtils.ts";
 
 describe("Type assertions look strange at first, but they work", () => {
   assertType<IsExact<string, string>>(true);

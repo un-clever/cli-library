@@ -9,7 +9,7 @@
  * See FlagSetReturn<FS> test (set to false to pass, but should be true)
  */
 import { assertType, describe, type IsExact, it } from "testlib";
-import { booleanFlag, stringFlag } from "../flagParsers.ts";
+import { booleanFlag, stringFlag } from "../flags.ts";
 import type * as v1 from "../types.ts";
 
 /**

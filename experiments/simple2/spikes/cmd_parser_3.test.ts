@@ -4,10 +4,7 @@ import {
   type CommandFunction,
   type StringWriter,
 } from "./cmd_parser_3.ts";
-import {
-  getTestFlagset,
-  type TtestFlagsetReturn,
-} from "../tests/test_helpers.test.ts";
+import { getTestFlagset, type TtestFlagsetReturn } from "../tests/testUtils.ts";
 import type { CliArgs, Flagset } from "../types.ts";
 import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
 import { Buffer } from "@std/io";

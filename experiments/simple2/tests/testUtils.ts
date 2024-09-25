@@ -1,9 +1,11 @@
-import { booleanFlag, floatFlag, intFlag, stringFlag } from "../flagParsers.ts";
-import type { OptionalFlag, RequiredFlag } from "../types.ts";
+import { booleanFlag, floatFlag, stringFlag } from "../flags.ts";
+import { intFlag } from "../extras/intFlag.ts";
+import type { CliArgs, OptionalFlag, RequiredFlag } from "../types.ts";
 
-/**
- * start with some hard-coded flags
- */
+export interface ArgsExample {
+  raw: string[];
+  parsed: Error | Omit<CliArgs<unknown>, "flags">;
+}
 
 export function getTestFlagset() {
   const one: OptionalFlag<string> = {

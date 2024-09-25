@@ -7,7 +7,7 @@
  * CONCLUSION: wip...
  */
 import { assertType, describe, Has, type IsExact, it } from "testlib";
-import { booleanFlag, stringFlag } from "../flagParsers.ts";
+import { booleanFlag, stringFlag } from "../flags.ts";
 import type * as v1 from "../types.ts";
 
 /**

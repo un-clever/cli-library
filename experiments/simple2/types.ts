@@ -127,17 +127,6 @@ export type Flagset<VV> = {
     : RequiredFlag<VV[K]>;
 };
 
-// export type Flagset = Record<string, Flag<unknown>>;
-// TODO: I haven't found a way to express this yet
-// and haven't had a need for it yet.
-// export type Flagset<FF> = {
-//   [K in keyof FF]: if FF<K> can be F | undefined ? OptionalFlag<F> : RequiredFlag<F>
-// }
-
-// export type FlagsetRequired<FST> = {
-//   [K in keyof FST]: FST[K] extends BaseFlag<infer F> ? F : never;
-// };
-
 /**
  * FlagsetReturn extracts the interface of the complete parsed flags produced by
  * a flagset, treating OptionalFlag's as optional props.
@@ -181,3 +170,5 @@ export interface CliArgs<VV> {
   dashdash: string[]; // args after --, useful mostly for commands that call another command
   flags: VV;
 }
+
+export type FlagSetParser<VV> = (args: string[]) => CliArgs<VV>;
