@@ -7,7 +7,7 @@ import {
 import {
   getTestFlagset,
   type TtestFlagsetReturn,
-} from "../test_helpers.test.ts";
+} from "../tests/test_helpers.test.ts";
 import type { CliArgs, Flagset } from "../types.ts";
 import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
 import { Buffer } from "@std/io";

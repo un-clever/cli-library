@@ -10,7 +10,7 @@ import type {
   FlagType,
   OptionalFlag,
   RequiredFlag,
-} from "./types.ts";
+} from "../types.ts";
 import { describe } from "@std/testing/bdd";
 import {
   getTestFlagset,

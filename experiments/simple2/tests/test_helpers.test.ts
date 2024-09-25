@@ -1,5 +1,5 @@
-import { booleanFlag, floatFlag, intFlag, stringFlag } from "./flagParsers.ts";
-import type { OptionalFlag, RequiredFlag } from "./types.ts";
+import { booleanFlag, floatFlag, intFlag, stringFlag } from "../flagParsers.ts";
+import type { OptionalFlag, RequiredFlag } from "../types.ts";
 
 /**
  * start with some hard-coded flags
