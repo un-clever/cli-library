@@ -1,10 +1,35 @@
 import { booleanFlag, floatFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
-import type { CliArgs, OptionalFlag, RequiredFlag } from "../types.ts";
+import type {
+  CliArgs,
+  FlagSetParser,
+  OptionalFlag,
+  RequiredFlag,
+} from "../types.ts";
+import { assertEquals, assertThrows, it } from "testlib";
 
 export interface ArgsExample {
   raw: string[];
   parsed: Error | Omit<CliArgs<unknown>, "flags">;
+}
+
+export function testmanyArgExamples(
+  parse: FlagSetParser<unknown>,
+  examples: ArgsExample[],
+) {
+  for (const eg of examples) {
+    const testTitle = `"${eg.raw.join(" ")}"`;
+    if (eg.parsed instanceof Error) {
+      it(`rejects args ${testTitle}`, () => {
+        assertThrows(() => parse(eg.raw));
+      });
+    } else {
+      it(`parses args ${testTitle}`, () => {
+        const { args, dashdash } = parse(eg.raw);
+        assertEquals({ args, dashdash }, eg.parsed);
+      });
+    }
+  }
 }
 
 export function getTestFlagset() {

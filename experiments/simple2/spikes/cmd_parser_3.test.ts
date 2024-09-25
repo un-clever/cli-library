@@ -61,3 +61,15 @@ describe("we can make a simple command", () => {
     // )
   });
 });
+
+import { simpleArgsCases } from "../tests/testData.ts";
+import { testmanyArgExamples } from "../tests/testUtils.ts";
+import { FlagsParser } from "./cmd_parser_3.ts";
+
+describe("it parses simple positional arguments", () => {
+  const parser = new FlagsParser<unknown>({}, true);
+  const parse = (args: string[]) => parser.parse(args);
+  testmanyArgExamples(parse, simpleArgsCases);
+});
+
+describe("TODO: it parses positional args with a --");

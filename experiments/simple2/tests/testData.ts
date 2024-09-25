@@ -1,26 +1,5 @@
 // Data useful for testing CLI implementations
 import type { ArgsExample } from "./testUtils.ts";
-import type { FlagSetParser } from "../types.ts";
-import { assertEquals, assertThrows, it } from "testlib";
-
-export function testmanyArgExamples(
-  parse: FlagSetParser<unknown>,
-  examples: ArgsExample[],
-) {
-  for (const eg of examples) {
-    const testTitle = eg.raw.join(" ");
-    if (eg.parsed instanceof Error) {
-      it(`rejects ${testTitle}`, () => {
-        assertThrows(() => parse(eg.raw));
-      });
-    } else {
-      it(`parses ${testTitle}`, () => {
-        const { args, dashdash } = parse(eg.raw);
-        assertEquals({ args, dashdash }, eg.parsed);
-      });
-    }
-  }
-}
 
 // deno-fmt-ignore  (to keep the table concise)
 export const simpleArgsCases: ArgsExample[] = [
