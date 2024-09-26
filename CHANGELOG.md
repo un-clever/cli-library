@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.5.1-alpha.1 - 2024-09-26
+#### Build system
+- prepare pre-release - (7d642bb) - Brad Olson
+
+- - -
+
 ## v0.4.0 - 2024-09-20 WIP Version 2
 #### Features
 - Working on a simpler parser for the next version..
