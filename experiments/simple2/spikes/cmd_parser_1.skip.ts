@@ -8,13 +8,13 @@
  * hard code parts of the flag parser to get types working.
  */
 import { assertEquals, describe, it } from "testlib";
-import { booleanFlag, dateFlag, floatFlag, stringFlag } from "../flags.ts";
+import { booleanFlag, dateFlag, numberFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
 import { negatedFlag } from "../extras/negatedFlag.ts";
 import type { CliArgs, FlagParser, OptionalFlag } from "../types.ts";
 import { FlagsetParsed } from "../types.ts";
 import { KeyOfPropertyEntries } from "@sinclair/typebox";
-import { ParsingError } from "../commands.ts";
+import { ParsingError } from "../errors.ts";
 
 /**
  * A flagset with just positional args
