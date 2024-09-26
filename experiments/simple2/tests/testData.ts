@@ -1,5 +1,5 @@
 // Data useful for testing CLI implementations
-import { booleanFlag, required } from "../flags.ts";
+import { booleanFlag, required, stringFlag } from "../flags.ts";
 import { CliArgs, Flagset } from "../types.ts";
 import type { ArgsExample, FlagsetExample } from "./testUtils.ts";
 
@@ -58,4 +58,33 @@ export const booleanFlagsetCases: FlagsetExample<booleanFlagsetType>[] = [
   { raw: ["--verbose"], parsed: { ...emptyParse, flags: { verbose: true } } },
   // missing flags should default to false since there's no way to set them false yet
   { raw: [], parsed: { ...emptyParse, flags: { verbose: false } } },
+];
+
+// String flag test data
+export type requiredStringFlagsetType = { title: string };
+export const requiredStringFlagset: Flagset<requiredStringFlagsetType> = {
+  title: required("title", "", stringFlag),
+};
+// deno-fmt-ignore  (to keep the table concise)
+export const requiredStringFlagsetCases: FlagsetExample<requiredStringFlagsetType>[] = [
+  { raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } },
+  { raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } },
+  { raw: ["early", "--title", "go-for-it"], parsed: { args: ["early"], flags: {title: "go-for-it" }, dashdash: []}},
+  // FIX COMMENTED TESTS
+  // { raw: ["--title", "go-for-it", "late"], parsed: { args: ["late"], flags: {title: "go-for-it" }, dashdash: [] }},
+  // { raw: ["early", "--title", "go-for-it", "late"], parsed: { args: ["early", "late"], flags: {title: "go-for-it" }, dashdash: [] }},
+
+  // PASSTHROUGH ARGS HANDLING
+  // { raw: ["--title", "pass through args after", "--", "a"], parsed: { args: [], flags: {title: "pass through args after"}, dashdash: ["a"]}},
+  // { raw: ["early", "--title", "pass through args after", "--", "a"], parsed: { args: ["early"], flags: {title: "pass through args after"}, dashdash: ["a"]}},
+  // { raw: ["early", "--title", "pass through args after", "late", "--", "a"], parsed: { args: ["early", "late"], flags: {title: "pass through args after"}, dashdash: ["a"]}},
+  // { raw: ["--title", "arg", "late" "--"], parsed: GenericParsingError }, // missing dashdash args
+  // NOTE: "--" as a string flag arg is JUST a string, not the pass-through flag
+  { raw: ["--title", "--"], parsed: { ...emptyParse, flags: {title: "--" }}},
+
+  // EXPECTED ERRORS
+  { raw: [], parsed: GenericParsingError }, // missing flag
+  { raw: ["--title"], parsed: GenericParsingError }, // missing arg
+  { raw: ["--ttile", "arg"], parsed: GenericParsingError }, // unrecognized flag
+
 ];
