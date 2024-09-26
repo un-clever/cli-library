@@ -186,4 +186,9 @@ export interface CliArgs<VV> {
   flags: VV;
 }
 
-export type FlagSetParser<VV> = (args: string[]) => CliArgs<VV>;
+/**
+ * FlagsetParser supports a CLI by converting the raw args into a parsed
+ * structure taking into account positional arguments optional, required, and
+ * default flags,
+ */
+export type FlagsetParser<VV> = (args: string[]) => CliArgs<VV>;

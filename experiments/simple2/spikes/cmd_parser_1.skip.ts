@@ -14,7 +14,7 @@ import { negatedFlag } from "../extras/negatedFlag.ts";
 import type { CliArgs, FlagParser, OptionalFlag } from "../types.ts";
 import { FlagsetParsed } from "../types.ts";
 import { KeyOfPropertyEntries } from "@sinclair/typebox";
-import { ParsingError } from "../commands.ts";
+import { ParsingError } from "../errors.ts";
 
 /**
  * A flagset with just positional args

@@ -1,6 +1,6 @@
 // a broken command parser attempt
 
-import { ParsingError } from "../commands.ts";
+import { ParsingError } from "../errors.ts";
 import type { CliArgs, Flag, Flagset } from "../types.ts";
 
 interface parseState<F> {

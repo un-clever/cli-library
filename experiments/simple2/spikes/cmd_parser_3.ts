@@ -1,5 +1,5 @@
-import { ParsingError } from "../commands.ts";
-import { GetHelp } from "../commands.ts";
+import { ParsingError } from "../errors.ts";
+import { GetHelp } from "../errors.ts";
 import type { CliArgs, Flagset } from "../types.ts";
 import type { Writer } from "@std/io";
 
