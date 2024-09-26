@@ -6,7 +6,7 @@ import type { FlagParser } from "../types.ts";
 type testCase1<T> = [FlagParser<T>, T | undefined, string[], string[]];
 
 // deno-fmt-ignore  (to keep the table concise)
-const testTable1: Record<string, testCase1<any>> = {
+const miniParsersTestCases: Record<string, testCase1<any>> = {
 
   //===== BOOLEAN FLAGS
   "boolean flags don't need extra args": [booleanFlag, true, [], []],
@@ -61,8 +61,8 @@ const testTable1: Record<string, testCase1<any>> = {
 
 describe("test flag mini parsers", () => {
   // test the massive table
-  for (const desc in testTable1) {
-    const [parser, value, argsin, tail] = testTable1[desc];
+  for (const desc in miniParsersTestCases) {
+    const [parser, value, argsin, tail] = miniParsersTestCases[desc];
     it(desc, () => {
       const result = parser.parse(0, argsin);
       assertEquals(result.value, value, "parsed values should match");

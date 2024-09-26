@@ -6,4 +6,4 @@ Big Ideas:
 - simple-ish: grab a powerful idea--param types know how to parse themselves, and leverage it. Typings may be complex, but the implementation should be readable.
 - composeable: You can make a simple, single-command cli easily. You can combine several of these, without modification, into a variable-depth multi-commmand cli.
 
-command containers don't have flags, just shove that down into the actual excutable command
+command containers don't have flags, just shove flag inheritane down into the actual excutable command
