@@ -28,14 +28,6 @@ describe("we can make a simple command", () => {
     assertType<IsExact<Flagset<CommandType>, typeof flags>>(true);
   });
 
-  //   params:
-  //
-  // ): Promise<number> => {
-  //     await write(JSON.stringify(params))
-  //     return 0;
-  //   }
-  // )
-
   it("tries", async () => {
     const args = ["a", "b", "--one", "c"];
     const expectedParams: Params = {
@@ -52,13 +44,6 @@ describe("we can make a simple command", () => {
     await cmd.parseAndRun(args);
     const decoder = new TextDecoder(); //...and here's grabbing that output
     assertEquals(JSON.parse(decoder.decode(output.bytes())), expectedParams);
-
-    // const cmd = command("testcmd", flags, exec, Deno.stdout);
-    // command<CommandType>(
-    //   "a test command",
-    //   simpleFlags,
-
-    // )
   });
 });
 
@@ -67,18 +52,19 @@ import { testmanyArgExamples } from "../tests/testUtils.ts";
 import { FlagsParser } from "./cmd_parser_3.ts";
 import { assertThrows } from "@std/assert/throws";
 
-describe("it parses simple positional arguments", () => {
+describe("we can parse simple positional arguments", () => {
   const parser = new FlagsParser<unknown>({});
   const parse = (args: string[]) => parser.parse(args);
   testmanyArgExamples(parse, simpleArgsCases);
 });
 
-describe("it parses positional args with a --", () => {
+describe("we can parse positional args with a --", () => {
   const parser = new FlagsParser<unknown>({});
   const parse = (args: string[]) => parser.parse(args);
   testmanyArgExamples(parse, dashDashCases);
 });
-describe("it can disallow -- in the args", () => {
+
+describe("we can disallow -- in the args", () => {
   const parser = new FlagsParser<unknown>({}, false);
   const parse = (args: string[]) => parser.parse(args);
   for (const c of dashDashCases) {
@@ -87,3 +73,7 @@ describe("it can disallow -- in the args", () => {
     });
   }
 });
+
+describe.skip("TODO: it can parse boolean (default-false) flags");
+describe.skip("TODO: it can parse string flags");
+describe.skip("TODO: it can parse numeric flags");
