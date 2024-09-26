@@ -64,14 +64,16 @@ function fuzzedExample<VV>(eg: FlagsetExample<VV>): FlagsetExample<VV>[] {
     // inject a positional arg after
     {raw: [...raw, "late"], parsed: {args:[...args, "late"] ,flags, dashdash}},
     // inject positionals before and after
-    // FIXME: {raw: ["early", ...raw, "late"], parsed: {args:["early", ...args, "late"] ,flags, dashdash}},
+    {raw: ["early", ...raw, "late"], parsed: {args:["early", ...args, "late"] ,flags, dashdash}},
     // add an unrecognized flag before and after
     {raw: ["--some-unrecognized-flag", ...raw], parsed: GenericParsingError},
-    // FIXME: {raw: [...raw, "--some-unrecognized-flag"], parsed: GenericParsingError},
+    {raw: [...raw, "--some-unrecognized-flag"], parsed: GenericParsingError},
     // add some passthrough arguments
-    // FIXME {raw: [...raw, "--", "a", "b", "c"], parsed: {args:["early", ...args] ,flags, dashdash: ["a", "b", "c"]}},
+    {raw: [...raw, "--", "a", "b", "c"], parsed: {args, flags, dashdash: ["a", "b", "c"]}},
+    // add some passthrough arguments AND positionals
+    {raw: ["early", "early", ...raw, "late", "later", "z", "--", "a", "b", "c"], parsed: {args:["early", "early", ...args, "late", "later", "z"] , flags, dashdash: ["a", "b", "c"]}},
     // add a -- without following arguments
-    // FIXME: {raw: [...raw, "--"], parsed: GenericParsingError},
+    {raw: [...raw, "--"], parsed: GenericParsingError},
   ];
 }
 
@@ -96,18 +98,8 @@ export const requiredStringFlagset: Flagset<requiredStringFlagsetType> = {
 // deno-fmt-ignore  (to keep the table concise)
 export const requiredStringFlagsetCases: FlagsetExample<requiredStringFlagsetType>[] = [
   // TODO: functionalize this for numbers too
-  { raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } },
-  { raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } },
-  { raw: ["early", "--title", "go-for-it"], parsed: { args: ["early"], flags: {title: "go-for-it" }, dashdash: []}},
-  // FIX COMMENTED TESTS
-  // { raw: ["--title", "go-for-it", "late"], parsed: { args: ["late"], flags: {title: "go-for-it" }, dashdash: [] }},
-  // { raw: ["early", "--title", "go-for-it", "late"], parsed: { args: ["early", "late"], flags: {title: "go-for-it" }, dashdash: [] }},
-
-  // PASSTHROUGH ARGS HANDLING
-  // { raw: ["--title", "pass through args after", "--", "a"], parsed: { args: [], flags: {title: "pass through args after"}, dashdash: ["a"]}},
-  // { raw: ["early", "--title", "pass through args after", "--", "a"], parsed: { args: ["early"], flags: {title: "pass through args after"}, dashdash: ["a"]}},
-  // { raw: ["early", "--title", "pass through args after", "late", "--", "a"], parsed: { args: ["early", "late"], flags: {title: "pass through args after"}, dashdash: ["a"]}},
-  // { raw: ["--title", "arg", "late" "--"], parsed: GenericParsingError }, // missing dashdash args
+  ...fuzzedExample({ raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } }),
+  ...fuzzedExample({ raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } }),
   // NOTE: "--" as a string flag arg is JUST a string, not the pass-through flag
   { raw: ["--title", "--"], parsed: { ...emptyParse, flags: {title: "--" }}},
 

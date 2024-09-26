@@ -28,9 +28,9 @@ export class FlagsParser<VV> {
       const arg = args[i++];
       // NOTE: we used to make dashdash optional, but now we just parse it and fail if not allowed
       if (arg === "--") {
-        i += this.gulpDashDash(i, args);
+        i = this.gulpDashDash(i, args);
       } else if (arg.startsWith("--")) {
-        i += this.handleFlag(arg.slice(2), i, args);
+        i = this.handleFlag(arg.slice(2), i, args);
       } else {
         this.args.push(arg);
       }
