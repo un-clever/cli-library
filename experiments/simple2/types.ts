@@ -191,4 +191,4 @@ export interface CliArgs<VV> {
  * structure taking into account positional arguments optional, required, and
  * default flags,
  */
-export type FlagsetParser<VV> = (args: string[]) => CliArgs<VV>;
+export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;

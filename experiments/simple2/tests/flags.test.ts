@@ -1,6 +1,12 @@
 // deno-lint-ignore-file no-explicit-any
-import { assertEquals, describe, it } from "testlib";
-import { booleanFlag, floatFlag, stringFlag } from "../flags.ts";
+import { assertEquals, assertThrows, describe, it } from "testlib";
+import {
+  booleanFlag,
+  numberFlag,
+  optional,
+  required,
+  stringFlag,
+} from "../flags.ts";
 import type { FlagParser } from "../types.ts";
 
 type testCase1<T> = [FlagParser<T>, T | undefined, string[], string[]];
@@ -23,15 +29,15 @@ const miniParsersTestCases: Record<string, testCase1<any>> = {
   "string flags can consume long, quoted arguments": [  stringFlag, "tree with long long branches", [ "tree with long long branches", "mountain", "apple", ], ["mountain", "apple"], ],
 
   //===== NUMERIC FLAGS
-  "floatFlag needs one argument": [floatFlag, undefined, [], []],
+  "floatFlag needs one argument": [numberFlag, undefined, [], []],
   // I'm sticking with fractions that convert well to binary because the comparison is exact in the test
-  "floatFlag consumes one argument": [floatFlag, 2.5, ["2.5", "fred", "4"], ["fred", "4"]],
-  "floatFlag needs only one argument": [floatFlag, 7.25, ["7.25"], []],
-  "floatFlag parses integers": [floatFlag, 1.0, ["1"], []],
-  "floatFlag parses negative numbers": [floatFlag, -1.5, ["-1.5"], []],
-  "floatFlag won't parse words": [floatFlag, undefined, ["zippy"], ["zippy"]],
-  "floatFlag grabs first number off dates": [floatFlag, 2020.0, ["2020-02-02"], []],
-  "floatFlag grabs first number off malformed numbers": [floatFlag, 25.0, ["25or6to4"], []],
+  "floatFlag consumes one argument": [numberFlag, 2.5, ["2.5", "fred", "4"], ["fred", "4"]],
+  "floatFlag needs only one argument": [numberFlag, 7.25, ["7.25"], []],
+  "floatFlag parses integers": [numberFlag, 1.0, ["1"], []],
+  "floatFlag parses negative numbers": [numberFlag, -1.5, ["-1.5"], []],
+  "floatFlag won't parse words": [numberFlag, undefined, ["zippy"], ["zippy"]],
+  "floatFlag grabs first number off dates": [numberFlag, 2020.0, ["2020-02-02"], []],
+  "floatFlag grabs first number off malformed numbers": [numberFlag, 25.0, ["25or6to4"], []],
 
   // ... intFlag also produces a number, but coerces to an int
   // "intFlag needs one argument": [intFlag, undefined, [], []],
@@ -73,4 +79,47 @@ describe("test flag mini parsers", () => {
       );
     });
   }
+});
+
+describe("flag factories", () => {
+  it("we can make a flag with no default", () => {
+    required("flag1", "string flags don't have defaults", stringFlag);
+    optional("flag2", "numeric flags don't have defaults", stringFlag);
+    required("flag1", "string flags don't have defaults", numberFlag);
+    optional("flag2", "numeric flags don't have defaults", numberFlag);
+  });
+  it("we can set a flag default if the parser doesn't have a default", () => {
+    required(
+      "flag1",
+      "string flags don't have defaults",
+      stringFlag,
+      "/a/path",
+    );
+    optional(
+      "flag2",
+      "numeric flags don't have defaults",
+      stringFlag,
+      "a long string",
+    );
+    required("flag1", "string flags don't have defaults", numberFlag, 5.2);
+    optional("flag2", "numeric flags don't have defaults", numberFlag, 6.3);
+  });
+  it("we can make a flag who's parser has a default", () => {
+    required("flag1", "boolean flags have defaults", booleanFlag);
+    optional("flag1", "boolean flags have defaults", booleanFlag);
+  });
+  it("but we CAN'T set a flag default if the parser has a default", () => {
+    assertThrows(() =>
+      required("flag1", "boolean flags have defaults", booleanFlag, true)
+    );
+    assertThrows(() =>
+      required("flag1", "boolean flags have defaults", booleanFlag, false)
+    );
+    assertThrows(() =>
+      optional("flag1", "boolean flags have defaults", booleanFlag, true)
+    );
+    assertThrows(() =>
+      optional("flag1", "boolean flags have defaults", booleanFlag, false)
+    );
+  });
 });

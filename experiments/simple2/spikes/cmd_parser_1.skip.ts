@@ -8,7 +8,7 @@
  * hard code parts of the flag parser to get types working.
  */
 import { assertEquals, describe, it } from "testlib";
-import { booleanFlag, dateFlag, floatFlag, stringFlag } from "../flags.ts";
+import { booleanFlag, dateFlag, numberFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
 import { negatedFlag } from "../extras/negatedFlag.ts";
 import type { CliArgs, FlagParser, OptionalFlag } from "../types.ts";

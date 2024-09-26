@@ -20,12 +20,14 @@ export function checkFlagDefault<V>(
   parser: FlagParser<V>,
   flagDefault?: V,
 ): V | undefined {
-  if (parser.default && flagDefault) {
+  const haveParserDefault = parser.default !== undefined;
+  const haveFlagDefault = flagDefault !== undefined;
+  if (haveParserDefault && haveFlagDefault) {
     throw new Error(
       `flag ${flagName} should not have default ${flagDefault} because it's parser has a mandatory default of ${parser.default}`,
     );
-  }
-  return parser.default || flagDefault;
+  } else if (haveParserDefault) return parser.default;
+  else return flagDefault;
 }
 
 /**
@@ -119,7 +121,7 @@ export const stringFlag: FlagParser<string> = {
 /**
  * Parse a decimal floating point number into a JavaScript number
  */
-export const floatFlag: FlagParser<number> = {
+export const numberFlag: FlagParser<number> = {
   parse(i: number, args: string[]) {
     const n = 1;
     const value = parseFloat(args[i]);

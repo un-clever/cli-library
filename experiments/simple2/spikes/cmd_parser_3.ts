@@ -89,9 +89,11 @@ export class FlagsParser<VV> {
       if (!this.partialFlags[k]) {
         // NOTE: parser defaults always take precedence because flag logic
         // depends on them
-        const flagDefault = flag.parser.default || flag.default; // parser default takes precedence
-        if (flagDefault) this.partialFlags[k] = flagDefault;
-        else if (flag.required) {
+        if (flag.parser.default !== undefined) {
+          this.partialFlags[k] = flag.parser.default;
+        } else if (flag.default !== undefined) {
+          this.partialFlags[k] = flag.default;
+        } else if (flag.required) {
           throw new ParsingError("missing required flag", "", k);
         }
       }

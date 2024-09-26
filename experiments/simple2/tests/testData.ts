@@ -1,5 +1,9 @@
 // Data useful for testing CLI implementations
-import type { ArgsExample } from "./testUtils.ts";
+import { booleanFlag, required } from "../flags.ts";
+import { CliArgs, Flagset } from "../types.ts";
+import type { ArgsExample, FlagsetExample } from "./testUtils.ts";
+
+export const GenericParsingError = new Error("missing args after --");
 
 // deno-fmt-ignore  (to keep the table concise)
 export const simpleArgsCases: ArgsExample[] = [
@@ -16,15 +20,13 @@ export const simpleArgsCases: ArgsExample[] = [
   {raw: ["a","b","c","d","e","f","g","h","i","j"], parsed: {args:["a","b","c","d","e","f","g","h","i","j"], dashdash:[]}},
 ];
 
-export const DashedWithoutArgs = new Error("missing args after --");
-
 export function makeDashDashCase(
   insertBefore: number,
   eg: ArgsExample,
 ): ArgsExample {
   if (insertBefore >= eg.raw.length) { // dashdash at end causes error
     const raw = [...eg.raw, "--"];
-    return { raw, parsed: DashedWithoutArgs };
+    return { raw, parsed: GenericParsingError };
   }
   const args = eg.raw.slice(0, insertBefore);
   const dashdash = eg.raw.slice(insertBefore);
@@ -43,4 +45,17 @@ export const dashDashCases: ArgsExample[] = [
   ...simpleArgsCases.map(makeDashDashCases(5)),
   ...simpleArgsCases.map(makeDashDashCases(9)),
   ...simpleArgsCases.map(makeDashDashCases(11)),
+];
+
+const emptyParse: CliArgs<unknown> = { args: [], flags: {}, dashdash: [] };
+
+// Boolean flag test data
+export type booleanFlagsetType = { verbose: boolean };
+export const booleanFlagset: Flagset<booleanFlagsetType> = {
+  verbose: required("verbose", "", booleanFlag),
+};
+export const booleanFlagsetCases: FlagsetExample<booleanFlagsetType>[] = [
+  { raw: ["--verbose"], parsed: { ...emptyParse, flags: { verbose: true } } },
+  // missing flags should default to false since there's no way to set them false yet
+  { raw: [], parsed: { ...emptyParse, flags: { verbose: false } } },
 ];

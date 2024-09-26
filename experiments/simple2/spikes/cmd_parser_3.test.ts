@@ -5,9 +5,26 @@ import {
   type StringWriter,
 } from "./cmd_parser_3.ts";
 import { getTestFlagset, type TtestFlagsetReturn } from "../tests/testUtils.ts";
-import type { CliArgs, Flagset } from "../types.ts";
-import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
+import type { CliArgs, Flagset, FlagsetParseFn } from "../types.ts";
+import {
+  assertEquals,
+  assertThrows,
+  assertType,
+  describe,
+  type IsExact,
+  it,
+} from "testlib";
 import { Buffer } from "@std/io";
+import {
+  booleanFlagset,
+  booleanFlagsetCases,
+  type booleanFlagsetType,
+  dashDashCases,
+  simpleArgsCases,
+} from "../tests/testData.ts";
+import { testmanyArgExamples } from "../tests/testUtils.ts";
+import { FlagsParser } from "./cmd_parser_3.ts";
+import { testmanyFlagsetExamples } from "../tests/testUtils.ts";
 
 const testFlagset = getTestFlagset();
 const { one, dos, three, four, cinco } = testFlagset;
@@ -47,11 +64,6 @@ describe("we can make a simple command", () => {
   });
 });
 
-import { dashDashCases, simpleArgsCases } from "../tests/testData.ts";
-import { testmanyArgExamples } from "../tests/testUtils.ts";
-import { FlagsParser } from "./cmd_parser_3.ts";
-import { assertThrows } from "@std/assert/throws";
-
 describe("we can parse simple positional arguments", () => {
   const parser = new FlagsParser<unknown>({});
   const parse = (args: string[]) => parser.parse(args);
@@ -74,6 +86,15 @@ describe("we can disallow -- in the args", () => {
   }
 });
 
-describe.skip("TODO: it can parse boolean (default-false) flags");
-describe.skip("TODO: it can parse string flags");
-describe.skip("TODO: it can parse numeric flags");
+function makeParseFn<VV>(fs: Flagset<VV>): FlagsetParseFn<VV> {
+  const parser = new FlagsParser(fs);
+  return (args: string[]) => parser.parse(args);
+}
+
+describe("we can parse boolean (default-false) flags", () => {
+  const parse = makeParseFn(booleanFlagset);
+  testmanyFlagsetExamples("booleanFlag", parse, booleanFlagsetCases);
+});
+
+describe.skip("TODO: we can parse string flags");
+describe.skip("TODO: we can parse numeric flags");

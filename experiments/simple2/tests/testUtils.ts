@@ -1,8 +1,8 @@
-import { booleanFlag, floatFlag, stringFlag } from "../flags.ts";
+import { booleanFlag, numberFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
 import type {
   CliArgs,
-  FlagsetParser,
+  FlagsetParseFn,
   OptionalFlag,
   RequiredFlag,
 } from "../types.ts";
@@ -13,8 +13,13 @@ export interface ArgsExample {
   parsed: Error | Omit<CliArgs<unknown>, "flags">;
 }
 
+export interface FlagsetExample<VV> {
+  raw: string[];
+  parsed: Error | CliArgs<VV>;
+}
+
 export function testmanyArgExamples(
-  parse: FlagsetParser<unknown>,
+  parse: FlagsetParseFn<unknown>,
   examples: ArgsExample[],
 ) {
   for (const eg of examples) {
@@ -27,6 +32,26 @@ export function testmanyArgExamples(
       it(`parses args ${testTitle}`, () => {
         const { args, dashdash } = parse(eg.raw);
         assertEquals({ args, dashdash }, eg.parsed);
+      });
+    }
+  }
+}
+
+export function testmanyFlagsetExamples<VV>(
+  flagtype: string,
+  parse: FlagsetParseFn<VV>,
+  examples: FlagsetExample<VV>[],
+) {
+  for (const eg of examples) {
+    const testTitle = `Flag type "${flagtype}": "${eg.raw.join(" ")}"`;
+    if (eg.parsed instanceof Error) {
+      it(`rejects args ${testTitle}`, () => {
+        assertThrows(() => parse(eg.raw));
+      });
+    } else {
+      it(`parses args ${testTitle}`, () => {
+        const { args, flags, dashdash } = parse(eg.raw);
+        assertEquals({ args, flags, dashdash }, eg.parsed);
       });
     }
   }
@@ -58,7 +83,7 @@ export function getTestFlagset() {
     name: "four",
     description: "your optional float flag",
     required: false,
-    parser: floatFlag,
+    parser: numberFlag,
   };
 
   const cinco: RequiredFlag<number> = {
