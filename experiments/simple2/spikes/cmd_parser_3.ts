@@ -11,12 +11,12 @@ export type CommandFunction<VV> = (
 ) => Promise<number>;
 
 export class FlagsParser<VV> {
-  // mutable: we will be mutating these during the parse, so this class is not thread safe
+  // mutable: we will be mutating these during the parse, so this class is NOT thread safe
   protected partialFlags: Partial<VV> = {};
   protected args: string[] = [];
   protected dashdash: string[] = [];
 
-  constructor(private flagset: Flagset<VV>, private handleDashDash = true) {}
+  constructor(private flagset: Flagset<VV>, readonly allowDashdash = true) {}
 
   parse(args: string[]): CliArgs<VV> {
     // re-init mutable props
@@ -26,13 +26,21 @@ export class FlagsParser<VV> {
     // we will be incrementing i in the loop body
     for (let i = 0; i < args.length;) {
       const arg = args[i++];
-      if (this.handleDashDash && arg === "--") {
+      // NOTE: we used to make dashdash optional, but now we just parse it and fail if not allowed
+      if (arg === "--") {
         i += this.gulpDashDash(i, args);
       } else if (arg.startsWith("--")) {
         i += this.handleFlag(arg.slice(2), i, args);
       } else {
         this.args.push(arg);
       }
+    }
+    if (!this.allowDashdash && this.dashdash) {
+      throw new ParsingError(
+        '"--" not allowed',
+        "this command doesn't allow passthrough args after a '--'",
+        "--",
+      );
     }
     return {
       flags: this.confirmedFlags(this.partialFlags),

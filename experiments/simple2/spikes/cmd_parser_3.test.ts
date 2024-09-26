@@ -65,15 +65,25 @@ describe("we can make a simple command", () => {
 import { dashDashCases, simpleArgsCases } from "../tests/testData.ts";
 import { testmanyArgExamples } from "../tests/testUtils.ts";
 import { FlagsParser } from "./cmd_parser_3.ts";
+import { assertThrows } from "@std/assert/throws";
 
 describe("it parses simple positional arguments", () => {
-  const parser = new FlagsParser<unknown>({}, true);
+  const parser = new FlagsParser<unknown>({});
   const parse = (args: string[]) => parser.parse(args);
   testmanyArgExamples(parse, simpleArgsCases);
 });
 
-describe("TODO: it parses positional args with a --", () => {
-  const parser = new FlagsParser<unknown>({}, true);
+describe("it parses positional args with a --", () => {
+  const parser = new FlagsParser<unknown>({});
   const parse = (args: string[]) => parser.parse(args);
   testmanyArgExamples(parse, dashDashCases);
+});
+describe("it can disallow -- in the args", () => {
+  const parser = new FlagsParser<unknown>({}, false);
+  const parse = (args: string[]) => parser.parse(args);
+  for (const c of dashDashCases) {
+    it("can always prohibit dashdash in the args", () => {
+      assertThrows(() => parse(c.raw));
+    });
+  }
 });
