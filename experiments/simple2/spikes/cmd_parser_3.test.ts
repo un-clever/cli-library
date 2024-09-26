@@ -20,6 +20,8 @@ import {
   booleanFlagsetCases,
   type booleanFlagsetType,
   dashDashCases,
+  defaultingStringFlagset,
+  defaultingStringFlagsetCases,
   requiredStringFlagset,
   requiredStringFlagsetCases,
   simpleArgsCases,
@@ -27,6 +29,8 @@ import {
 import { testmanyArgExamples } from "../tests/testUtils.ts";
 import { FlagsParser } from "./cmd_parser_3.ts";
 import { testmanyFlagsetExamples } from "../tests/testUtils.ts";
+import { optionalStringFlagset } from "../tests/testData.ts";
+import { optionalStringFlagsetCases } from "../tests/testData.ts";
 
 const testFlagset = getTestFlagset();
 const { one, dos, three, four, cinco } = testFlagset;
@@ -98,9 +102,31 @@ describe("we can parse boolean (default-false) flags", () => {
   testmanyFlagsetExamples("booleanFlag", parse, booleanFlagsetCases);
 });
 
-describe("we can parse string flags", () => {
+describe("we can parse required string flags", () => {
   const parse = makeParseFn(requiredStringFlagset);
-  testmanyFlagsetExamples("booleanFlag", parse, requiredStringFlagsetCases);
+  testmanyFlagsetExamples(
+    "required string flag",
+    parse,
+    requiredStringFlagsetCases,
+  );
+});
+
+describe("we can parse defaulting string flags", () => {
+  const parse = makeParseFn(defaultingStringFlagset);
+  testmanyFlagsetExamples(
+    "optional string flag with default",
+    parse,
+    defaultingStringFlagsetCases,
+  );
+});
+
+describe("we can parse optional string flags", () => {
+  const parse = makeParseFn(optionalStringFlagset);
+  testmanyFlagsetExamples(
+    "optional string flag without default",
+    parse,
+    optionalStringFlagsetCases,
+  );
 });
 
 describe.skip("TODO: we can parse numeric flags");

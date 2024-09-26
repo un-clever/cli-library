@@ -1,6 +1,6 @@
 // Data useful for testing CLI implementations
-import { booleanFlag, required, stringFlag } from "../flags.ts";
-import { CliArgs, Flagset } from "../types.ts";
+import { booleanFlag, optional, required, stringFlag } from "../flags.ts";
+import type { CliArgs, Flagset } from "../types.ts";
 import type { ArgsExample, FlagsetExample } from "./testUtils.ts";
 
 export const GenericParsingError = new Error("missing args after --");
@@ -90,7 +90,7 @@ export const booleanFlagsetCases: FlagsetExample<booleanFlagsetType>[] = [
   { raw: [], parsed: { ...emptyParse, flags: { verbose: false } } },
 ];
 
-// String flag test data
+// Required String flag test data
 export type requiredStringFlagsetType = { title: string };
 export const requiredStringFlagset: Flagset<requiredStringFlagsetType> = {
   title: required("title", "", stringFlag),
@@ -102,9 +102,44 @@ export const requiredStringFlagsetCases: FlagsetExample<requiredStringFlagsetTyp
   ...fuzzedExample({ raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } }),
   // NOTE: "--" as a string flag arg is JUST a string, not the pass-through flag
   { raw: ["--title", "--"], parsed: { ...emptyParse, flags: {title: "--" }}},
-
   // EXPECTED ERRORS
   { raw: [], parsed: GenericParsingError }, // missing flag
+  { raw: ["--title"], parsed: GenericParsingError }, // missing arg
+  { raw: ["--ttile", "arg"], parsed: GenericParsingError }, // unrecognized flag
+];
+
+// Defaulting String flag test data
+export type defaultingStringFlagsetType = { title?: string };
+export const defaultingStringFlagset: Flagset<defaultingStringFlagsetType> = {
+  title: optional("title", "", stringFlag, "going to the movies"),
+};
+// deno-fmt-ignore  (to keep the table concise)
+export const defaultingStringFlagsetCases: FlagsetExample<defaultingStringFlagsetType>[] = [
+  // test default
+  ...fuzzedExample({ raw: [], parsed: { ...emptyParse, flags: {title: "going to the movies" } } }),
+  ...fuzzedExample({ raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } }),
+  ...fuzzedExample({ raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } }),
+  // NOTE: "--" as a string flag arg is JUST a string, not the pass-through flag
+  { raw: ["--title", "--"], parsed: { ...emptyParse, flags: {title: "--" }}},
+  // EXPECTED ERRORS
+  { raw: ["--title"], parsed: GenericParsingError }, // missing arg
+  { raw: ["--ttile", "arg"], parsed: GenericParsingError }, // unrecognized flag
+];
+
+// Optional String flag test data
+export type optionalStringFlagsetType = { title?: string };
+export const optionalStringFlagset: Flagset<optionalStringFlagsetType> = {
+  title: optional("title", "", stringFlag),
+};
+// deno-fmt-ignore  (to keep the table concise)
+export const optionalStringFlagsetCases: FlagsetExample<defaultingStringFlagsetType>[] = [
+  // test default
+  ...fuzzedExample({ raw: [], parsed: { ...emptyParse, flags: {} } }),
+  ...fuzzedExample({ raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } }),
+  ...fuzzedExample({ raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } }),
+  // NOTE: "--" as a string flag arg is JUST a string, not the pass-through flag
+  { raw: ["--title", "--"], parsed: { ...emptyParse, flags: {title: "--" }}},
+  // EXPECTED ERRORS
   { raw: ["--title"], parsed: GenericParsingError }, // missing arg
   { raw: ["--ttile", "arg"], parsed: GenericParsingError }, // unrecognized flag
 ];
