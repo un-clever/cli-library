@@ -2,10 +2,11 @@
 import {
   command,
   type CommandFunction,
+  FlagsParser,
   type StringWriter,
-} from "./cmd_parser_3.ts";
-import { getTestFlagset, type TtestFlagsetReturn } from "../tests/testUtils.ts";
-import type { CliArgs, Flagset, FlagsetParseFn } from "../types.ts";
+} from "./commands.ts";
+import { getTestFlagset } from "./tests/testUtils.ts";
+import type { CliArgs, Flagset, FlagsetParseFn } from "./types.ts";
 import {
   assertEquals,
   assertThrows,
@@ -18,7 +19,6 @@ import { Buffer } from "@std/io";
 import {
   booleanFlagset,
   booleanFlagsetCases,
-  type booleanFlagsetType,
   dashDashCases,
   defaultingNumericFlagset,
   defaultingNumericFlagsetCases,
@@ -26,24 +26,22 @@ import {
   defaultingStringFlagsetCases,
   optionalNumericFlagset,
   optionalNumericFlagsetCases,
+  optionalStringFlagset,
+  optionalStringFlagsetCases,
   requiredNumericFlagset,
   requiredNumericFlagsetCases,
   requiredStringFlagset,
   requiredStringFlagsetCases,
   simpleArgsCases,
-} from "../tests/testData.ts";
-import { testmanyArgExamples } from "../tests/testUtils.ts";
-import { FlagsParser } from "./cmd_parser_3.ts";
-import { testmanyFlagsetExamples } from "../tests/testUtils.ts";
-import { optionalStringFlagset } from "../tests/testData.ts";
-import { optionalStringFlagsetCases } from "../tests/testData.ts";
+} from "./tests/testData.ts";
+import { testmanyArgExamples } from "./tests/testUtils.ts";
+import { testmanyFlagsetExamples } from "./tests/testUtils.ts";
 
 const testFlagset = getTestFlagset();
 const { one, dos, three, four, cinco } = testFlagset;
 
 describe("we can make a simple command", () => {
   type CommandType = { one?: string };
-  // const simpleFlags: Flagset<CommandType> = { one };
   const flags = { one };
   type Params = CliArgs<CommandType>;
 

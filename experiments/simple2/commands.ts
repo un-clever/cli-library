@@ -1,6 +1,5 @@
-import { ParsingError } from "../errors.ts";
-import { GetHelp } from "../errors.ts";
-import type { CliArgs, Flagset } from "../types.ts";
+import { GetHelp, ParsingError } from "./errors.ts";
+import type { CliArgs, Flagset } from "./types.ts";
 import type { Writer } from "@std/io";
 
 export type StringWriter = (msg: string) => Promise<number>; // writer interface
