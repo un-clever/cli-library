@@ -49,13 +49,41 @@ export const dashDashCases: ArgsExample[] = [
 
 const emptyParse: CliArgs<unknown> = { args: [], flags: {}, dashdash: [] };
 
+function fuzzedExample<VV>(eg: FlagsetExample<VV>): FlagsetExample<VV>[] {
+  const { raw, parsed } = eg;
+  if (parsed instanceof Error) return [eg];
+  const { args, flags, dashdash } = parsed;
+  if (dashdash.length > 0) {
+    throw new Error("TEST CODING ERROR: fuzzer can't handle dashdash'ed tests");
+  }
+  // deno-fmt-ignore  (to keep the table concise)
+  return [
+    eg, // original
+    // inject a positional arg before
+    {raw: ["early", ...raw], parsed: {args:["early", ...args] ,flags, dashdash}},
+    // inject a positional arg after
+    {raw: [...raw, "late"], parsed: {args:[...args, "late"] ,flags, dashdash}},
+    // inject positionals before and after
+    // FIXME: {raw: ["early", ...raw, "late"], parsed: {args:["early", ...args, "late"] ,flags, dashdash}},
+    // add an unrecognized flag before and after
+    {raw: ["--some-unrecognized-flag", ...raw], parsed: GenericParsingError},
+    // FIXME: {raw: [...raw, "--some-unrecognized-flag"], parsed: GenericParsingError},
+    // add some passthrough arguments
+    // FIXME {raw: [...raw, "--", "a", "b", "c"], parsed: {args:["early", ...args] ,flags, dashdash: ["a", "b", "c"]}},
+    // add a -- without following arguments
+    // FIXME: {raw: [...raw, "--"], parsed: GenericParsingError},
+  ];
+}
+
 // Boolean flag test data
 export type booleanFlagsetType = { verbose: boolean };
 export const booleanFlagset: Flagset<booleanFlagsetType> = {
   verbose: required("verbose", "", booleanFlag),
 };
+// deno-fmt-ignore  (to keep the table concise)
 export const booleanFlagsetCases: FlagsetExample<booleanFlagsetType>[] = [
-  { raw: ["--verbose"], parsed: { ...emptyParse, flags: { verbose: true } } },
+  ...fuzzedExample<booleanFlagsetType>({ raw: ["--verbose"], parsed: { ...emptyParse, flags: { verbose: true }}}),
+
   // missing flags should default to false since there's no way to set them false yet
   { raw: [], parsed: { ...emptyParse, flags: { verbose: false } } },
 ];
@@ -67,6 +95,7 @@ export const requiredStringFlagset: Flagset<requiredStringFlagsetType> = {
 };
 // deno-fmt-ignore  (to keep the table concise)
 export const requiredStringFlagsetCases: FlagsetExample<requiredStringFlagsetType>[] = [
+  // TODO: functionalize this for numbers too
   { raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } },
   { raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } },
   { raw: ["early", "--title", "go-for-it"], parsed: { args: ["early"], flags: {title: "go-for-it" }, dashdash: []}},
@@ -86,5 +115,4 @@ export const requiredStringFlagsetCases: FlagsetExample<requiredStringFlagsetTyp
   { raw: [], parsed: GenericParsingError }, // missing flag
   { raw: ["--title"], parsed: GenericParsingError }, // missing arg
   { raw: ["--ttile", "arg"], parsed: GenericParsingError }, // unrecognized flag
-
 ];
