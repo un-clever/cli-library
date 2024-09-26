@@ -84,13 +84,28 @@ export interface BaseFlag<V> {
 
 /**
  * RequiredFlag asserts that the flag must be present in the command-line args
- * It will always infer it's parsed type as F
+ * It will always infer it's parsed type as V and require the flag to appear
+ * in the CLI args unless a default is provided.
+ *
+ * NOTE that required flags MAY have a default. The semantic of required flags
+ * is that a successfully parsed CLI with that flag will always have a value for that
+ * flag, i.e. it's a *required* property of the flagset parse.
  */
 export type RequiredFlag<V> = BaseFlag<V> & { required: true };
 
 /**
  * OptionalFlag assets that the flag may be absent from the command-line args.
- * It will infer it's parsed type as F but it's allowable type as F | undefined.
+ * It will infer it's parsed type as V but allow the flag to NOT appear in the
+ * CLI args.
+ *
+ * NOTE that optional flags MAY have a default. The semantic of optional
+ * flags is that a successfully parsed CLI with that flag could have the value
+ * of undefined, i.e. it's an *optional* property of the flagset parse, so code
+ * will have to test for a real value before using the flag. You can do away
+ * with such tests by using a RequiredFlag with a default. Defaults are
+ * permitted on OptionalFlags too because of the reality that developers
+ * sometimes add convenience defaults to CLI's and may want to have the compiler
+ * check for nullish tests in case they later remove those defaults.
  */
 export type OptionalFlag<F> = BaseFlag<F> & { required: false };
 

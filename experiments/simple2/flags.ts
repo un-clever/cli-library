@@ -1,6 +1,94 @@
-import type { FlagParser } from "./types.ts";
+import type { Flag, FlagParser, OptionalFlag, RequiredFlag } from "./types.ts";
 
-export const FailedParse = { n: 0 };
+export const FailedParse = Object.freeze({ n: 0 });
+
+/**
+ * checkFlagDefault audits the flag default value.
+ *
+ * If the parser has a default, it ALWAYS takes precedence over a flag default
+ * because the parser is saying, "my logic depends on a particular thing
+ * happening if this flag is absent"
+ *
+ * LATER: move this to the audit test helper
+ * @param flagName string name of flag for error messsage
+ * @param parser the FlagParser for the flag (which may have a default.)
+ * @param flagDefault any default for this particular flag the developer may have provided
+ * @returns
+ */
+export function checkFlagDefault<V>(
+  flagName: string,
+  parser: FlagParser<V>,
+  flagDefault?: V,
+): V | undefined {
+  if (parser.default && flagDefault) {
+    throw new Error(
+      `flag ${flagName} should not have default ${flagDefault} because it's parser has a mandatory default of ${parser.default}`,
+    );
+  }
+  return parser.default || flagDefault;
+}
+
+/**
+ * Create a required flag
+ *
+ * @param name - long form "slug of the flag", --<name> signals the flag
+ * @param description - long description of the flag
+ * @param parser - parser to extract the flag's value from arguments
+ * @param defaultValue - default value of the flag (otherwise "undefined")
+ * @returns an OptionalFlag for a CLI spec
+ */
+export function required<V>(
+  name: string,
+  description: string,
+  parser: FlagParser<V>,
+  defaultValue?: V,
+): RequiredFlag<V> {
+  return {
+    name,
+    description,
+    parser,
+    required: true,
+    default: checkFlagDefault(name, parser, defaultValue),
+  };
+}
+
+/**
+ * Create an optional flag
+ * @param name - long form "slug of the flag", --<name> signals the flag
+ * @param description - long description of the flag
+ * @param parser - parser to extract the flag's value from arguments
+ * @param defaultValue - default value of the flag (otherwise "undefined")
+ * @returns an OptionalFlag for a CLI spec
+ */
+export function optional<V>(
+  name: string,
+  description: string,
+  parser: FlagParser<V>,
+  defaultValue?: V,
+): OptionalFlag<V> {
+  return {
+    ...required(name, description, parser, defaultValue),
+    required: false,
+  };
+}
+
+/**
+ * Type guard for RequiredFlag
+ * @param f a flag
+ * @returns truthy if it's required
+ */
+export function isRequiredFlag<T>(f: Flag<T>): f is RequiredFlag<T> {
+  return f.required;
+}
+
+/**
+ * Type guard for OptionalFlag
+ * @param f a flag
+ * @returns truthy if it's optional
+ */
+export function isOptionalFlag<T>(f: Flag<T>): f is OptionalFlag<T> {
+  return !f.required;
+}
 
 /**
  * A normal boolean flag, false by default, true if it's present: e.g. --wrap.
