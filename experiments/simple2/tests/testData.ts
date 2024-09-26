@@ -22,8 +22,11 @@ export function makeDashDashCase(
   insertBefore: number,
   eg: ArgsExample,
 ): ArgsExample {
-  if (insertBefore > eg.raw.length) { // dashdash at end causes error
+  if (insertBefore >= eg.raw.length) { // dashdash at end causes error
     const raw = [...eg.raw, "--"];
+    // if (insertBefore < 4) {
+    //   console.debug("failing on raw=", raw, insertBefore, eg.raw);
+    // }
     return { raw, parsed: DashedWithoutArgs };
   }
   const args = eg.raw.slice(0, insertBefore);
