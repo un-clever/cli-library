@@ -1,4 +1,5 @@
 // Data useful for testing CLI implementations
+import { numberFlag } from "../flags.ts";
 import { booleanFlag, optional, required, stringFlag } from "../flags.ts";
 import type { CliArgs, Flagset } from "../types.ts";
 import type { ArgsExample, FlagsetExample } from "./testUtils.ts";
@@ -115,7 +116,6 @@ export const defaultingStringFlagset: Flagset<defaultingStringFlagsetType> = {
 };
 // deno-fmt-ignore  (to keep the table concise)
 export const defaultingStringFlagsetCases: FlagsetExample<defaultingStringFlagsetType>[] = [
-  // test default
   ...fuzzedExample({ raw: [], parsed: { ...emptyParse, flags: {title: "going to the movies" } } }),
   ...fuzzedExample({ raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } }),
   ...fuzzedExample({ raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } }),
@@ -132,8 +132,7 @@ export const optionalStringFlagset: Flagset<optionalStringFlagsetType> = {
   title: optional("title", "", stringFlag),
 };
 // deno-fmt-ignore  (to keep the table concise)
-export const optionalStringFlagsetCases: FlagsetExample<defaultingStringFlagsetType>[] = [
-  // test default
+export const optionalStringFlagsetCases: FlagsetExample<optionalStringFlagsetType>[] = [
   ...fuzzedExample({ raw: [], parsed: { ...emptyParse, flags: {} } }),
   ...fuzzedExample({ raw: ["--title", "go-for-it"], parsed: { ...emptyParse, flags: {title: "go-for-it" } } }),
   ...fuzzedExample({ raw: ["--title", "Go For Words"], parsed: { ...emptyParse, flags: {title: "Go For Words" } } }),
@@ -142,4 +141,63 @@ export const optionalStringFlagsetCases: FlagsetExample<defaultingStringFlagsetT
   // EXPECTED ERRORS
   { raw: ["--title"], parsed: GenericParsingError }, // missing arg
   { raw: ["--ttile", "arg"], parsed: GenericParsingError }, // unrecognized flag
+];
+
+// required numeric flag test data
+export type requiredNumericFlagsetType = { count: number };
+export const requiredNumericFlagset: Flagset<requiredNumericFlagsetType> = {
+  count: required("count", "", numberFlag),
+};
+// deno-fmt-ignore  (to keep the table concise)
+export const requiredNumericFlagsetCases: FlagsetExample<requiredNumericFlagsetType>[] = [
+  ...fuzzedExample({raw: ["--count", "5.4"], parsed: {args:[], flags:{count: 5.4}, dashdash: []}}),
+  ...fuzzedExample({raw: ["--count", "-2000.345"], parsed: {args:[], flags:{count: -2000.345}, dashdash: []}}),
+  ...fuzzedExample({raw: ["--count", "-2"], parsed: {args:[], flags:{count: -2}, dashdash: []}}),
+  // NOTE: we'll grab numbers off the front of any string, just like parseFloat, use a validator if you want more
+  ...fuzzedExample({raw: ["--count", "12abcd"], parsed: {args:[], flags:{count: 12}, dashdash: []}}),
+  // EXPECTED ERRORS
+  { raw: ["--count"], parsed: GenericParsingError }, // missing arg
+  { raw: ["--cnt", "5"], parsed: GenericParsingError }, // unrecognized flag
+  // ...Invalid args
+  {raw: ["--count", "abf1"], parsed: GenericParsingError},
+  {raw: ["--count", "elephant"], parsed: GenericParsingError},
+  // ...NOTE: unlike string flags, "--" is not a valid argument
+  {raw: ["--count", "--"], parsed: GenericParsingError},
+];
+
+// defaulting required numeric flag test data
+export type defaultingNumericFlagsetType = { count: number };
+export const defaultingNumericFlagset: Flagset<defaultingNumericFlagsetType> = {
+  count: required("count", "", numberFlag, -99.5),
+};
+// deno-fmt-ignore  (to keep the table concise)
+export const defaultingNumericFlagsetCases: FlagsetExample<defaultingNumericFlagsetType>[] = [
+  ...fuzzedExample({raw: ["--count", "31.55"], parsed: {args:[], flags:{count: 31.55}, dashdash: []}}),
+  ...fuzzedExample({raw: [], parsed: {args:[], flags:{count: -99.5}, dashdash: []}}),
+  // EXPECTED ERRORS
+  { raw: ["--cnt", "5"], parsed: GenericParsingError }, // unrecognized flag
+  {raw: ["--count"], parsed: GenericParsingError}, // flag present, arg missing
+  // ...Invalid args
+  {raw: ["--count", "abf1"], parsed: GenericParsingError},
+  {raw: ["--count", "elephant"], parsed: GenericParsingError},
+  {raw: ["--count", "--"], parsed: GenericParsingError},
+];
+
+// optional numeric flag test data
+export type optionalNumericFlagsetType = { count?: number };
+export const optionalNumericFlagset: Flagset<optionalNumericFlagsetType> = {
+  count: optional("count", "", numberFlag),
+};
+// deno-fmt-ignore  (to keep the table concise)
+export const optionalNumericFlagsetCases: FlagsetExample<optionalNumericFlagsetType>[] = [
+  ...fuzzedExample({raw: [], parsed: {args:[], flags:{}, dashdash: []}}),
+  ...fuzzedExample({raw: ["--count", "5.4"], parsed: {args:[], flags:{count: 5.4}, dashdash: []}}),
+  ...fuzzedExample({raw: ["--count", "12abcd"], parsed: {args:[], flags:{count: 12}, dashdash: []}}),
+  // EXPECTED ERRORS
+  { raw: ["--count"], parsed: GenericParsingError }, // missing arg
+  { raw: ["--cnt", "5"], parsed: GenericParsingError }, // unrecognized flag
+  // ...Invalid args
+  {raw: ["--count", "abf1"], parsed: GenericParsingError},
+  {raw: ["--count", "elephant"], parsed: GenericParsingError},
+  {raw: ["--count", "--"], parsed: GenericParsingError},
 ];

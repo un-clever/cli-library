@@ -20,8 +20,14 @@ import {
   booleanFlagsetCases,
   type booleanFlagsetType,
   dashDashCases,
+  defaultingNumericFlagset,
+  defaultingNumericFlagsetCases,
   defaultingStringFlagset,
   defaultingStringFlagsetCases,
+  optionalNumericFlagset,
+  optionalNumericFlagsetCases,
+  requiredNumericFlagset,
+  requiredNumericFlagsetCases,
   requiredStringFlagset,
   requiredStringFlagsetCases,
   simpleArgsCases,
@@ -129,4 +135,29 @@ describe("we can parse optional string flags", () => {
   );
 });
 
-describe.skip("TODO: we can parse numeric flags");
+describe(" we can parse required numeric flags", () => {
+  const parse = makeParseFn(requiredNumericFlagset);
+  testmanyFlagsetExamples(
+    "required numeric flag without default",
+    parse,
+    requiredNumericFlagsetCases,
+  );
+});
+
+describe(" we can parse defaulting numeric flags", () => {
+  const parse = makeParseFn(defaultingNumericFlagset);
+  testmanyFlagsetExamples(
+    "required string flag with default",
+    parse,
+    defaultingNumericFlagsetCases,
+  );
+});
+
+describe(" we can parse optional numeric flags", () => {
+  const parse = makeParseFn(optionalNumericFlagset);
+  testmanyFlagsetExamples(
+    "optional numeric flag without default",
+    parse,
+    optionalNumericFlagsetCases,
+  );
+});
