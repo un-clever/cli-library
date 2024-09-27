@@ -1,4 +1,4 @@
-import type { FlagParser } from "../types.ts";
+import type { FlagtypeDef } from "../types.ts";
 
 /**
  * A negatable boolean flag: e.g. --no-wrap
@@ -10,7 +10,7 @@ import type { FlagParser } from "../types.ts";
  * rephrase it if you can. But, here's a helpful type if you want it.
  */
 
-export const negatedFlag: FlagParser<boolean> = {
+export const negatedFlag: FlagtypeDef<boolean> = {
   parse(_i: number, _: string[]) {
     return { n: 0, value: false }; // negated flags are true by default, false if present
   },

@@ -11,7 +11,7 @@ import { assertEquals, describe, it } from "testlib";
 import { booleanFlag, dateFlag, numberFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
 import { negatedFlag } from "../extras/negatedFlag.ts";
-import type { CliArgs, FlagParser, OptionalFlag } from "../types.ts";
+import type { CliArgs, FlagtypeDef, OptionalFlag } from "../types.ts";
 import { FlagsetParsed } from "../types.ts";
 import { KeyOfPropertyEntries } from "@sinclair/typebox";
 import { ParsingError } from "../errors.ts";

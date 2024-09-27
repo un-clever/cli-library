@@ -20,7 +20,7 @@ type BaseFlag<V> = {
   name: string;
   description: string;
   // parser function
-  parser: v1.FlagParser<V>;
+  parser: v1.FlagtypeDef<V>;
   // possible default value
   default?: V;
   // alternative slugs that should be prefixed with --

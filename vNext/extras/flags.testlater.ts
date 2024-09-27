@@ -1,10 +1,10 @@
 // deno-lint-ignore-file no-explicit-any
 import { assertEquals, describe, it } from "testlib";
 import { booleanFlag, numberFlag, stringFlag } from "../flags.ts";
-import type { FlagParser } from "../types.ts";
+import type { FlagtypeDef } from "../types.ts";
 
 // [parser, parse result, input raw args, resulting arg tail]
-type testCase1<T> = [FlagParser<T>, T | undefined, string[], string[]];
+type testCase1<T> = [FlagtypeDef<T>, T | undefined, string[], string[]];
 
 // deno-fmt-ignore  (to keep the table concise)
 const miniParsersTestCases: Record<string, testCase1<any>> = {

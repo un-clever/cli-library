@@ -7,7 +7,7 @@ import type {
   FlagReturn,
   Flagset,
   FlagsetReturn,
-  FlagType,
+  FlagValue,
   OptionalFlag,
   RequiredFlag,
 } from "../types.ts";
@@ -55,11 +55,11 @@ describe("we can strongly type flags", () => {
 describe("we can extract the types of a flag", () => {
   const { one, dos, three, four, cinco } = getTestFlagset();
   it("extracts what TypeScript type a flag parses into", () => {
-    assertType<IsExact<FlagType<typeof one>, string>>(true);
-    assertType<IsExact<FlagType<typeof dos>, string>>(true);
-    assertType<IsExact<FlagType<typeof three>, boolean>>(true);
-    assertType<IsExact<FlagType<typeof four>, number>>(true);
-    assertType<IsExact<FlagType<typeof cinco>, number>>(true);
+    assertType<IsExact<FlagValue<typeof one>, string>>(true);
+    assertType<IsExact<FlagValue<typeof dos>, string>>(true);
+    assertType<IsExact<FlagValue<typeof three>, boolean>>(true);
+    assertType<IsExact<FlagValue<typeof four>, number>>(true);
+    assertType<IsExact<FlagValue<typeof cinco>, number>>(true);
   });
   it("extracts what TypeScript type a flag might be in a set of flags, taking into account that optional flags might be undefined", () => {
     assertType<IsExact<FlagReturn<typeof one>, string | undefined>>(true);
@@ -69,12 +69,12 @@ describe("we can extract the types of a flag", () => {
     assertType<IsExact<FlagReturn<typeof cinco>, number>>(true);
   });
   it("and the extractions are specific enough to catch mistakes", () => {
-    assertType<IsExact<FlagType<typeof one>, boolean>>(false);
-    assertType<IsExact<FlagType<typeof dos>, number>>(false);
-    assertType<IsExact<FlagType<typeof three>, number>>(false);
-    assertType<IsExact<FlagType<typeof three>, string>>(false);
-    assertType<IsExact<FlagType<typeof four>, string>>(false);
-    assertType<IsExact<FlagType<typeof cinco>, boolean>>(false);
+    assertType<IsExact<FlagValue<typeof one>, boolean>>(false);
+    assertType<IsExact<FlagValue<typeof dos>, number>>(false);
+    assertType<IsExact<FlagValue<typeof three>, number>>(false);
+    assertType<IsExact<FlagValue<typeof three>, string>>(false);
+    assertType<IsExact<FlagValue<typeof four>, string>>(false);
+    assertType<IsExact<FlagValue<typeof cinco>, boolean>>(false);
 
     assertType<IsExact<FlagReturn<typeof one>, string>>(false);
     assertType<IsExact<FlagReturn<typeof dos>, string | undefined>>(false);

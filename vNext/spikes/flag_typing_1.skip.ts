@@ -23,7 +23,7 @@ import type * as v1 from "../types.ts";
 
 // reuse the same definition for a single-value flag and its type extractor
 type Flag<V> = v1.Flag<V>;
-type FlagType<F> = v1.FlagType<F>;
+type FlagType<F> = v1.FlagValue<F>;
 
 // Flagsets parse to a structured Result when all props are required
 type FlagsetRequired<R> = {

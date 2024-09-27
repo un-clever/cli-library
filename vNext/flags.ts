@@ -1,4 +1,4 @@
-import type { Flag, FlagParser, OptionalFlag, RequiredFlag } from "./types.ts";
+import type { Flag, FlagtypeDef, OptionalFlag, RequiredFlag } from "./types.ts";
 
 export const FailedParse = Object.freeze({ n: 0 });
 
@@ -17,7 +17,7 @@ export const FailedParse = Object.freeze({ n: 0 });
  */
 export function checkFlagDefault<V>(
   flagName: string,
-  parser: FlagParser<V>,
+  parser: FlagtypeDef<V>,
   flagDefault?: V,
 ): V | undefined {
   const haveParserDefault = parser.default !== undefined;
@@ -42,7 +42,7 @@ export function checkFlagDefault<V>(
 export function required<V>(
   name: string,
   description: string,
-  parser: FlagParser<V>,
+  parser: FlagtypeDef<V>,
   defaultValue?: V,
 ): RequiredFlag<V> {
   return {
@@ -65,7 +65,7 @@ export function required<V>(
 export function optional<V>(
   name: string,
   description: string,
-  parser: FlagParser<V>,
+  parser: FlagtypeDef<V>,
   defaultValue?: V,
 ): OptionalFlag<V> {
   return {
@@ -98,7 +98,7 @@ export function isOptionalFlag<T>(f: Flag<T>): f is OptionalFlag<T> {
  * If you need fancier, default-true (negatable) flags (e.g. --no-wrap). See
  * falseFlag() below.
  */
-export const booleanFlag: FlagParser<boolean> = {
+export const booleanFlag: FlagtypeDef<boolean> = {
   parse(_i: number, _: string[]) {
     // If we get here, the flag is present and already stripped off, so return true
     return { n: 0, value: true };
@@ -109,7 +109,7 @@ export const booleanFlag: FlagParser<boolean> = {
 /**
  * Parse a string flag
  */
-export const stringFlag: FlagParser<string> = {
+export const stringFlag: FlagtypeDef<string> = {
   parse(i: number, args: string[]) {
     const n = 1;
     const value = args[i];
@@ -121,7 +121,7 @@ export const stringFlag: FlagParser<string> = {
 /**
  * Parse a decimal floating point number into a JavaScript number
  */
-export const numberFlag: FlagParser<number> = {
+export const numberFlag: FlagtypeDef<number> = {
   parse(i: number, args: string[]) {
     const n = 1;
     const value = parseFloat(args[i]);
