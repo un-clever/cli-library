@@ -2,6 +2,32 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.5.1 - 2024-09-27
+#### Miscellaneous Chores
+- **(version)** v0.5.1-alpha.2 - (9867990) - Brad Olson
+
+- - -
+
+## v0.5.1-alpha.2 - 2024-09-27
+#### Build system
+- once again repair multi-version directories - (0f74476) - Brad Olson
+- fix multi-version exports - (b18e0ce) - Brad Olson
+#### Miscellaneous Chores
+- **(version)** v0.5.1-alpha.2 - (147563d) - Brad Olson
+- really fix changelog - (bddb1a9) - Brad Olson
+- fix changelog - (9e1d620) - Brad Olson
+
+- - -
+
+## v0.5.1-alpha.1 - 2024-09-27
+#### Build system
+- prepare pre-release - (7d642bb) - Brad Olson
+- moved misplaced changelog - (3f5bbc6) - Brad Olson
+#### Miscellaneous Chores
+- **(version)** v0.5.1-alpha.1 - (3eedb07) - Brad Olson
+
+- - -
+
 ## v0.5.1-alpha.2 - 2024-09-27
 #### Build system
 - once again repair multi-version directories - (0f74476) - Brad Olson
