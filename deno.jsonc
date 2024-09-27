@@ -1,6 +1,6 @@
 {
   "name": "@un-clever/cli-library",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "exports": {
     ".": "./v02/mod.ts",
     "./v02": "./v02/mod.ts",
