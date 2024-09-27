@@ -107,26 +107,12 @@ export function command<VV>(
     description: string;
     flags: Flagset<VV>;
     run: CommandFn<VV>;
-    output: Writer;
   },
 ): Command<VV> {
-  const encoder = new TextEncoder();
-  const write = async (msg: string) =>
-    await opts.output.write(encoder.encode(msg));
   const parse = (args: string[]) => {
     const fp = new FlagsParser(opts.flags);
     return fp.parse(args);
   };
-  // const parseAndRun = async (args: string[]): Promise<number> => {
-  //   try {
-  //     const params = parse(args);
-  //     const result = await opts.run(params, write);
-  //     return result;
-  //   } catch (err) {
-  //     await write(GetHelp(err));
-  //     return 999;
-  //   }
-  // };
 
   return {
     describe: () => opts.description,
@@ -134,4 +120,22 @@ export function command<VV>(
     parse,
     execute: opts.run,
   };
+}
+
+export async function runCommand<VV>(
+  cmd: Command<VV>,
+  args: string[],
+  output: Writer,
+): Promise<number> {
+  const encoder = new TextEncoder();
+  const write = async (msg: string) => await output.write(encoder.encode(msg));
+
+  try {
+    const params = cmd.parse(args);
+    const result = await cmd.execute(params, write);
+    return result;
+  } catch (err) {
+    await write(GetHelp(err));
+    return 999;
+  }
 }

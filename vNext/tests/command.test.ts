@@ -1,12 +1,13 @@
 // deno-lint-ignore-file no-unused-vars
-import {
-  command,
-  type CommandFunction,
-  FlagsParser,
-  type StringWriter,
-} from "../command.ts";
+import { command, FlagsParser, runCommand } from "../command.ts";
 import { getTestFlagset } from "./testUtils.ts";
-import type { CliArgs, Flagset, FlagsetParseFn } from "../types.ts";
+import type {
+  CliArgs,
+  CommandFn,
+  Flagset,
+  FlagsetParseFn,
+  StringWrite,
+} from "../types.ts";
 import {
   assertEquals,
   assertThrows,
@@ -45,13 +46,13 @@ describe("we can make a simple command", () => {
   const flags = { one };
   type Params = CliArgs<CommandType>;
 
-  async function run(params: Params, write: StringWriter): Promise<number> {
+  async function run(params: Params, write: StringWrite): Promise<number> {
     await write(JSON.stringify(params));
     return 0;
   }
 
   it("the types check out", () => {
-    assertType<IsExact<CommandFunction<CommandType>, typeof run>>(true);
+    assertType<IsExact<CommandFn<CommandType>, typeof run>>(true);
     assertType<IsExact<Flagset<CommandType>, typeof flags>>(true);
   });
 
@@ -64,11 +65,12 @@ describe("we can make a simple command", () => {
     };
     const description = "test command";
     const output = new Buffer(); // one way to trap command output...
-    const cmd = command({ description, flags, run, output });
+    const cmd = command({ description, flags, run });
     assertEquals(cmd.describe(), description);
     assertEquals(cmd.help(), description);
     assertEquals(cmd.parse(args), expectedParams);
-    await cmd.parseAndRun(args);
+    const status = await runCommand(cmd, args, output);
+    assertEquals(status, 0);
     const decoder = new TextDecoder(); //...and here's grabbing that output
     assertEquals(JSON.parse(decoder.decode(output.bytes())), expectedParams);
   });
