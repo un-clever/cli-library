@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.6.1 - 2024-09-27
+#### Build system
+- postedits for v0.6.0 - (387809b) - Brad Olson
+- postedits for v0.6.0 - (2153d27) - Brad Olson
+#### Documentation
+- improve notes in v0.2 - (51ee68d) - Brad Olson
+#### Miscellaneous Chores
+- clean out spikes and experiments to attic - (bfae4b1) - Brad Olson
+
+- - -
+
 ## v0.6.0 - 2024-09-27
 #### Features
 - add very simple command help - (0c45949) - Brad Olson
