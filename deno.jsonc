@@ -1,7 +1,11 @@
 {
   "name": "@un-clever/cli-library",
   "version": "0.5.1-alpha.1",
-  "exports": { "./": "./v02/mod.ts", "./v02": "./v02/mod.ts" },
+  "exports": {
+    "./": "./v02/mod.ts",
+    "./v02": "./v02/mod.ts",
+    "./vnext": "./vNext/index.ts"
+  },
   "tasks": {
     "test": "deno test --watch ./src",
     "status": "convco changelog --include-hidden-sections --no-links",

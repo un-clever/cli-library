@@ -4,9 +4,9 @@ import {
   type CommandFunction,
   FlagsParser,
   type StringWriter,
-} from "./commands.ts";
-import { getTestFlagset } from "./tests/testUtils.ts";
-import type { CliArgs, Flagset, FlagsetParseFn } from "./types.ts";
+} from "../command.ts";
+import { getTestFlagset } from "./testUtils.ts";
+import type { CliArgs, Flagset, FlagsetParseFn } from "../types.ts";
 import {
   assertEquals,
   assertThrows,
@@ -33,9 +33,9 @@ import {
   requiredStringFlagset,
   requiredStringFlagsetCases,
   simpleArgsCases,
-} from "./tests/testData.ts";
-import { testmanyArgExamples } from "./tests/testUtils.ts";
-import { testmanyFlagsetExamples } from "./tests/testUtils.ts";
+} from "./testData.ts";
+import { testmanyArgExamples } from "./testUtils.ts";
+import { testmanyFlagsetExamples } from "./testUtils.ts";
 
 const testFlagset = getTestFlagset();
 const { one, dos, three, four, cinco } = testFlagset;
