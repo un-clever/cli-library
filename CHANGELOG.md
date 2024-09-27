@@ -6,8 +6,6 @@ All notable changes to this project will be documented in this file. See [conven
 #### Build system
 - prepare pre-release - (7d642bb) - Brad Olson
 
-- - -
-
 ## v0.5.0 - 2024-09-26
 #### Documentation
 - refine FlagParser - (d0c2d3f) - Brad Olson
@@ -20,7 +18,6 @@ All notable changes to this project will be documented in this file. See [conven
 #### Style
 - **(green)** moved tests to their own folder for easier cloc checks - (3e47ddf) - Brad Olson
 
-- - -
 ## v0.4.0 - 2024-09-20 WIP Version 2
 #### Features
 - Strongly type a simpler parser - (d3ea842) - Brad Olson
