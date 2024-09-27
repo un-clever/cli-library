@@ -2,49 +2,70 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.6.1 - 2024-09-27
+#### Build system
+- postedits for v0.6.0 - (387809b) - Brad Olson
+- postedits for v0.6.0 - (2153d27) - Brad Olson
+#### Documentation
+- improve notes in v0.2 - (51ee68d) - Brad Olson
+#### Miscellaneous Chores
+- clean out spikes and experiments to attic - (bfae4b1) - Brad Olson
+
+- - -
+
+## v0.6.0 - 2024-09-27
+#### Features
+- add very simple command help - (0c45949) - Brad Olson
+
+- - -
+## v0.5.2-alpha.1 - 2024-09-27
+#### Miscellaneous Chores
+- remove changie config - (1773f40) - Brad Olson
+- clean changelog - (d4993b9) - Brad Olson
+#### Refactoring
+- **(green)** move bundle files to root directory to decrease IDE double imports - (d3f83fa) - Brad Olson
+- **(green)** separate command runner from command - (4eb9a24) - Brad Olson
+- **(green)** Rename many types - (940672f) - Brad Olson
+- renaming more types - (8eede36) - Brad Olson
+
+- - -
+
 ## v0.5.1-alpha.1 - 2024-09-26
 #### Build system
 - prepare pre-release - (7d642bb) - Brad Olson
 
-- - -
-
 ## v0.5.0 - 2024-09-26
 #### Documentation
 - refine FlagParser - (d0c2d3f) - Brad Olson
-- document utility functions - (c9ce847) - Brad Olson
 #### Features
-- **(green)** adopt command parser spike 3 into simple2 experiment - (d0eb50a) - Brad Olson
-- **(green)** allow both Optional and required flags to have defaults, changing semantics slightly - (592ca65) - Brad Olson
-- **(green)** Make flag parsers index-based to reduce gc and re-assignment problems - (08c0452) - Brad Olson
-- **(types)** stronglly typed flagsets with optional params - (992b856) - Brad Olson
+- promote simpler parser to vnext - (d0eb50a) - Brad Olson
+- allow both Optional and required flags to have defaults - (592ca65) - Brad Olson
+- Make flag parsers index-based to reduce gc and re-assignment problems - (08c0452) - Brad Olson
+- stronglly typed flagsets with optional params - (992b856) - Brad Olson
 - add flag factory utility functions - (cb7dbe9) - Brad Olson
 #### Style
 - **(green)** moved tests to their own folder for easier cloc checks - (3e47ddf) - Brad Olson
-#### Tests
-- **(bookmark)** spike3 passes simple args passing... - (803088c) - Brad Olson
-- **(green)** test optional and default string flags - (eb25861) - Brad Olson
-- **(green)** fixed: parsing trailing positionals - (3c90b59) - Brad Olson
-- **(green)** test boolean flags and throw and double defaults - (ce12e70) - Brad Olson
-- **(green)** optionally prohibit dashdash in the args - (caac95d) - Brad Olson
-- **(green)** dashdash parsing works - (c0bf634) - Brad Olson
-- **(green)** spike3 basic command works - (4f7cdc8) - Brad Olson
-- **(green)** spike3 types required and optional TOGETHER fully - (6ba8e51) - Brad Olson
-- **(green)** spike3 types required and optional TOGETHER - (ffca4cb) - Brad Olson
-- **(green)** spike3 types required and optional separately - (5804a13) - Brad Olson
-- **(green)** spike2 complete--this has to use discriminated unions to distinguish required, I think, tests passing, conclusion failed. - (7beda35) - Brad Olson
-- **(green)** the same tests pass when I throw in an optional field provided I cast correctly. - (3eb79c5) - Brad Olson
-- **(green)** I can fully round trip types from flagsets that are all optional or all requried - (327a1c2) - Brad Olson
-- **(green)** I can type flagsets correctly when the props are optional - (138c88f) - Brad Olson
-- **(green)** I can type flagsets correctly when the results are required - (be5c406) - Brad Olson
-- **(green)** I can round trip flag types - (6d14d4a) - Brad Olson
-- **(green)** simple parser handles one arg - (746d386) - Brad Olson
-- **(green)** made notes trying to type flags with optional props - (567a9b4) - Brad Olson
-- **(red)** need to fix late positional arg parsing - (2d9456e) - Brad Olson
-- **(red)** I can type flagsets correctly when the props are optional - (9549b1b) - Brad Olson
-- **(red)** I want to round trip flagset types - (a82389a) - Brad Olson
-- test all numericFlags - (1fd1cb4) - Brad Olson
-- further proving to myself I need to expose distinct types - (cd2e436) - Brad Olson
 
-- - -
+## v0.4.0 - 2024-09-20 WIP Version 2
+#### Features
+- Strongly type a simpler parser - (d3ea842) - Brad Olson
+- Finish work on mini parsers - (09751e5) - Brad Olson
+#### Miscellaneous Chores
+- Move deps from deps.ts to import map - (d445e98) - Brad Olson
+- Move deno config to jsonc - (7488be5) - Brad Olson
+- Restructure testing imports... - (af4c3cf) - Brad Olson
+
+## v0.3.0 - 2024-09-16
+#### Build
+- fix version number for jsr - (54f6020) - Brad Olson
+- fixing changelog generation - (cde935a) - Brad Olson
+#### Bug Fixes
+- patch git History for cog - (9a55eee) - Brad Olson
+
+## v0.2.3 - 2024-09-16
+#### Features
+- initial dev version - (8777fe5) - Brad Olson
+#### Miscellaneous Chores
+- add an initial changelog - (2b71fc6) - Brad Olson
 
 Changelog generated by [cocogitto](https://github.com/cocogitto/cocogitto).
