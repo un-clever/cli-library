@@ -1,5 +1,5 @@
 import { assertThrows, describe, it } from "testlib";
-import { getFlagsetParser } from "../flagset.ts";
+import { getFlagsetHelp, getFlagsetParser } from "../flagset.ts";
 import {
   booleanFlagset,
   booleanFlagsetCases,
@@ -19,6 +19,7 @@ import {
   simpleArgsCases,
 } from "./testData.ts";
 import { testmanyArgExamples, testmanyFlagsetExamples } from "./testUtils.ts";
+import { assertEquals } from "@std/assert/equals";
 
 describe("we can parse simple positional arguments", () => {
   testmanyArgExamples(getFlagsetParser<unknown>({}), simpleArgsCases);
@@ -62,6 +63,7 @@ describe("we can parse optional string flags", () => {
     optionalStringFlagsetCases,
   );
 });
+
 describe(" we can parse required numeric flags", () => {
   testmanyFlagsetExamples(
     "required numeric flag without default",
@@ -76,10 +78,17 @@ describe(" we can parse defaulting numeric flags", () => {
     defaultingNumericFlagsetCases,
   );
 });
-describe(" we can parse optional numeric flags", () => {
+describe("we can parse optional numeric flags", () => {
   testmanyFlagsetExamples(
     "optional numeric flag without default",
     getFlagsetParser(optionalNumericFlagset),
     optionalNumericFlagsetCases,
   );
+});
+
+describe("flagsets can generate help", () => {
+  it("rudimentasry flagset help", () => {
+    const help = getFlagsetHelp(optionalStringFlagset);
+    assertEquals(help, "--title: \n");
+  });
 });

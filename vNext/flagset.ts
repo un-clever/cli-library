@@ -1,3 +1,4 @@
+// code for using flagsets to parse command lines and generate help
 import { ParsingError } from "./errors.ts";
 import type { CliArgs, Flagset, FlagsetParseFn } from "./types.ts";
 
@@ -107,4 +108,24 @@ class FlagsParser1<VV> {
     }
     return flags as VV;
   }
+}
+
+export function flagNames<VV>(fs: Flagset<VV>): (keyof Flagset<VV>)[] {
+  const names = Object.keys(fs);
+  return names.sort() as (keyof Flagset<VV>)[];
+}
+
+export function getFlagsetHelp<VV>(fs: Flagset<VV>): string {
+  const result: string[] = [];
+  for (const name of flagNames(fs)) {
+    const f = fs[name];
+    // TODO: somewhere, f.name === name
+    result.push(
+      `--${f.name}: ${f.description}${
+        f.default ? ` (default: ${f.default})` : ""
+      }`,
+    );
+  }
+  result.push("");
+  return result.join("\n");
 }
