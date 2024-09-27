@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.6.2 - 2024-09-27
+#### Build system
+- trigger provenance on jsr - (364330c) - Brad Olson
+#### Miscellaneous Chores
+- **(github)** merge help into main - (ec359b7) - Brad Olson
+- version fixup - (cbd5e6d) - Brad Olson
+
+- - -
+
 ## v0.6.1 - 2024-09-27
 #### Build system
 - postedits for v0.6.0 - (387809b) - Brad Olson
