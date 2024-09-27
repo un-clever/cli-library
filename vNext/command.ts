@@ -1,5 +1,5 @@
 import { GetHelp } from "./errors.ts";
-import { getFlagsetParser } from "./flagset.ts";
+import { getFlagsetHelp, getFlagsetParser } from "./flagset.ts";
 import type { Command, CommandFn, Flagset } from "./types.ts";
 import type { Writer } from "@std/io";
 
@@ -10,9 +10,11 @@ export function command<VV>(
     run: CommandFn<VV>;
   },
 ): Command<VV> {
+  const help = (): string =>
+    `${opts.description}\n\n${getFlagsetHelp(opts.flags)}`;
   return {
     describe: () => opts.description,
-    help: () => opts.description,
+    help,
     parse: getFlagsetParser(opts.flags),
     execute: opts.run,
   };

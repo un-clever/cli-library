@@ -40,7 +40,10 @@ describe("we can make a simple command", () => {
     const output = new Buffer(); // one way to trap command output...
     const cmd = command({ description, flags, run });
     assertEquals(cmd.describe(), description);
-    assertEquals(cmd.help(), description);
+    assertEquals(
+      cmd.help(),
+      `test command\n\n--one: your optional string argument\n`,
+    );
     assertEquals(cmd.parse(args), expectedParams);
     const status = await runCommand(cmd, args, output);
     assertEquals(status, 0);
