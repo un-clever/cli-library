@@ -56,7 +56,7 @@ describe("we can make a simple command", () => {
     assertType<IsExact<Flagset<CommandType>, typeof flags>>(true);
   });
 
-  it("tries", async () => {
+  it("seems to work", async () => {
     const args = ["a", "b", "--one", "c"];
     const expectedParams: Params = {
       flags: { one: "c" },

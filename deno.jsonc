@@ -4,7 +4,7 @@
   "exports": {
     ".": "./v02/mod.ts",
     "./v02": "./v02/mod.ts",
-    "./vnext": "./vNext/index.ts"
+    "./vnext": "./vnext.ts"
   },
   "tasks": {
     "test": "deno test --watch ./src",

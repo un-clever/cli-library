@@ -1,6 +1,5 @@
 import { GetHelp, ParsingError } from "./errors.ts";
-import { Command } from "./index.ts";
-import type { CliArgs, CommandFn, Flagset } from "./types.ts";
+import type { CliArgs, Command, CommandFn, Flagset } from "./types.ts";
 import type { Writer } from "@std/io";
 
 export class FlagsParser<VV> {
