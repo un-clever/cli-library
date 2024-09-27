@@ -1,4 +1,4 @@
-// deno-lint-ignore-file no-unused-vars
+// deno-lint-ignore-file no-unused-vars no-explicit-any
 import { assert, assertEquals, describe, it } from "testlib";
 import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";

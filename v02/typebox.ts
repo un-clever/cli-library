@@ -9,6 +9,9 @@ import { Value } from "@sinclair/typebox/value";
 import type { ArgList, CommandHandler, Env, Parser } from "./types.ts";
 import { Command } from "./Command.ts";
 
+/**
+ * Add some key types to Typebox
+ */
 export function initializeTypebox(): void {
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   FormatRegistry.Set("date", (v) => dateRegex.test(v));
@@ -66,6 +69,11 @@ function cliArgSpecs(propname: string, prop: TSchema): string[] {
   return [propname, "NEEDS A .TITLE PROPERTY"];
 }
 
+/**
+ * Generate help for one option in a Typebox schema
+ * @param schema
+ * @returns
+ */
 export function typeboxOptionDocumentation<S extends TObject>(
   schema: S,
 ): string {
@@ -77,6 +85,12 @@ export function typeboxOptionDocumentation<S extends TObject>(
     .join("\n");
 }
 
+/**
+ * @param commandSchema turn a typebox schema into a command
+ * @param handler
+ * @param semver
+ * @returns
+ */
 export function typeboxCommand<S extends TObject>(
   commandSchema: S,
   handler: TypeboxHandler<S>,
@@ -97,7 +111,11 @@ export function typeboxCommand<S extends TObject>(
 
 // DENO SPECIFIC CODE
 
-// turns a typebox schema into a minimist parse options object
+/**
+ * turns a typebox schema into a minimist parse options object
+ * @param t
+ * @returns
+ */
 export function toParseArgsOptions(t: TObject): ParseOptions {
   const stringOptions: string[] = [];
   const booleanOptions: string[] = [];
@@ -144,6 +162,11 @@ export function toParseArgsOptions(t: TObject): ParseOptions {
 }
 
 // This is a stub implementation of a parser for typebox schemas
+/**
+ * A rudimentary CLI parser
+ * @param schema
+ * @returns
+ */
 export function typeboxParser<S extends TObject>(schema: S): Parser<Static<S>> {
   initializeTypebox();
   return (raw: ArgList, ..._envs: Env[]) => {

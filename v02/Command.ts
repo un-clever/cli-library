@@ -1,17 +1,20 @@
 import type {
   ArgList,
-  Env,
   CommandHandler,
   CommandMetadata,
+  Env,
   ParsedArgs,
 } from "./types.ts";
 import type { Parser } from "./types.ts";
 
+/**
+ * Command class defines  CLI program
+ */
 export class Command<TArgs> {
   constructor(
     readonly metadata: CommandMetadata,
     private parser: Parser<TArgs>,
-    private handler: CommandHandler<TArgs>
+    private handler: CommandHandler<TArgs>,
   ) {
     //TODO: add tokens (aliases) to metadata and confirm no dups
     //TODO: add command aliases and match3es command predicate (aliases will be checked for dups in multicommand)
@@ -33,7 +36,7 @@ export class Command<TArgs> {
   help(): void {
     console.log(
       this.usage(),
-      "\n\nOptions:\n" + this.metadata.optionsDocumentation
+      "\n\nOptions:\n" + this.metadata.optionsDocumentation,
     );
   }
 
@@ -53,6 +56,10 @@ export class Command<TArgs> {
   }
 }
 
+/**
+ * @param args wantsHelp returns true if the CLI seems to be requesting help
+ * @returns
+ */
 export function wantsHelp(args: ArgList): boolean {
   return ["help", "-h", "--help", "-?"].includes(args[0]);
 }

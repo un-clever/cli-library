@@ -1,6 +1,9 @@
 import type { ArgList, CommandMetadata, Env } from "./types.ts";
 import type { Command } from "./Command.ts";
 
+/**
+ * MultiCommand is a class that defines a CLI with multiple subcommands
+ */
 export class MultiCommand {
   constructor(
     private metadata: Omit<CommandMetadata, "optionsDocumentation">,

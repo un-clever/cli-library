@@ -1,4 +1,4 @@
-import { Env } from "./types.ts";
+import type { Env } from "./types.ts";
 
 /**
  * Retrieves the value of the specified environment variable from the given array of environments.
@@ -12,7 +12,7 @@ import { Env } from "./types.ts";
 export function getEnv(
   key: string,
   envs: Env[],
-  defaultValue?: string
+  defaultValue?: string,
 ): string | undefined {
   for (const env of envs) {
     if (env[key]) return env[key];
@@ -20,16 +20,24 @@ export function getEnv(
   return defaultValue;
 }
 
+/**
+ * mustGetEnv throws an exception if the env value isn't defined
+ * @param key
+ * @param description
+ * @param envs
+ * @param defaultValue
+ * @returns
+ */
 export function mustGetEnv(
   key: string,
   description: string,
   envs: Env[],
-  defaultValue?: string
+  defaultValue?: string,
 ) {
   const value = getEnv(key, envs, defaultValue);
   if (value === undefined) {
     throw new Error(
-      `Missing required environment variable: ${key} (${description})`
+      `Missing required environment variable: ${key} (${description})`,
     );
   }
   return value;
