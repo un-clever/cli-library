@@ -1,13 +1,7 @@
 import { GetHelp, ParsingError } from "./errors.ts";
-import type { CliArgs, Flagset } from "./types.ts";
+import { Command } from "./index.ts";
+import type { CliArgs, CommandFn, Flagset } from "./types.ts";
 import type { Writer } from "@std/io";
-
-export type StringWriter = (msg: string) => Promise<number>; // writer interface
-
-export type CommandFunction<VV> = (
-  params: CliArgs<VV>,
-  write: StringWriter,
-) => Promise<number>;
 
 export class FlagsParser<VV> {
   // mutable: we will be mutating these during the parse, so this class is NOT thread safe
@@ -112,10 +106,10 @@ export function command<VV>(
   opts: {
     description: string;
     flags: Flagset<VV>;
-    run: CommandFunction<VV>;
+    run: CommandFn<VV>;
     output: Writer;
   },
-) {
+): Command<VV> {
   const encoder = new TextEncoder();
   const write = async (msg: string) =>
     await opts.output.write(encoder.encode(msg));
@@ -123,23 +117,21 @@ export function command<VV>(
     const fp = new FlagsParser(opts.flags);
     return fp.parse(args);
   };
-  const parseAndRun = async (args: string[]): Promise<number> => {
-    try {
-      const params = parse(args);
-      const result = await opts.run(params, write);
-      return result;
-    } catch (err) {
-      await write(GetHelp(err));
-      return 999;
-    }
-  };
+  // const parseAndRun = async (args: string[]): Promise<number> => {
+  //   try {
+  //     const params = parse(args);
+  //     const result = await opts.run(params, write);
+  //     return result;
+  //   } catch (err) {
+  //     await write(GetHelp(err));
+  //     return 999;
+  //   }
+  // };
 
   return {
     describe: () => opts.description,
     help: () => opts.description,
     parse,
-    run: opts.run,
-    parseAndRun,
-    write,
+    execute: opts.run,
   };
 }

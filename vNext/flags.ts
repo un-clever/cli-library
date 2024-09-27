@@ -1,6 +1,13 @@
-import type { Flag, FlagtypeDef, OptionalFlag, RequiredFlag } from "./types.ts";
+import type {
+  Flag,
+  FlagtypeDef,
+  OptionalFlag,
+  ParseResult,
+  RequiredFlag,
+} from "./types.ts";
 
-export const FailedParse = Object.freeze({ n: 0 });
+// deno-lint-ignore no-explicit-any
+export const FailedParse: ParseResult<any> = Object.freeze({ n: 0 });
 
 /**
  * checkFlagDefault audits the flag default value.

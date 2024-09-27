@@ -11,7 +11,7 @@ export class ParsingError extends Error {
     super(message);
   }
 
-  help() {
+  help(): string {
     const messages = [`Parsing error: ${this.message}`];
 
     // enrich with any metadata that's present

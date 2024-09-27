@@ -234,3 +234,27 @@ export interface CliArgs<VV> {
  * default flags,
  */
 export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
+
+/**
+ * StringWrite is any async command that can take a string and output it
+ * somewhere, typically stdout.
+ */
+export type StringWrite = (msg: string) => Promise<number>; // writer interface
+
+/**
+ * CommandFn is a function which implements (executes a command).
+ */
+export type CommandFn<VV> = (
+  params: CliArgs<VV>,
+  write: StringWrite,
+) => Promise<number>;
+
+/**
+ * Command is the functional interface to a CLI program
+ */
+export interface Command<VV> {
+  describe: () => string;
+  help: () => string;
+  parse: FlagsetParseFn<VV>;
+  execute: CommandFn<VV>;
+}
