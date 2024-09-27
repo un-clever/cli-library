@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.6.0 - 2024-09-27
+#### Features
+- add very simple command help - (0c45949) - Brad Olson
+
+- - -
 ## v0.5.2-alpha.1 - 2024-09-27
 #### Miscellaneous Chores
 - remove changie config - (1773f40) - Brad Olson
