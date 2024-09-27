@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.5.2-alpha.1 - 2024-09-27
+#### Miscellaneous Chores
+- remove changie config - (1773f40) - Brad Olson
+- clean changelog - (d4993b9) - Brad Olson
+#### Refactoring
+- **(green)** move bundle files to root directory to decrease IDE double imports - (d3f83fa) - Brad Olson
+- **(green)** separate command runner from command - (4eb9a24) - Brad Olson
+- **(green)** Rename many types - (940672f) - Brad Olson
+- renaming more types - (8eede36) - Brad Olson
+
+- - -
+
 ## v0.5.1-alpha.1 - 2024-09-26
 #### Build system
 - prepare pre-release - (7d642bb) - Brad Olson
