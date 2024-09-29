@@ -10,6 +10,20 @@ export function getFlagsetParser<VV>(
   return fp.parse.bind(fp);
 }
 
+export function auditFlagset<VV>(fs: Flagset<VV>): string[] {
+  const problems: string[] = [];
+  for (const k in fs) {
+    const flag = fs[k];
+    if (k !== flag.name) {
+      problems.push(`flag key ("${k}") !== flag.name ("${flag.name}")`);
+    }
+    if (k === "help") {
+      problems.push(`help is processed especially; don't a help flag`);
+    }
+  }
+  return problems;
+}
+
 // don't use this outside the module--it may get refactored into a more functional approach
 class FlagsParser1<VV> {
   // mutable: we will be mutating these during the parse, so this class is NOT thread safe
@@ -27,8 +41,10 @@ class FlagsParser1<VV> {
     // we will be incrementing i in the loop body
     for (let i = 0; i < args.length;) {
       const arg = args[i++];
-      // NOTE: we used to make dashdash optional, but now we just parse it and fail if not allowed
-      if (arg === "--") {
+      if (["--help", "-h"].includes(arg)) {
+        throw new ParsingError("help requested", "", "help");
+      } else if (arg === "--") {
+        // NOTE: we used to make dashdash optional, but now we just parse it and fail if not allowed
         i = this.gulpDashDash(i, args);
       } else if (arg.startsWith("--")) {
         i = this.handleFlag(arg.slice(2), i, args);
@@ -111,13 +127,17 @@ class FlagsParser1<VV> {
 }
 
 export function flagNames<VV>(fs: Flagset<VV>): (keyof Flagset<VV>)[] {
-  const names = Object.keys(fs);
+  const names = [...Object.keys(fs), "help"];
   return names.sort() as (keyof Flagset<VV>)[];
 }
 
 export function getFlagsetHelp<VV>(fs: Flagset<VV>): string {
   const result: string[] = [];
   for (const name of flagNames(fs)) {
+    if (name === "help") {
+      result.push(`--help: show comand help`);
+      continue;
+    }
     const f = fs[name];
     // TODO: somewhere, f.name === name
     result.push(

@@ -2,7 +2,7 @@
   "name": "@un-clever/cli-library",
   "version": "0.6.2",
   "exports": {
-    ".": "./vnext.ts"
+    ".": "./index.ts"
   },
   "tasks": {
     "test": "deno test --watch ./src"
