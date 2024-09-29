@@ -1,24 +1,28 @@
 # Un-Clever Command Line App Library
 
-Status: informative, tiny, but unstable
+Status: informative, tiny, but unstable.
 
-I can be really clever. Sometimes that's a bonus; sometimes it's a footgun. I'm not advocating stupid, mind you. I'm not even saying things always have to be simple because simple can hide a lot of complexity. But with most of the CLI tools and scripts I write, the constant challenge is: "Don't get too clever. This isn't the main task; it's the task you're doing so you can accomplish the main task."
+This is a utilitarian library for writing tools. It's probably not what you want to write a rich, beautiful, CLI app made for mass consumption, but it's just the ticket for that custom CLI you use every other month and don't want to have to re-remember a how a complicated library works just to change it.
 
-Command line tools are like pajamas. I find myself using them often, but not always the same ones. For the ones I create, they mostly have to be functional, reliable, and easy to maintain more than they have to be beautiful.
+## Quick Start
 
-I appreciate a beautiful, elegant CLI app. Colors, well-formatted help, progress bars. If you make ones like that, wonderful! Don't use this library! Check out the alternatives I list at the bottom of this README.
+## Philosophy
 
-But the CLI scripts I write just need to get a job done over time. I want them to help me do that now...and six months from now when I have to use them again. I want to be able to extend or add commands without having to spend a lot of time re-learning a toolkit.
+It emphasizes:
+
+- Small in terms of: lines of code, cognitive burden, dependencies
+- Easy to re-learn when you have to modify a tool a year later
+- Leverage TypeScript instead of a custom DSL
+- Strongly typed
+
+The CLI scripts I write just need to get a job done over time. I want them to help me do that now...and six months from now when I have to use them again. I want to be able to extend or add commands without having to spend a lot of time re-learning a toolkit.
 
 This library has several goals:
 
 - Orthagonal: single-command scripts can be easily combined into one script with subcommands.
 - Slim on code: so I can understand it six months from now.
 - Slim on deps: to decrease security and size risks. I only want to use built-in's, a simple arg parser, and a validator library.
-- Leverage TypeScript: because I don't want to have to re-learn a DSL to maintain s script.
-- Leverage A Popular Validation Library: because I do want to ensure CLI args are valid, but I don't want to re-learn an ad-hoc command schema each time I need to write a script.
-
-What do I mean by that last concern? I've built CLI's with a lot of libraries, but they all invent their own way to specify valid command-line arguments, and most of them eventually approach the complexity of a schema validation library (Like Zod, Joi, JSONSchema libraries, etc.) I already use those tools and I don't want to learn new ways to state schema.
+- Leverage TypeScript: because I don't want to have to re-learn a DSL to maintain a tool.
 
 So here's the basic concept. An un-clever CLI command has
 
@@ -30,10 +34,6 @@ So here's the basic concept. An un-clever CLI command has
 Such commands can easily be combined into an un-clever Multi-CLI that has can list or execute the subcommands.
 
 No magic. That's just leveraging basic TypeScript.
-
-I don't use the library at that level, though. For a little bit more ease (and hidden complexity), there's a function that will take Typebox validator and derived the Help and Parser for me. I hope to add Zod, the other validator I use often.
-
-The approach, I think, is solid: use a simple args parser (we use @std's cross-platform one based on Minimist) to parse the args *tolerantly*. Use an  existing validator library to prevent invalid args. Then pass those args as a single struct to a vanilla function that get's the job done.
 
 ## Future Plans
 

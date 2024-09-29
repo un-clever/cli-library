@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.7.0 - 2024-09-29
+#### Features
+- add help flag handling... - (50ba2df) - Brad Olson
+- BREAKING PRE-MAJOR CHANGE removing Typebox - (645bf4b) - Brad Olson
+#### Miscellaneous Chores
+- remove v02 (with Typebox support) - (ebed686) - Brad Olson
+
+- - -
+
 ## v0.6.2 - 2024-09-27
 #### Build system
 - trigger provenance on jsr - (364330c) - Brad Olson
