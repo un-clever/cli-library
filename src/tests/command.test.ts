@@ -6,7 +6,7 @@ import type {
   CommandFn,
   Flagset,
   FlagsetParseFn,
-  StringWrite,
+  StringOutput,
 } from "../types.ts";
 import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
 import { Buffer } from "@std/io";
@@ -19,7 +19,7 @@ describe("we can make a simple command", () => {
   const flags = { one };
   type Params = CliArgs<CommandType>;
 
-  async function run(params: Params, write: StringWrite): Promise<number> {
+  async function run(params: Params, write: StringOutput): Promise<number> {
     await write(JSON.stringify(params));
     return 0;
   }

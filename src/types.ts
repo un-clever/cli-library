@@ -239,14 +239,14 @@ export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
  * StringWrite is any async command that can take a string and output it
  * somewhere, typically stdout.
  */
-export type StringWrite = (msg: string) => Promise<number>; // writer interface
+export type StringOutput = (msg: string) => Promise<number>; // writer interface
 
 /**
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
   params: CliArgs<VV>,
-  write: StringWrite,
+  write: StringOutput,
 ) => Promise<number>;
 
 /**
