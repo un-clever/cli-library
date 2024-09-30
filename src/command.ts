@@ -1,7 +1,12 @@
 import { GetHelp } from "./errors.ts";
 import { getFlagsetHelp, getFlagsetParser } from "./flagset.ts";
-import type { Command, CommandFn, Flagset, StringOutput } from "./types.ts";
-import type { Writer } from "@std/io";
+import type {
+  Command,
+  CommandFn,
+  Flagset,
+  StringOutput,
+  Writer,
+} from "./types.ts";
 
 export function command<VV>(
   opts: {

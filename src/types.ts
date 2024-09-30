@@ -33,6 +33,13 @@
  */
 
 /**
+ * copied verbatim from @std/io to get our lib runtime deps down to zero
+ */
+export interface Writer {
+  write(p: Uint8Array): Promise<number>;
+}
+
+/**
  * ParseFn: a function that can parse a particular flag type.
  *
  * # KEY CONCEPT: (i: number, args: string[]) => Value + N
