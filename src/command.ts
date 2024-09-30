@@ -26,6 +26,7 @@ export function makeStringOutput(output: Writer): StringOutput {
 }
 
 export async function runCommand<VV>(
+  // TODO: add name here or in command object, which may become names path in multicommand
   cmd: Command<VV>,
   args: string[],
   output: Writer,
@@ -37,7 +38,8 @@ export async function runCommand<VV>(
     const result = await cmd.execute(params, write);
     return result;
   } catch (err) {
-    await write(GetHelp(err));
+    await write(cmd.help());
+    await write("\n" + GetHelp(err));
     return 999;
   }
 }
