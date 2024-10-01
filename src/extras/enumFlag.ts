@@ -8,6 +8,7 @@ import type { FlagtypeDef } from "../types.ts";
  */
 export type StringsToEnums<SS extends string[]> = SS[number];
 
+// export type
 /**
  * Create a flag type (parser) from an array of legal string values
  * @param legalValues
