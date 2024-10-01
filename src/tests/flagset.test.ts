@@ -87,7 +87,7 @@ describe("we can parse optional numeric flags", () => {
 });
 
 describe("flagsets can generate help", () => {
-  it("rudimentasry flagset help", () => {
+  it("rudimentary flagset help", () => {
     const help = getFlagsetHelp(optionalStringFlagset);
     assertEquals(help, "--help: show comand help\n--title: \n");
   });
