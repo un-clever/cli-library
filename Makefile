@@ -1,7 +1,6 @@
-TEST_ARGS=--doc --allow-read *.ts ./src/**/*.ts
 
 test:
-	deno test ${TEST_ARGS}
+	deno test --allow-read --doc
 
 testw:
-	deno test --watch ${TEST_ARGS}
+	deno test --watch --allow-read
