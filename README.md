@@ -1,30 +1,23 @@
 # Un-Clever Command Line App Library
 
-Status: informative, tiny, but unstable.
+Status: informative, tiny, growingly unstable.
 
-This is a utilitarian library for writing tools. It's probably not what you want to write a rich, beautiful, CLI app made for mass consumption, but it's just the ticket for that custom CLI you use every other month and don't want to have to re-remember a how a complicated library works just to change it.
+This library emphasizes simple maintainability for your tools:
+
+- Slim on cognitive overhead: Easy to come back to
+- Slim on code: minimal executable lines
+- Slim on deps: no dependencies in the core library (some libs used in testing)
+- Strong types, tests, and docs.
+- Orthagonal: grow simple commands into multi-command libs
+- Cross runtime: because who know where the wind will blow?
+
+This is not a library for the prettiest CLI's; it's a library for sane, maintainable tools.
 
 ## Quick Start
 
 ## Philosophy
 
-It emphasizes:
-
-- Small in terms of: lines of code, cognitive burden, dependencies
-- Easy to re-learn when you have to modify a tool a year later
-- Leverage TypeScript instead of a custom DSL
-- Strongly typed
-
-The CLI scripts I write just need to get a job done over time. I want them to help me do that now...and six months from now when I have to use them again. I want to be able to extend or add commands without having to spend a lot of time re-learning a toolkit.
-
-This library has several goals:
-
-- Orthagonal: single-command scripts can be easily combined into one script with subcommands.
-- Slim on code: so I can understand it six months from now.
-- Slim on deps: to decrease security and size risks. I only want to use built-in's, a simple arg parser, and a validator library.
-- Leverage TypeScript: because I don't want to have to re-learn a DSL to maintain a tool.
-
-So here's the basic concept. An un-clever CLI command has
+Here's the basic concept. An un-clever CLI command has
 
 - *Parser*: a function that takes a `string[]`, parses that string array as command line args into a simple structure *and validates that structure*.
 - *Handler*: an async function that accepts a such a structure and does the job and returns an integer exit code.
@@ -33,9 +26,15 @@ So here's the basic concept. An un-clever CLI command has
 
 Such commands can easily be combined into an un-clever Multi-CLI that has can list or execute the subcommands.
 
-No magic. That's just leveraging basic TypeScript.
+## Bonus Material
 
-## Future Plans
+### Cross-Runtime Testing
+
+I find myself having to use Node, Bun, Deno, and CloudFlare workers. I want to write CLI tools to support my work without making it a major endeavor to switch runtimes, tweak a tool after not looking at it for a year, etc.
+
+This library showcases some ways to do that.
+
+### Future Plans
 
 - Optionally read args from environment variables
 - Optionally read args from .env or config files
@@ -43,7 +42,7 @@ No magic. That's just leveraging basic TypeScript.
 - Confirm that there aren't duplicate commands or arg aliases
 - Add single-dash chains (e.g. the `-rf` in `rm -rf`).
 
-## Alternatives
+### Alternatives
 
 In 2024 I've looked at:
 
