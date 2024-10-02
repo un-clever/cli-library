@@ -1,39 +1,6 @@
 // enum flags are limited sets of strings
 import { FailedParse } from "../flags.ts";
-import type { FlagtypeDef } from "../types.ts";
-
-/**
- * Extract a union type of the strings from a string array constant.
- *
- * # Examples:
- *
- * ```ts
- * import type {StringArrayElements} from "./enumFlag.ts";
- *
- * // Here's a literal type that can be one of these three strings
- * // and a constant using that type
- * type HardCodedType = "text" | "html" | "markdown";
- * const _hardCodedConst: HardCodedType[] = ["html", "markdown", "html", "text"];
- *
- * // We can do this same thing with StringArrayElements
- * // NOTE: we must derive the type from a *readonly* array
- * // here using the ` as const`; assertion. See Notes below.
- * const elements = ["text", "html", "markdown"] as const; // SEE NOTES BELOW!
- * type DerivedType = StringArrayElements<typeof elements>;
- * const _derivedConst: DerivedType[] = _hardCodedConst;
- * ```
- *
- * # Notes:
- *
- * The array of ArrayType must be a readonly array, usually produced by adding
- * "as const" to the end of the statement defining it. This assures TypeScript
- * that it can infer very literal types off the string array.
- *
- * Thanks to [StackOverflow 41253310](https://stackoverflow.com/questions/41253310/typescript-retrieve-element-type-information-from-array-type)
- * for help with this type definition
- */
-export type StringArrayElements<ArrayType extends readonly string[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+import type { FlagtypeDef, StringArrayElements } from "../types.ts";
 
 /**
  * Create a flag type (parser) from an array of legal string values This flag
@@ -54,10 +21,10 @@ export type StringArrayElements<ArrayType extends readonly string[]> =
  *
  * ```ts
  * import { assertEquals, assertThrows, describe, it} from "testlib";
- * import type {Flagset, ParseResult} from "../types.ts";
+ * import type {Flagset, ParseResult, StringArrayElements} from "../types.ts";
  * import {optional, required} from "../flags.ts";
  * import {getFlagsetParser} from "../flagset.ts";
- * import {makeEnumFlag, type StringArrayElements} from "./enumFlag.ts"
+ * import {makeEnumFlag} from "./enumFlag.ts"
  *
  * describe("enumFlag parsing and use", () => {
  *   // let's make an array of acceptable values

@@ -40,6 +40,39 @@ export interface Writer {
 }
 
 /**
+ * Utility to extract a union type of the strings from a string array constant.
+ *
+ * # Examples:
+ *
+ * ```ts
+ * import type {StringArrayElements} from "./types.ts";
+ *
+ * // Here's a literal type that can be one of these three strings
+ * // and a constant using that type
+ * type HardCodedType = "text" | "html" | "markdown";
+ * const _hardCodedConst: HardCodedType[] = ["html", "markdown", "html", "text"];
+ *
+ * // We can do this same thing with StringArrayElements
+ * // NOTE: we must derive the type from a *readonly* array
+ * // here using the ` as const`; assertion. See Notes below.
+ * const elements = ["text", "html", "markdown"] as const; // SEE NOTES BELOW!
+ * type DerivedType = StringArrayElements<typeof elements>;
+ * const _derivedConst: DerivedType[] = _hardCodedConst;
+ * ```
+ *
+ * # Notes:
+ *
+ * The array of ArrayType must be a readonly array, usually produced by adding
+ * "as const" to the end of the statement defining it. This assures TypeScript
+ * that it can infer very literal types off the string array.
+ *
+ * Thanks to [StackOverflow 41253310](https://stackoverflow.com/questions/41253310/typescript-retrieve-element-type-information-from-array-type)
+ * for help with this type definition
+ */
+export type StringArrayElements<ArrayType extends readonly string[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+/**
  * ParseFn: a function that can parse a particular flag type.
  *
  * # KEY CONCEPT: (i: number, args: string[]) => Value + N
