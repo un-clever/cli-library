@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.2 - 2024-10-02
+#### Documentation
+- **(green)** get initial README.md doctests working - (cb3ac1c) - Brad Olson
+#### Tests
+- **(red)** REPORT: Deno doc test problems... - (5dca454) - Brad Olson
+
+- - -
+
 ## v0.8.1 - 2024-10-02
 #### Bug Fixes
 - **(green)** add /extras submodule to expose enumFlag - (b72397d) - Brad Olson
