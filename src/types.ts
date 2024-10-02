@@ -33,6 +33,13 @@
  */
 
 /**
+ * copied verbatim from @std/io to get our lib runtime deps down to zero
+ */
+export interface Writer {
+  write(p: Uint8Array): Promise<number>;
+}
+
+/**
  * ParseFn: a function that can parse a particular flag type.
  *
  * # KEY CONCEPT: (i: number, args: string[]) => Value + N
@@ -239,14 +246,14 @@ export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
  * StringWrite is any async command that can take a string and output it
  * somewhere, typically stdout.
  */
-export type StringWrite = (msg: string) => Promise<number>; // writer interface
+export type StringOutput = (msg: string) => Promise<number>; // writer interface
 
 /**
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
   params: CliArgs<VV>,
-  write: StringWrite,
+  write: StringOutput,
 ) => Promise<number>;
 
 /**

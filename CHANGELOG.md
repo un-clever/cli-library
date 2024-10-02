@@ -2,10 +2,23 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
-## v0.7.0 - 2024-09-29
+## v0.8.0 - 2024-10-02
+#### Documentation
+- notes on other libs - (e35b3f6) - Brad Olson
+#### Features
+- **(green)** add enumFlag parser examples - (9a8fb42) - Brad Olson
+- **(green)** add enumFlag parser - (6808487) - Brad Olson
+#### Refactoring
+- rename StringWrite to StringOutput - (a1173bd) - Brad Olson
+#### Tests
+- **(green)** check that core runtime has only local imports - (cc65fa1) - Brad Olson
+
+- - -
+
+## v0.7.0 - 2024-09-29 BREAKING
 #### Features
 - add help flag handling... - (50ba2df) - Brad Olson
-- BREAKING PRE-MAJOR CHANGE removing Typebox - (645bf4b) - Brad Olson
+- **BREAKING PRE-MAJOR CHANGE** removing Typebox - (645bf4b) - Brad Olson
 #### Miscellaneous Chores
 - remove v02 (with Typebox support) - (ebed686) - Brad Olson
 

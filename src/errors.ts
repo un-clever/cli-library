@@ -15,7 +15,7 @@ export class ParsingError extends Error {
     const messages = [`Parsing error: ${this.message}`];
 
     // enrich with any metadata that's present
-    if (this.paramName) messages.push(`\nParameter: ${this.paramName}`);
+    if (this.paramName) messages.push(`Flag: ${this.paramName}`);
     if (this.advice) messages.push(`Possible solution:\n\n${this.advice}`);
 
     return messages.join("\n") + "\n";

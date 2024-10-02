@@ -9,10 +9,15 @@ import {
 } from "../flags.ts";
 import type { FlagtypeDef } from "../types.ts";
 
-type testCase1<T> = [FlagtypeDef<T>, T | undefined, string[], string[]];
+export type flagTestCase<T> = [
+  FlagtypeDef<T>, // flagdef to be tested
+  T | undefined, // expected parse result
+  string[], // input args
+  string[], // remaining args after parse
+];
 
 // deno-fmt-ignore  (to keep the table concise)
-const miniParsersTestCases: Record<string, testCase1<any>> = {
+const miniParsersTestCases: Record<string, flagTestCase<any>> = {
 
   //===== BOOLEAN FLAGS
   "boolean flags don't need extra args": [booleanFlag, true, [], []],

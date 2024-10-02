@@ -10,13 +10,18 @@ import type {
   FlagValue,
   OptionalFlag,
   RequiredFlag,
+  Writer,
 } from "../types.ts";
 import { describe } from "@std/testing/bdd";
 import { getTestFlagset, type TtestFlagsetReturn } from "./testUtils.ts";
+import type { Writer as StandardWriter } from "@std/io";
 
 describe("Type assertions look strange at first, but they work", () => {
   assertType<IsExact<string, string>>(true);
   assertType<IsExact<string, number>>(false);
+});
+describe("Our copied version of @std/io.Writer matches the standard", () => {
+  assertType<IsExact<Writer, StandardWriter>>(true);
 });
 
 describe("we can strongly type flags", () => {

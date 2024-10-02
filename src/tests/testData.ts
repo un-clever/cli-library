@@ -50,7 +50,9 @@ export const dashDashCases: ArgsExample[] = [
 
 const emptyParse: CliArgs<unknown> = { args: [], flags: {}, dashdash: [] };
 
-function fuzzedExample<VV>(eg: FlagsetExample<VV>): FlagsetExample<VV>[] {
+export function fuzzedExample<VV>(
+  eg: FlagsetExample<VV>,
+): FlagsetExample<VV>[] {
   const { raw, parsed } = eg;
   if (parsed instanceof Error) return [eg];
   const { args, flags, dashdash } = parsed;

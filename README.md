@@ -48,11 +48,14 @@ No magic. That's just leveraging basic TypeScript.
 In 2024 I've looked at:
 
 - Commander: battle-tested
+- CAC (Command and Conquer)
 - Clipanion: powers yarn, nice, seems to work with Deno. It uses that `class` keyword some misguided coders think is evil (while they proceed to write bad OOP without using the `class` keyword).
 - Clerc: nice functional approach, seems to work with Deno. At the time I looked at it, the docs were slim but growing.
-- Cliffy: nice Deno-only framework
+- Cliffy: nice, seems to be a Deno-only framework
 - OCLI: from SalesForce, looks complicated, reliable, and well-tooled
 - Lesy
+- Yargs
+- Built in libs for Deno, Bun, Node
 
 They all have their own tradeoffs and do a lot more than this package does. I would use them for my occasional CLI's except that:
 
