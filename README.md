@@ -13,7 +13,29 @@ This library emphasizes simple maintainability for your tools:
 
 This is not a library for the prettiest CLI's; it's a library for sane, maintainable tools.
 
-## Quick Start
+## Features
+
+- Development Dependencies: only @std for testing
+
+| Section | Code | Comments |
+| ======= | ==== | ======== |
+| Runtime | 221  | 72       |
+| Types   | 215  | 65       |
+| Tests   | 659  | 61       |
+
+Minimized (not that you'd use it that way): <4kb. This is a readable library.
+
+- Typed flags for string, boolean, and number.
+- Flagsets parse into strongly typed structures with optional props when there's optional flags.
+- Flag types are fairly easy to extend. See [Simple Parsing Patterns].
+- Command Line Parsers are data driven--you can define the whole thing with literal objects, but there are helper functions that help keep things clean.
+- Built in help.
+- Simple commands are simple to write.
+- Simple commands can be bundled into multi-command apps.
+
+## Ugly Start
+
+If you just need a CLI with some help for a quick script, here you go:
 
 ```ts
 // a one statement Hello World in Deno
@@ -35,6 +57,8 @@ const status = await runCommand(
 
 assertEquals(status, 0);
 ```
+
+## Quick Start
 
 You can use that quick-and-dirty API for throw-together scripts, complete with help. Under the surface, though, there's strong typing and a set of composeable types. Here's the same example, exploded for type commentary:
 
@@ -78,6 +102,8 @@ assertEquals(status, 0);
 
 ## Philosophy
 
+### Concepts:
+
 Here's the basic concept. An un-clever CLI command has
 
 - *Parser*: a function that takes a `string[]`, parses that string array as command line args into a simple structure.
@@ -86,6 +112,62 @@ Here's the basic concept. An un-clever CLI command has
 - *Version*: a semver of the CLI because semantic versioning is *very good*.
 
 Such commands can easily be combined into an un-clever Multi-CLI that has can list or execute the subcommands.
+
+### The Parser Core
+
+The core of un-clever's CLI engine lies in its extensible command line parser.
+
+- *FlagType*: a simple function that defines a type of flag and can attempt to parse a value from the front of a `string[]`.
+- *FlagSet*: a group of named flags drives a...
+- *Parser*: which parses a `string[]` into named flags and positional args.
+
+### Simple Parsing Patterns
+
+Raw args are string[].
+
+Flag parsers accept index + args and return n + value;
+
+Flagsets are Record<string, Flag>
+
+Flags are just parser, name, description, default.
+
+Flagsets drive commandline parsers which produce args, flags, and dashdash
+
+Command handlers accept {args, flags, dashdash} and a writer.
+
+Writer are just (string)=>Promise<n> that write to any Writer. This makes it easier to capture out for testing and re-use command handlers in some fun ways, decoupling them from STDOUT and console.
+
+## Complete Use
+
+### Built in Flag Types
+
+### Optional and Require
+
+### Defaults
+
+### Positional Arguments
+
+### Passthrough Arguments: --/dashdash
+
+### Iterative Enhancement: MultiCommands
+
+### Featured Limitations
+
+- All flags are leaf flags. Compose your own hierarchy with {...base, ...extra}
+
+### Extras: Enums, Dates, Integers
+
+### Creating New Flag Types
+
+### Grokking the Typedefs
+
+### On Beyond Inspiration
+
+Zod, Typebox
+
+Web interface
+
+Multicommands
 
 ## Bonus Material
 
