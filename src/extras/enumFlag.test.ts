@@ -6,8 +6,13 @@ import {
   type IsExact,
   it,
 } from "testlib";
-import type { Flagset, FlagtypeDef, ParseResult } from "../types.ts";
-import { makeEnumFlag, type StringArrayElements } from "./enumFlag.ts";
+import type {
+  Flagset,
+  FlagtypeDef,
+  ParseResult,
+  StringArrayElements,
+} from "../types.ts";
+import { makeEnumFlag } from "./enumFlag.ts";
 import { optional, required } from "../flags.ts";
 import { getFlagsetParser } from "../flagset.ts";
 import {

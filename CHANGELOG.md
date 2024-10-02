@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.1 - 2024-10-02
+#### Bug Fixes
+- **(green)** add /extras submodule to expose enumFlag - (b72397d) - Brad Olson
+#### Build system
+- **(green)** add tests to Makefile - (01992d4) - Brad Olson
+#### Refactoring
+- **(green)** move StringArrayElements utility to ./types.ts - (9363a28) - Brad Olson
+
+- - -
+
 ## v0.8.0 - 2024-10-02
 #### Documentation
 - notes on other libs - (e35b3f6) - Brad Olson
