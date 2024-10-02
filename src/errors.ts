@@ -22,7 +22,8 @@ export class ParsingError extends Error {
   }
 }
 
-export function GetHelp(err: Error | ParsingError): string {
+export function GetHelp(err: unknown): string {
   if (err instanceof ParsingError) return err.help();
-  return err.message + "\n";
+  if (err instanceof Error) return err.message + "\n";
+  return `unrecognized error type: ${typeof err}`;
 }

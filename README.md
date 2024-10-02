@@ -17,39 +17,45 @@ This is not a library for the prettiest CLI's; it's a library for sane, maintain
 
 ```ts
 // a one statement Hello World in Deno
+import {assertEquals} from "@std/assert";
 import { command, required, runCommand, stringFlag } from "@un-clever/cli-library";
 
-await runCommand(
+const status = await runCommand(
   command({
     description: "hello command",
     flags: { who: required("who", "who to say hello to", stringFlag, "World") },
-    run: async (args: { flags: { who: string } }, output) =>
-      await output(`Hello, ${args.flags.who}!`),
+    run: async (args: { flags: { who: string } }, output) => {
+        await output(`Hello, ${args.flags.who}!`);
+        return 0;
+      },
   }),
   Deno.args,
   Deno.stdout,
 );
+
+assertEquals(status, 0);
 ```
 
-## Okay, why isn't this getting checked
-
-Underneath that simplicitly lays some strong typing and a structure that lends itself to composition and iterative enhancement.
+You can use that quick-and-dirty API for throw-together scripts, complete with help. Under the surface, though, there's strong typing and a set of composeable types. Here's the same example, exploded for type commentary:
 
 ```ts
 // lets unpack the pieces and types a bit more explicitly
+import { command, required, runCommand, stringFlag } from "@un-clever/cli-library";
+import type {FlagsetReturn, StringOutput} from "@un-clever/cli-library";
+import {assertEquals} from "@std/assert";
 
 // a CLI begins with a set of flags that parse to an expected type
 const helloFlags = {
   who: required("who", "who to say hello to", stringFlag, "World"),
 };
-type HelloFlags = FlagsetRRRReturn<typeof helloFlags>;
+type HelloFlags = FlagsetReturn<typeof helloFlags>;
 
 // then we have a function that implements our command and expects
 // 1. flags like we've described
 // 2. an async function that outputs strings (makes testing easier!)
 // and returns an integer status code
 async function helloHandler(
-  cliArgs: { flags: SHelloFlags },
+  cliArgs: { flags: HelloFlags },
   output: StringOutput,
 ) {
   await output(JSON.stringify(cliArgs));
@@ -64,7 +70,11 @@ const helloCommand = command({
   flags: helloFlags,
   run: helloHandler,
 });
-``
+
+const status = await runCommand(helloCommand, ["--who", "Abe"], Deno.stdout);
+
+assertEquals(status, 0);
+```
 
 ## Philosophy
 

@@ -14,22 +14,27 @@ import {
   stringFlag,
   type StringOutput,
 } from "@un-clever/cli-library";
+import { assertEquals } from "testlib";
 
 // TODO: make a simpler API: run(handler, flags, description="myfilename")
 /**
  * FIRST QUICKSTART
  */
 // a one statement Hello World in Deno
-await runCommand(
+const status1 = await runCommand(
   command({
     description: "hello command",
     flags: { who: required("who", "who to say hello to", stringFlag, "World") },
-    run: async (args: { flags: { who: string } }, output) =>
-      await output(`Hello, ${args.flags.who}!`),
+    run: async (args: { flags: { who: string } }, output) => {
+      await output(`Hello, ${args.flags.who}!`);
+      return 0;
+    },
   }),
   Deno.args,
   Deno.stdout,
 );
+
+assertEquals(status1, 0);
 
 /**
  * SECOND QUICKSTART
@@ -62,6 +67,10 @@ const helloCommand = command({
   flags: helloFlags,
   run: helloHandler,
 });
+
+const status2 = await runCommand(helloCommand, ["--who", "Abe"], Deno.stdout);
+
+assertEquals(status2, 0);
 
 /**
  * Later examples
