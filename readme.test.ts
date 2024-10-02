@@ -1,0 +1,115 @@
+// deno-lint-ignore-file no-unused-vars
+// examples for Readme
+import {
+  booleanFlag,
+  type CliArgs,
+  command,
+  type CommandFn,
+  type Flagset,
+  type FlagsetReturn,
+  numberFlag,
+  optional,
+  required,
+  runCommand,
+  stringFlag,
+  type StringOutput,
+} from "@un-clever/cli-library";
+
+// TODO: make a simpler API: run(handler, flags, description="myfilename")
+/**
+ * FIRST QUICKSTART
+ */
+// a one statement Hello World in Deno
+await runCommand(
+  command({
+    description: "hello command",
+    flags: { who: required("who", "who to say hello to", stringFlag, "World") },
+    run: async (args: { flags: { who: string } }, output) =>
+      await output(`Hello, ${args.flags.who}!`),
+  }),
+  Deno.args,
+  Deno.stdout,
+);
+
+/**
+ * SECOND QUICKSTART
+ */
+// lets unpack the pieces and types a bit more explicitly
+
+// a CLI begins with a set of flags that parse to an expected type
+const helloFlags = {
+  who: required("who", "who to say hello to", stringFlag, "World"),
+};
+type HelloFlags = FlagsetReturn<typeof helloFlags>;
+
+// then we have a function that implements our command and expects
+// 1. flags like we've described
+// 2. an async function that outputs strings (makes testing easier!)
+// and returns an integer status code
+async function helloHandler(
+  cliArgs: { flags: HelloFlags },
+  output: StringOutput,
+) {
+  await output(JSON.stringify(cliArgs));
+  return 0; // The SHELL's idea of success!
+}
+
+// TODO: switch this to the simpler RUN interface
+
+// we bundle those up into a Command
+const helloCommand = command({
+  description: "Hello command",
+  flags: helloFlags,
+  run: helloHandler,
+});
+
+/**
+ * Later examples
+ */
+
+// then we run the command
+await runCommand(helloCommand, Deno.args, Deno.stdout);
+
+// or, if we prefer, we can start with the expected type and typecheck our flags
+//
+type HelloFlags2 = { who: string };
+const helloFlags2: Flagset<HelloFlags2> = {
+  who: required("who", "who to say hello to", stringFlag, "World"),
+};
+
+// structure of the flags we expect
+interface Flags {
+  verbose: boolean;
+  infile: string;
+  outfile?: string;
+  reps: number;
+}
+
+const flags: Flagset<Flags> = {
+  verbose: required("verbose", "be noisy", booleanFlag),
+  infile: required("infile", "input file", stringFlag, "default.txt"),
+  outfile: optional("optional", "output file (otherwise stdout)", stringFlag),
+  reps: required("reps", "how many times to repeat the file", numberFlag, 1),
+};
+
+const myImpelementation: CommandFn<Flags> = async (
+  parsedCli: CliArgs<Flags>,
+  write: StringOutput,
+) => {
+  const { flags } = parsedCli;
+  await write(`
+    If I were a real command, I would ${
+    flags.verbose ? "be VERY" : "not be"
+  } noisy.
+    I would read from the file, ${flags.infile}.
+    I would write ${flags.reps} copies to ${flags.outfile || "STDOUT"}.`);
+  return 0; // success
+};
+
+const myCommand = command({
+  description: "stub file duplicator",
+  flags,
+  run: myImpelementation,
+});
+
+await runCommand(myCommand, Deno.args, Deno.stdout);
