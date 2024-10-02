@@ -7,10 +7,6 @@ All notable changes to this project will be documented in this file. See [conven
 - **(green)** add /extras submodule to expose enumFlag - (b72397d) - Brad Olson
 #### Build system
 - **(green)** add tests to Makefile - (01992d4) - Brad Olson
-#### Miscellaneous Chores
-- Merge remote-tracking branch 'origin/main' into 8-alpha-test-on-real-scripts - (8ca3f7b) - Brad Olson
-- Merge pull request #9 from un-clever/trialrelease - (040067f) - Brad Olson
-- clean up post release - (325babe) - Brad Olson
 #### Refactoring
 - **(green)** move StringArrayElements utility to ./types.ts - (9363a28) - Brad Olson
 
