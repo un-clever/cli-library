@@ -3,10 +3,6 @@ All notable changes to this project will be documented in this file. See [conven
 
 - - -
 ## v0.8.0 - 2024-10-02
-#### Bug Fixes
-- **(green)** remove extra space from help - (5bb4d7b) - Brad Olson
-#### Build system
-- change version in deno.jsonc - (1a9bce9) - Brad Olson
 #### Documentation
 - notes on other libs - (e35b3f6) - Brad Olson
 #### Features
@@ -19,10 +15,10 @@ All notable changes to this project will be documented in this file. See [conven
 
 - - -
 
-## v0.7.0 - 2024-09-29
+## v0.7.0 - 2024-09-29 BREAKING
 #### Features
 - add help flag handling... - (50ba2df) - Brad Olson
-- BREAKING PRE-MAJOR CHANGE removing Typebox - (645bf4b) - Brad Olson
+- **BREAKING PRE-MAJOR CHANGE** removing Typebox - (645bf4b) - Brad Olson
 #### Miscellaneous Chores
 - remove v02 (with Typebox support) - (ebed686) - Brad Olson
 
