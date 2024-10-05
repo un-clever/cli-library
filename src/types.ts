@@ -297,3 +297,5 @@ export interface Command<VV> {
   help: () => string;
   run: (rawargs: string[], log?: Logger) => Promise<number>;
 }
+
+export type CommandMap = Record<string, Command<unknown>>;

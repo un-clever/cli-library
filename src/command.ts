@@ -1,6 +1,13 @@
 import { GetHelp } from "./errors.ts";
 import { getFlagsetHelp, getFlagsetParser } from "./flagset.ts";
-import type { Command, CommandFn, Flagset, Logger, Writer } from "./types.ts";
+import type {
+  Command,
+  CommandFn,
+  CommandMap,
+  Flagset,
+  Logger,
+  Writer,
+} from "./types.ts";
 
 const defaultLogger: Logger = makeLogger(Deno.stdout);
 
@@ -44,7 +51,38 @@ export function makeLogger(output: Writer): Logger {
     output.write(encoder.encode(msg));
 }
 
-export function multiCommand() {}
+interface NoFlags {}
+
+export function multiCommand(
+  name: string,
+  description: string,
+  commands: CommandMap,
+): Command<NoFlags> {
+  const describe = () => `${name}: ${description}`;
+  const help = () => [describe, ...Object.keys(commands)].join("\n");
+  const run = async (
+    rawargs: string[],
+    log: Logger = defaultLogger,
+  ): Promise<number> => {
+    try {
+      const subcmd = rawargs[0];
+      if (subcmd && subcmd in commands) {
+        // TODO push subcmd into command path
+        // maybe run should be runSub(["path1"], args, log)
+        const cmd = commands[subcmd];
+        return await cmd.run(rawargs.slice(1), log);
+      }
+      await log(`unrecognized subcommand: '${subcmd}`);
+      await log(help());
+      return 1000;
+    } catch (err) {
+      await log(help());
+      await log("\n" + GetHelp(err));
+      return 999;
+    }
+  };
+  return { describe, help, run };
+}
 // //
 // export async function runCommand<VV>(
 //   // TODO: add name here or in command object, which may become names path in multicommand
