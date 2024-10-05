@@ -7,32 +7,28 @@ import {
   type CommandFn,
   type Flagset,
   type FlagsetReturn,
+  type Logger,
+  makeLogger,
   numberFlag,
   optional,
   required,
-  runCommand,
   stringFlag,
-  type StringOutput,
 } from "@un-clever/cli-library";
 import { assertEquals } from "testlib";
 
-// TODO: make a simpler API: run(handler, flags, description="myfilename")
 /**
- * FIRST QUICKSTART
+ * QUICK AND DIRTY START
  */
 // a one statement Hello World in Deno
-const status1 = await runCommand(
-  command({
-    description: "hello command",
-    flags: { who: required("who", "who to say hello to", stringFlag, "World") },
-    run: async (args: { flags: { who: string } }, output) => {
-      await output(`Hello, ${args.flags.who}!`);
-      return 0;
-    },
-  }),
-  Deno.args,
-  Deno.stdout,
-);
+const status1 = await command(
+  "hello",
+  "hello command",
+  { who: required("who", "who to say hello to", stringFlag, "World") },
+  async (args: { flags: { who: string } }, output) => {
+    await output(`Hello, ${args.flags.who}!`);
+    return 0;
+  },
+).run(Deno.args);
 
 assertEquals(status1, 0);
 
@@ -53,7 +49,7 @@ type HelloFlags = FlagsetReturn<typeof helloFlags>;
 // and returns an integer status code
 async function helloHandler(
   cliArgs: { flags: HelloFlags },
-  output: StringOutput,
+  output: Logger,
 ) {
   await output(JSON.stringify(cliArgs));
   return 0; // The SHELL's idea of success!
@@ -62,22 +58,23 @@ async function helloHandler(
 // TODO: switch this to the simpler RUN interface
 
 // we bundle those up into a Command
-const helloCommand = command({
-  description: "Hello command",
-  flags: helloFlags,
-  run: helloHandler,
-});
+const helloCommand = command(
+  "hello",
+  "Hello command",
+  helloFlags,
+  helloHandler,
+);
 
-const status2 = await runCommand(helloCommand, ["--who", "Abe"], Deno.stdout);
+const status2 = await helloCommand.run(
+  ["--who", "Abe"],
+  makeLogger(Deno.stdout),
+);
 
 assertEquals(status2, 0);
 
 /**
  * Later examples
  */
-
-// then we run the command
-await runCommand(helloCommand, Deno.args, Deno.stdout);
 
 // or, if we prefer, we can start with the expected type and typecheck our flags
 //
@@ -103,7 +100,7 @@ const flags: Flagset<Flags> = {
 
 const myImpelementation: CommandFn<Flags> = async (
   parsedCli: CliArgs<Flags>,
-  write: StringOutput,
+  write: Logger,
 ) => {
   const { flags } = parsedCli;
   await write(`
@@ -115,10 +112,11 @@ const myImpelementation: CommandFn<Flags> = async (
   return 0; // success
 };
 
-const myCommand = command({
-  description: "stub file duplicator",
+const myCommand = command(
+  "catX",
+  "stub file duplicator",
   flags,
-  run: myImpelementation,
-});
+  myImpelementation,
+);
 
-await runCommand(myCommand, Deno.args, Deno.stdout);
+await myCommand.run(Deno.args);

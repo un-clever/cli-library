@@ -1,5 +1,5 @@
 import { FailedParse } from "../flags.ts";
-import type { FlagtypeDef } from "../types.ts";
+import type { FlagType } from "../types.ts";
 
 /**
  * Parse a string into a UTC date. See WARNING
@@ -34,7 +34,7 @@ import type { FlagtypeDef } from "../types.ts";
 // LATER: add this in a separate module as an test of extensibility
 // there are some tests that might help in the accompanying test module
 // currently commented out though
-const _dateFlag: FlagtypeDef<Date> = {
+const _dateFlag: FlagType<Date> = {
   parse(i: number, args: string[]) {
     const n = 1;
     const test = new Date(args[i]);

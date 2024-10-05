@@ -1,6 +1,6 @@
 // enum flags are limited sets of strings
 import { FailedParse } from "../flags.ts";
-import type { FlagtypeDef, StringArrayElements } from "../types.ts";
+import type { FlagType, StringArrayElements } from "../types.ts";
 
 /**
  * Create a flag type (parser) from an array of legal string values This flag
@@ -103,9 +103,9 @@ import type { FlagtypeDef, StringArrayElements } from "../types.ts";
  */
 export function makeEnumFlag<SS extends readonly string[]>(
   legalValues: SS,
-): FlagtypeDef<StringArrayElements<SS>> {
+): FlagType<StringArrayElements<SS>> {
   type EE = StringArrayElements<SS>;
-  const flagParser: FlagtypeDef<EE> = {
+  const flagParser: FlagType<EE> = {
     parse: (i: number, args: string[]) => {
       const n = 1;
       const trialValue = args[i];

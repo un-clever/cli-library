@@ -2,7 +2,7 @@ import { booleanFlag, numberFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
 import type {
   CliArgs,
-  FlagsetParseFn,
+  FlagsetParser,
   OptionalFlag,
   RequiredFlag,
 } from "../types.ts";
@@ -19,7 +19,7 @@ export interface FlagsetExample<VV> {
 }
 
 export function testmanyArgExamples(
-  parse: FlagsetParseFn<unknown>,
+  parse: FlagsetParser<unknown>,
   examples: ArgsExample[],
 ) {
   for (const eg of examples) {
@@ -39,7 +39,7 @@ export function testmanyArgExamples(
 
 export function testmanyFlagsetExamples<VV>(
   flagtype: string,
-  parse: FlagsetParseFn<VV>,
+  parse: FlagsetParser<VV>,
   examples: FlagsetExample<VV>[],
 ) {
   for (const eg of examples) {

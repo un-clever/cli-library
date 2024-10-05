@@ -1,11 +1,11 @@
 // code for using flagsets to parse command lines and generate help
 import { ParsingError } from "./errors.ts";
-import type { CliArgs, Flagset, FlagsetParseFn } from "./types.ts";
+import type { CliArgs, Flagset, FlagsetParser } from "./types.ts";
 
 export function getFlagsetParser<VV>(
   flagset: Flagset<VV>,
   allowDashdash = true,
-): FlagsetParseFn<VV> {
+): FlagsetParser<VV> {
   const fp = new FlagsParser1(flagset, allowDashdash);
   return fp.parse.bind(fp);
 }

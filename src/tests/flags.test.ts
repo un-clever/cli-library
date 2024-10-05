@@ -7,10 +7,10 @@ import {
   required,
   stringFlag,
 } from "../flags.ts";
-import type { FlagtypeDef } from "../types.ts";
+import type { FlagType } from "../types.ts";
 
 export type flagTestCase<T> = [
-  FlagtypeDef<T>, // flagdef to be tested
+  FlagType<T>, // flagdef to be tested
   T | undefined, // expected parse result
   string[], // input args
   string[], // remaining args after parse

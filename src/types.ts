@@ -106,8 +106,8 @@ export type ParseResult<V> = {
 };
 
 /**
- * FlagtypeDef(inition) is a ParseFunction (see above) and other metadata necessary to
- * parse a type of flag.
+ * FlagType is a ParseFunction (see above) and other metadata necessary to parse
+ * a new type of flag.
  *
  * .default = the default value for all flags of that type. This is NOT a
  * default value for a particular flag, but for a whole class of flags, like
@@ -115,7 +115,7 @@ export type ParseResult<V> = {
  */
 
 /** */
-export interface FlagtypeDef<V> {
+export interface FlagType<V> {
   parse: ParseFn<V>;
   default?: V;
   // preexecute?: (flagname: string, value: V) => Promise<void>;
@@ -131,7 +131,7 @@ export interface BaseFlag<V> {
   // brief help for the flag
   description: string;
   // parser function
-  parser: FlagtypeDef<V>;
+  parser: FlagType<V>;
   // possible default value
   default?: V;
   // alternative slugs that should be prefixed with --
@@ -232,7 +232,7 @@ export type FlagsetReturn<FF> =
   & FlagsetOptionalProps<FF>
   & FlagsetRequiredProps<FF>;
 
-// a couple helper types for FlagsetReturn
+// a couple HELPER types for FlagsetReturn
 type FlagsetOptionalProps<FF> = {
   // uses "as" to remap/exclude keys that don't match a particular pattern
   // so we can add the "?:" optional token to the definition. There might
@@ -273,20 +273,20 @@ export interface CliArgs<VV> {
  * structure taking into account positional arguments optional, required, and
  * default flags,
  */
-export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
+export type FlagsetParser<VV> = (args: string[]) => CliArgs<VV>;
 
 /**
  * StringWrite is any async command that can take a string and output it
  * somewhere, typically stdout.
  */
-export type StringOutput = (msg: string) => Promise<number>; // writer interface
+export type Logger = (msg: string, ...rest: unknown[]) => Promise<number>; // writer interface
 
 /**
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
   params: CliArgs<VV>,
-  write: StringOutput,
+  log: Logger,
 ) => Promise<number>;
 
 /**
@@ -295,6 +295,5 @@ export type CommandFn<VV> = (
 export interface Command<VV> {
   describe: () => string;
   help: () => string;
-  parse: FlagsetParseFn<VV>;
-  execute: CommandFn<VV>;
+  run: (rawargs: string[], log?: Logger) => Promise<number>;
 }
