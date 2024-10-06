@@ -19,7 +19,7 @@ export function command<VV>(
   description: string,
   flags: Flagset<VV>,
   handler: CommandFn<VV>,
-): Command<VV> {
+): Command {
   const describe = () => `${name}: ${description}`;
   const help = (): string =>
     `${name}: ${description}\n\n${getFlagsetHelp(flags)}`;
@@ -51,13 +51,11 @@ export function makeLogger(output: Writer): PrintFn {
     output.write(encoder.encode(msg));
 }
 
-interface NoFlags {}
-
 export function multiCommand(
   name: string,
   description: string,
   commands: CommandMap,
-): Command<NoFlags> {
+): Command {
   const describe = () => `${name}: ${description}`;
   const help = () => [describe, ...Object.keys(commands)].join("\n");
   const run = async (

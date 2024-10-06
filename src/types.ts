@@ -295,10 +295,10 @@ export type CommandFn<VV> = (
 /**
  * Command is the functional interface to a CLI program
  */
-export interface Command<VV> {
+export interface Command {
   describe: () => string;
   help: () => string;
   run: (rawargs: string[], log?: PrintFn) => Promise<number>;
 }
 
-export type CommandMap = Record<string, Command<unknown>>;
+export type CommandMap = Record<string, Command>;
