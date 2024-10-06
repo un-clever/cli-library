@@ -30,7 +30,7 @@ export function command<VV>(
     try {
       const parse = getFlagsetParser(flags);
       const params = parse(rawargs);
-      const result = await handler(params, log);
+      const result = await handler(params.flags, log, params.args);
       return result;
     } catch (err) {
       await log(help());
@@ -81,22 +81,3 @@ export function multiCommand(
   };
   return { describe, help, run };
 }
-// //
-// export async function runCommand<VV>(
-//   // TODO: add name here or in command object, which may become names path in multicommand
-//   cmd: Command<VV>,
-//   args: string[],
-//   output: Writer,
-// ): Promise<number> {
-//   const write = makeLogger(output);
-
-//   try {
-//     const params = cmd.parse(args);
-//     const result = await cmd.handler(params, write);
-//     return result;
-//   } catch (err) {
-//     await write(cmd.help());
-//     await write("\n" + GetHelp(err));
-//     return 999;
-//   }
-// }

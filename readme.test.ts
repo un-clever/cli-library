@@ -24,8 +24,8 @@ const status1 = await command(
   "hello",
   "hello command",
   { who: required("who", "who to say hello to", stringFlag, "World") },
-  async (args: { flags: { who: string } }, output) => {
-    await output(`Hello, ${args.flags.who}!`);
+  async (flags: { who: string }, output) => {
+    await output(`Hello, ${flags.who}!`);
     return 0;
   },
 ).run(Deno.args);
@@ -48,10 +48,10 @@ type HelloFlags = FlagsetReturn<typeof helloFlags>;
 // 2. an async function that outputs strings (makes testing easier!)
 // and returns an integer status code
 async function helloHandler(
-  cliArgs: { flags: HelloFlags },
+  flags: HelloFlags,
   output: PrintFn,
 ) {
-  await output(JSON.stringify(cliArgs));
+  await output(JSON.stringify(flags));
   return 0; // The SHELL's idea of success!
 }
 
@@ -99,10 +99,9 @@ const flags: Flagset<Flags> = {
 };
 
 const myImpelementation: CommandFn<Flags> = async (
-  parsedCli: CliArgs<Flags>,
+  flags: Flags,
   write: PrintFn,
 ) => {
-  const { flags } = parsedCli;
   await write(`
     If I were a real command, I would ${
     flags.verbose ? "be VERY" : "not be"

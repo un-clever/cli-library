@@ -8,7 +8,14 @@ import type {
   FlagsetParser,
   PrintFn,
 } from "../types.ts";
-import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
+import {
+  assertEquals,
+  assertType,
+  describe,
+  Has,
+  type IsExact,
+  it,
+} from "testlib";
 import { Buffer } from "@std/io";
 
 const testFlagset = getTestFlagset();
@@ -19,13 +26,17 @@ describe("we can make a simple command", () => {
   const flags = { one };
   type Params = CliArgs<CommandType>;
 
-  async function handler1(params: Params, write: PrintFn): Promise<number> {
-    await write(JSON.stringify(params));
+  async function handler1(
+    flags: CommandType,
+    write: PrintFn,
+    args?: string[],
+  ): Promise<number> {
+    await write(JSON.stringify({ flags, args, dashdash: [] }));
     return 0;
   }
 
   it("the types check out", () => {
-    assertType<IsExact<CommandFn<CommandType>, typeof handler1>>(true);
+    assertType<Has<CommandFn<CommandType>, typeof handler1>>(true);
     assertType<IsExact<Flagset<CommandType>, typeof flags>>(true);
   });
 
