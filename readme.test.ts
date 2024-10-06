@@ -7,10 +7,10 @@ import {
   type CommandFn,
   type Flagset,
   type FlagsetReturn,
-  type Logger,
   makeLogger,
   numberFlag,
   optional,
+  type PrintFn,
   required,
   stringFlag,
 } from "@un-clever/cli-library";
@@ -49,7 +49,7 @@ type HelloFlags = FlagsetReturn<typeof helloFlags>;
 // and returns an integer status code
 async function helloHandler(
   cliArgs: { flags: HelloFlags },
-  output: Logger,
+  output: PrintFn,
 ) {
   await output(JSON.stringify(cliArgs));
   return 0; // The SHELL's idea of success!
@@ -100,7 +100,7 @@ const flags: Flagset<Flags> = {
 
 const myImpelementation: CommandFn<Flags> = async (
   parsedCli: CliArgs<Flags>,
-  write: Logger,
+  write: PrintFn,
 ) => {
   const { flags } = parsedCli;
   await write(`

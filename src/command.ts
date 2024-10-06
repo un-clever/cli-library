@@ -5,11 +5,11 @@ import type {
   CommandFn,
   CommandMap,
   Flagset,
-  Logger,
+  PrintFn,
   Writer,
 } from "./types.ts";
 
-const defaultLogger: Logger = makeLogger(Deno.stdout);
+const defaultLogger: PrintFn = makeLogger(Deno.stdout);
 
 /**
  * Turn a handler and flags into a simple (leaf) command
@@ -25,7 +25,7 @@ export function command<VV>(
     `${name}: ${description}\n\n${getFlagsetHelp(flags)}`;
   const run = async (
     rawargs: string[],
-    log: Logger = defaultLogger,
+    log: PrintFn = defaultLogger,
   ): Promise<number> => {
     try {
       const parse = getFlagsetParser(flags);
@@ -43,7 +43,7 @@ export function command<VV>(
   return { describe, help, run };
 }
 
-export function makeLogger(output: Writer): Logger {
+export function makeLogger(output: Writer): PrintFn {
   const encoder = new TextEncoder();
   // handle the rest later
   // maybe function or entries or k:fn
@@ -62,7 +62,7 @@ export function multiCommand(
   const help = () => [describe, ...Object.keys(commands)].join("\n");
   const run = async (
     rawargs: string[],
-    log: Logger = defaultLogger,
+    log: PrintFn = defaultLogger,
   ): Promise<number> => {
     try {
       const subcmd = rawargs[0];

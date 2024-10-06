@@ -30,6 +30,9 @@
  * - F: the type of the Flag (flag specification) Flag<F> = FT
  * - FF: the type of a Flagset (multiple flags specification)
  * - VV: "flags," the type that a flagset parses out to
+ *
+ * Other Abbreviations
+ * Fn: function
  */
 
 /**
@@ -38,6 +41,12 @@
 export interface Writer {
   write(p: Uint8Array): Promise<number>;
 }
+
+/**
+ * StringWrite is any async command that can take a string and output it
+ * somewhere, typically stdout.
+ */
+export type PrintFn = (msg: string, ...rest: unknown[]) => Promise<number>; // writer interface
 
 /**
  * Utility to extract a union type of the strings from a string array constant.
@@ -276,17 +285,11 @@ export interface CliArgs<VV> {
 export type FlagsetParser<VV> = (args: string[]) => CliArgs<VV>;
 
 /**
- * StringWrite is any async command that can take a string and output it
- * somewhere, typically stdout.
- */
-export type Logger = (msg: string, ...rest: unknown[]) => Promise<number>; // writer interface
-
-/**
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
   params: CliArgs<VV>,
-  log: Logger,
+  log: PrintFn,
 ) => Promise<number>;
 
 /**
@@ -295,7 +298,7 @@ export type CommandFn<VV> = (
 export interface Command<VV> {
   describe: () => string;
   help: () => string;
-  run: (rawargs: string[], log?: Logger) => Promise<number>;
+  run: (rawargs: string[], log?: PrintFn) => Promise<number>;
 }
 
 export type CommandMap = Record<string, Command<unknown>>;
