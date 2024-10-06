@@ -24,7 +24,7 @@ const status1 = await command(
   "hello",
   "hello command",
   { who: required("who", "who to say hello to", stringFlag, "World") },
-  async (flags: { who: string }, output) => {
+  async (output, flags: { who: string }) => {
     await output(`Hello, ${flags.who}!`);
     return 0;
   },
@@ -48,8 +48,8 @@ type HelloFlags = FlagsetReturn<typeof helloFlags>;
 // 2. an async function that outputs strings (makes testing easier!)
 // and returns an integer status code
 async function helloHandler(
-  flags: HelloFlags,
   output: PrintFn,
+  flags: HelloFlags,
 ) {
   await output(JSON.stringify(flags));
   return 0; // The SHELL's idea of success!
@@ -99,8 +99,8 @@ const flags: Flagset<Flags> = {
 };
 
 const myImpelementation: CommandFn<Flags> = async (
-  flags: Flags,
   write: PrintFn,
+  flags: Flags,
 ) => {
   await write(`
     If I were a real command, I would ${

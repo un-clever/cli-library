@@ -288,9 +288,9 @@ export type FlagsetParser<VV> = (args: string[]) => CliArgs<VV>;
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
-  flags: VV,
   log: PrintFn,
-  positionals?: string[],
+  flags: VV,
+  positionals: string[],
 ) => Promise<number>;
 
 /**

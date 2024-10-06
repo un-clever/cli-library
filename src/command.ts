@@ -30,7 +30,7 @@ export function command<VV>(
     try {
       const parse = getFlagsetParser(flags);
       const params = parse(rawargs);
-      const result = await handler(params.flags, log, params.args);
+      const result = await handler(log, params.flags, params.args);
       return result;
     } catch (err) {
       await log(help());

@@ -27,9 +27,9 @@ describe("we can make a simple command", () => {
   type Params = CliArgs<CommandType>;
 
   async function handler1(
-    flags: CommandType,
     write: PrintFn,
-    args?: string[],
+    flags: CommandType,
+    args: string[],
   ): Promise<number> {
     await write(JSON.stringify({ flags, args, dashdash: [] }));
     return 0;
