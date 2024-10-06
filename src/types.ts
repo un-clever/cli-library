@@ -288,10 +288,17 @@ export type FlagsetParser<VV> = (args: string[]) => CliArgs<VV>;
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
-  log: PrintFn,
   flags: VV,
   positionals: string[],
+  loggger: Logger,
 ) => Promise<number>;
+
+export type Logger = {
+  log: (msg: string) => Promise<number>;
+  error: (msg: string) => Promise<number>;
+  write: (msg: string) => Promise<number>;
+  ewrite: (msg: string) => Promise<number>;
+};
 
 /**
  * Command is the functional interface to a CLI program
@@ -299,7 +306,11 @@ export type CommandFn<VV> = (
 export interface Command {
   describe: () => string;
   help: () => string;
-  run: (rawargs: string[], log?: PrintFn) => Promise<number>;
+  run: (
+    rawargs: string[],
+    standardOutput?: Writer,
+    errorOutput?: Writer,
+  ) => Promise<number>;
 }
 
 export type CommandMap = Record<string, Command>;

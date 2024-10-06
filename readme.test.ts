@@ -2,15 +2,13 @@
 // examples for Readme
 import {
   booleanFlag,
-  type CliArgs,
   command,
   type CommandFn,
   type Flagset,
   type FlagsetReturn,
-  makeLogger,
+  type Logger,
   numberFlag,
   optional,
-  type PrintFn,
   required,
   stringFlag,
 } from "@un-clever/cli-library";
@@ -24,8 +22,8 @@ const status1 = await command(
   "hello",
   "hello command",
   { who: required("who", "who to say hello to", stringFlag, "World") },
-  async (output, flags: { who: string }) => {
-    await output(`Hello, ${flags.who}!`);
+  async (flags: { who: string }, _, log) => {
+    await log.log(`Hello, ${flags.who}!`);
     return 0;
   },
 ).run(Deno.args);
@@ -48,10 +46,11 @@ type HelloFlags = FlagsetReturn<typeof helloFlags>;
 // 2. an async function that outputs strings (makes testing easier!)
 // and returns an integer status code
 async function helloHandler(
-  output: PrintFn,
   flags: HelloFlags,
+  _: string[],
+  log: Logger,
 ) {
-  await output(JSON.stringify(flags));
+  await log.log(JSON.stringify(flags));
   return 0; // The SHELL's idea of success!
 }
 
@@ -67,7 +66,6 @@ const helloCommand = command(
 
 const status2 = await helloCommand.run(
   ["--who", "Abe"],
-  makeLogger(Deno.stdout),
 );
 
 assertEquals(status2, 0);
@@ -99,10 +97,11 @@ const flags: Flagset<Flags> = {
 };
 
 const myImpelementation: CommandFn<Flags> = async (
-  write: PrintFn,
   flags: Flags,
+  args: string[],
+  log: Logger,
 ) => {
-  await write(`
+  await log.write(`
     If I were a real command, I would ${
     flags.verbose ? "be VERY" : "not be"
   } noisy.

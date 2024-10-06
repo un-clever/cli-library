@@ -9,8 +9,6 @@ import type {
   Writer,
 } from "./types.ts";
 
-const defaultLogger: PrintFn = makeLogger(Deno.stdout);
-
 /**
  * Turn a handler and flags into a simple (leaf) command
  */
@@ -25,16 +23,18 @@ export function command<VV>(
     `${name}: ${description}\n\n${getFlagsetHelp(flags)}`;
   const run = async (
     rawargs: string[],
-    log: PrintFn = defaultLogger,
+    stdout?: Writer,
+    stderr?: Writer,
   ): Promise<number> => {
+    const logger = makeAsyncLoggerFancy(stdout, stderr);
     try {
       const parse = getFlagsetParser(flags);
       const params = parse(rawargs);
-      const result = await handler(log, params.flags, params.args);
+      const result = await handler(params.flags, params.args, logger);
       return result;
     } catch (err) {
-      await log(help());
-      await log("\n" + GetHelp(err));
+      await logger.ewrite(help());
+      await logger.ewrite("\n" + GetHelp(err));
       return 999;
     }
   };
@@ -51,6 +51,30 @@ export function makeLogger(output: Writer): PrintFn {
     output.write(encoder.encode(msg));
 }
 
+export function makeAsyncLoggerFancy(
+  standardOutput = Deno.stdout as Writer,
+  errorOutput = Deno.stderr as Writer,
+) {
+  const encoder = new TextEncoder();
+
+  function makeOutput(w: Writer, suffix = "") {
+    // TODO: this doesn't check the return value (number of bytes written)
+    return (msg: string) => w.write(encoder.encode(msg + suffix));
+  }
+
+  // Maybe: make log and error handle extra args like console does maybe sync too?
+  // log(...data: any[]): void
+  // error(...data: any[]): void
+
+  // these are all async functions!
+  return {
+    log: makeOutput(standardOutput, "\n"),
+    error: makeOutput(errorOutput, "\n"),
+    write: makeOutput(standardOutput),
+    ewrite: makeOutput(errorOutput),
+  };
+}
+
 export function multiCommand(
   name: string,
   description: string,
@@ -60,22 +84,24 @@ export function multiCommand(
   const help = () => [describe, ...Object.keys(commands)].join("\n");
   const run = async (
     rawargs: string[],
-    log: PrintFn = defaultLogger,
+    stdout?: Writer,
+    stderr?: Writer,
   ): Promise<number> => {
+    const logger = makeAsyncLoggerFancy(stdout, stderr);
     try {
       const subcmd = rawargs[0];
       if (subcmd && subcmd in commands) {
         // TODO push subcmd into command path
         // maybe run should be runSub(["path1"], args, log)
         const cmd = commands[subcmd];
-        return await cmd.run(rawargs.slice(1), log);
+        return await cmd.run(rawargs.slice(1), stdout, stderr);
       }
-      await log(`unrecognized subcommand: '${subcmd}`);
-      await log(help());
+      await logger.error(`unrecognized subcommand: '${subcmd}`);
+      await logger.error(help());
       return 1000;
     } catch (err) {
-      await log(help());
-      await log("\n" + GetHelp(err));
+      await logger.error(help());
+      await logger.error("\n" + GetHelp(err));
       return 999;
     }
   };

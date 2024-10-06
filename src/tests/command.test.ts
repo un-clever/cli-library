@@ -1,11 +1,12 @@
 // deno-lint-ignore-file no-unused-vars
-import { command, makeLogger } from "../command.ts";
+import { command, makeAsyncLoggerFancy, makeLogger } from "../command.ts";
 import { getTestFlagset } from "./testUtils.ts";
 import type {
   CliArgs,
   CommandFn,
   Flagset,
   FlagsetParser,
+  Logger,
   PrintFn,
 } from "../types.ts";
 import {
@@ -27,11 +28,11 @@ describe("we can make a simple command", () => {
   type Params = CliArgs<CommandType>;
 
   async function handler1(
-    write: PrintFn,
     flags: CommandType,
     args: string[],
+    logger: Logger,
   ): Promise<number> {
-    await write(JSON.stringify({ flags, args, dashdash: [] }));
+    await logger.write(JSON.stringify({ flags, args, dashdash: [] }));
     return 0;
   }
 
@@ -55,7 +56,10 @@ describe("we can make a simple command", () => {
       cmd.help(),
       `simple: test command\n\n--help: show comand help\n--one: your optional string argument\n`,
     );
-    const status = await cmd.run(args, makeLogger(output));
+    const status = await cmd.run(
+      args,
+      output,
+    );
     assertEquals(status, 0);
     const decoder = new TextDecoder(); //...and here's grabbing that output
     assertEquals(JSON.parse(decoder.decode(output.bytes())), expectedParams);
