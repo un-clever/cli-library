@@ -1,6 +1,6 @@
 import type {
   Flag,
-  FlagtypeDef,
+  FlagType,
   OptionalFlag,
   ParseResult,
   RequiredFlag,
@@ -24,7 +24,7 @@ export const FailedParse: ParseResult<any> = Object.freeze({ n: 0 });
  */
 export function checkFlagDefault<V>(
   flagName: string,
-  parser: FlagtypeDef<V>,
+  parser: FlagType<V>,
   flagDefault?: V,
 ): V | undefined {
   const haveParserDefault = parser.default !== undefined;
@@ -49,7 +49,7 @@ export function checkFlagDefault<V>(
 export function required<V>(
   name: string,
   description: string,
-  parser: FlagtypeDef<V>,
+  parser: FlagType<V>,
   defaultValue?: V,
 ): RequiredFlag<V> {
   return {
@@ -72,7 +72,7 @@ export function required<V>(
 export function optional<V>(
   name: string,
   description: string,
-  parser: FlagtypeDef<V>,
+  parser: FlagType<V>,
   defaultValue?: V,
 ): OptionalFlag<V> {
   return {
@@ -105,7 +105,7 @@ export function isOptionalFlag<T>(f: Flag<T>): f is OptionalFlag<T> {
  * If you need fancier, default-true (negatable) flags (e.g. --no-wrap). See
  * falseFlag() below.
  */
-export const booleanFlag: FlagtypeDef<boolean> = {
+export const booleanFlag: FlagType<boolean> = {
   parse(_i: number, _: string[]) {
     // If we get here, the flag is present and already stripped off, so return true
     return { n: 0, value: true };
@@ -116,7 +116,7 @@ export const booleanFlag: FlagtypeDef<boolean> = {
 /**
  * Parse a string flag
  */
-export const stringFlag: FlagtypeDef<string> = {
+export const stringFlag: FlagType<string> = {
   parse(i: number, args: string[]) {
     const n = 1;
     const value = args[i];
@@ -128,7 +128,7 @@ export const stringFlag: FlagtypeDef<string> = {
 /**
  * Parse a decimal floating point number into a JavaScript number
  */
-export const numberFlag: FlagtypeDef<number> = {
+export const numberFlag: FlagType<number> = {
   parse(i: number, args: string[]) {
     const n = 1;
     const value = parseFloat(args[i]);

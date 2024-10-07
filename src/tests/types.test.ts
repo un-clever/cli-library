@@ -10,8 +10,8 @@ import type {
   FlagValue,
   OptionalFlag,
   RequiredFlag,
-  Writer,
 } from "../types.ts";
+import type { Writer } from "../output.ts";
 import { describe } from "@std/testing/bdd";
 import { getTestFlagset, type TtestFlagsetReturn } from "./testUtils.ts";
 import type { Writer as StandardWriter } from "@std/io";

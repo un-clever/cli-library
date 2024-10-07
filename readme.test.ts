@@ -2,37 +2,31 @@
 // examples for Readme
 import {
   booleanFlag,
-  type CliArgs,
   command,
   type CommandFn,
   type Flagset,
   type FlagsetReturn,
+  type Logger,
   numberFlag,
   optional,
   required,
-  runCommand,
   stringFlag,
-  type StringOutput,
 } from "@un-clever/cli-library";
 import { assertEquals } from "testlib";
 
-// TODO: make a simpler API: run(handler, flags, description="myfilename")
 /**
- * FIRST QUICKSTART
+ * QUICK AND DIRTY START
  */
 // a one statement Hello World in Deno
-const status1 = await runCommand(
-  command({
-    description: "hello command",
-    flags: { who: required("who", "who to say hello to", stringFlag, "World") },
-    run: async (args: { flags: { who: string } }, output) => {
-      await output(`Hello, ${args.flags.who}!`);
-      return 0;
-    },
-  }),
-  Deno.args,
-  Deno.stdout,
-);
+const status1 = await command(
+  "hello",
+  "hello command",
+  { who: required("who", "who to say hello to", stringFlag, "World") },
+  async (flags: { who: string }, _, log) => {
+    await log.log(`Hello, ${flags.who}!`);
+    return 0;
+  },
+).run(Deno.args);
 
 assertEquals(status1, 0);
 
@@ -52,32 +46,33 @@ type HelloFlags = FlagsetReturn<typeof helloFlags>;
 // 2. an async function that outputs strings (makes testing easier!)
 // and returns an integer status code
 async function helloHandler(
-  cliArgs: { flags: HelloFlags },
-  output: StringOutput,
+  flags: HelloFlags,
+  _: string[],
+  log: Logger,
 ) {
-  await output(JSON.stringify(cliArgs));
+  await log.log(JSON.stringify(flags));
   return 0; // The SHELL's idea of success!
 }
 
 // TODO: switch this to the simpler RUN interface
 
 // we bundle those up into a Command
-const helloCommand = command({
-  description: "Hello command",
-  flags: helloFlags,
-  run: helloHandler,
-});
+const helloCommand = command(
+  "hello",
+  "Hello command",
+  helloFlags,
+  helloHandler,
+);
 
-const status2 = await runCommand(helloCommand, ["--who", "Abe"], Deno.stdout);
+const status2 = await helloCommand.run(
+  ["--who", "Abe"],
+);
 
 assertEquals(status2, 0);
 
 /**
  * Later examples
  */
-
-// then we run the command
-await runCommand(helloCommand, Deno.args, Deno.stdout);
 
 // or, if we prefer, we can start with the expected type and typecheck our flags
 //
@@ -102,11 +97,11 @@ const flags: Flagset<Flags> = {
 };
 
 const myImpelementation: CommandFn<Flags> = async (
-  parsedCli: CliArgs<Flags>,
-  write: StringOutput,
+  flags: Flags,
+  args: string[],
+  log: Logger,
 ) => {
-  const { flags } = parsedCli;
-  await write(`
+  await log.write(`
     If I were a real command, I would ${
     flags.verbose ? "be VERY" : "not be"
   } noisy.
@@ -115,10 +110,11 @@ const myImpelementation: CommandFn<Flags> = async (
   return 0; // success
 };
 
-const myCommand = command({
-  description: "stub file duplicator",
+const myCommand = command(
+  "catX",
+  "stub file duplicator",
   flags,
-  run: myImpelementation,
-});
+  myImpelementation,
+);
 
-await runCommand(myCommand, Deno.args, Deno.stdout);
+await myCommand.run(Deno.args);

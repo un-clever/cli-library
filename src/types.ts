@@ -30,14 +30,12 @@
  * - F: the type of the Flag (flag specification) Flag<F> = FT
  * - FF: the type of a Flagset (multiple flags specification)
  * - VV: "flags," the type that a flagset parses out to
+ *
+ * Other Abbreviations
+ * Fn: function
  */
 
-/**
- * copied verbatim from @std/io to get our lib runtime deps down to zero
- */
-export interface Writer {
-  write(p: Uint8Array): Promise<number>;
-}
+import type { Writer } from "./output.ts";
 
 /**
  * Utility to extract a union type of the strings from a string array constant.
@@ -106,8 +104,8 @@ export type ParseResult<V> = {
 };
 
 /**
- * FlagtypeDef(inition) is a ParseFunction (see above) and other metadata necessary to
- * parse a type of flag.
+ * FlagType is a ParseFunction (see above) and other metadata necessary to parse
+ * a new type of flag.
  *
  * .default = the default value for all flags of that type. This is NOT a
  * default value for a particular flag, but for a whole class of flags, like
@@ -115,7 +113,7 @@ export type ParseResult<V> = {
  */
 
 /** */
-export interface FlagtypeDef<V> {
+export interface FlagType<V> {
   parse: ParseFn<V>;
   default?: V;
   // preexecute?: (flagname: string, value: V) => Promise<void>;
@@ -131,7 +129,7 @@ export interface BaseFlag<V> {
   // brief help for the flag
   description: string;
   // parser function
-  parser: FlagtypeDef<V>;
+  parser: FlagType<V>;
   // possible default value
   default?: V;
   // alternative slugs that should be prefixed with --
@@ -232,7 +230,7 @@ export type FlagsetReturn<FF> =
   & FlagsetOptionalProps<FF>
   & FlagsetRequiredProps<FF>;
 
-// a couple helper types for FlagsetReturn
+// a couple HELPER types for FlagsetReturn
 type FlagsetOptionalProps<FF> = {
   // uses "as" to remap/exclude keys that don't match a particular pattern
   // so we can add the "?:" optional token to the definition. There might
@@ -273,28 +271,35 @@ export interface CliArgs<VV> {
  * structure taking into account positional arguments optional, required, and
  * default flags,
  */
-export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
-
-/**
- * StringWrite is any async command that can take a string and output it
- * somewhere, typically stdout.
- */
-export type StringOutput = (msg: string) => Promise<number>; // writer interface
+export type FlagsetParser<VV> = (args: string[]) => CliArgs<VV>;
 
 /**
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
-  params: CliArgs<VV>,
-  write: StringOutput,
+  flags: VV,
+  positionals: string[],
+  loggger: Logger,
 ) => Promise<number>;
+
+export type Logger = {
+  log: (msg: string) => Promise<number>;
+  error: (msg: string) => Promise<number>;
+  write: (msg: string) => Promise<number>;
+  ewrite: (msg: string) => Promise<number>;
+};
 
 /**
  * Command is the functional interface to a CLI program
  */
-export interface Command<VV> {
+export interface Command {
   describe: () => string;
   help: () => string;
-  parse: FlagsetParseFn<VV>;
-  execute: CommandFn<VV>;
+  run: (
+    rawargs: string[],
+    standardOutput?: Writer,
+    errorOutput?: Writer,
+  ) => Promise<number>;
 }
+
+export type CommandMap = Record<string, Command>;

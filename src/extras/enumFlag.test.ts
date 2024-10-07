@@ -8,7 +8,7 @@ import {
 } from "testlib";
 import type {
   Flagset,
-  FlagtypeDef,
+  FlagType,
   ParseResult,
   StringArrayElements,
 } from "../types.ts";
@@ -22,7 +22,7 @@ import {
 import { fuzzedExample } from "../tests/testData.ts";
 
 type flagTestCase<T> = [
-  FlagtypeDef<T>, // flagdef to be tested
+  FlagType<T>, // flagdef to be tested
   string[], // input args
   T | undefined, // expected parse result
   number, // number of args consumed
@@ -34,7 +34,7 @@ assertType<
   IsExact<StringArrayElements<typeof legalValues>, TlegalValues>
 >(true);
 
-const flag1to4: FlagtypeDef<TlegalValues> = makeEnumFlag(legalValues);
+const flag1to4: FlagType<TlegalValues> = makeEnumFlag(legalValues);
 
 /**
  * Examples for enumFlag.ts
