@@ -1,21 +1,21 @@
 import { booleanFlag, numberFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
 import type {
-  CliArgs,
   FlagsetParseFn,
   OptionalFlag,
+  ParsedArgs,
   RequiredFlag,
 } from "../types.ts";
 import { assertEquals, assertThrows, it } from "testlib";
 
 export interface ArgsExample {
   raw: string[];
-  parsed: Error | Omit<CliArgs<unknown>, "flags">;
+  parsed: Error | Omit<ParsedArgs<unknown>, "flags">;
 }
 
 export interface FlagsetExample<VV> {
   raw: string[];
-  parsed: Error | CliArgs<VV>;
+  parsed: Error | ParsedArgs<VV>;
 }
 
 export function testmanyArgExamples(

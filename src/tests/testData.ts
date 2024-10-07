@@ -1,7 +1,7 @@
 // Data useful for testing CLI implementations
 import { numberFlag } from "../flags.ts";
 import { booleanFlag, optional, required, stringFlag } from "../flags.ts";
-import type { CliArgs, Flagset } from "../types.ts";
+import type { Flagset, ParsedArgs } from "../types.ts";
 import type { ArgsExample, FlagsetExample } from "./testUtils.ts";
 
 export const GenericParsingError = new Error("missing args after --");
@@ -21,34 +21,7 @@ export const simpleArgsCases: ArgsExample[] = [
   {raw: ["a","b","c","d","e","f","g","h","i","j"], parsed: {args:["a","b","c","d","e","f","g","h","i","j"]}},
 ];
 
-// export function makeDashDashCase(
-//   insertBefore: number,
-//   eg: ArgsExample,
-// ): ArgsExample {
-//   if (insertBefore >= eg.raw.length) { // dashdash at end causes error
-//     const raw = [...eg.raw, "--"];
-//     return { raw, parsed: GenericParsingError };
-//   }
-//   const args = eg.raw.slice(0, insertBefore);
-//   const dashdash = eg.raw.slice(insertBefore);
-//   const raw = [...args, "--", ...dashdash];
-//   return ({ raw, parsed: { args, dashdash } });
-// }
-
-// export function makeDashDashCases(insertBefore: number) {
-//   return (eg: ArgsExample) => makeDashDashCase(insertBefore, eg);
-// }
-
-// export const dashDashCases: ArgsExample[] = [
-//   ...simpleArgsCases.map(makeDashDashCases(0)),
-//   ...simpleArgsCases.map(makeDashDashCases(1)),
-//   ...simpleArgsCases.map(makeDashDashCases(2)),
-//   ...simpleArgsCases.map(makeDashDashCases(5)),
-//   ...simpleArgsCases.map(makeDashDashCases(9)),
-//   ...simpleArgsCases.map(makeDashDashCases(11)),
-// ];
-
-const emptyParse: CliArgs<unknown> = { args: [], flags: {} };
+const emptyParse: ParsedArgs<unknown> = { args: [], flags: {} };
 
 export function fuzzedExample<VV>(
   eg: FlagsetExample<VV>,
@@ -68,12 +41,6 @@ export function fuzzedExample<VV>(
     // add an unrecognized flag before and after
     {raw: ["--some-unrecognized-flag", ...raw], parsed: GenericParsingError},
     {raw: [...raw, "--some-unrecognized-flag"], parsed: GenericParsingError},
-    // // add some passthrough arguments
-    // {raw: [...raw, "--", "a", "b", "c"], parsed: {args, flags: ["a", "b", "c"]}},
-    // // add some passthrough arguments AND positionals
-    // {raw: ["early", "early", ...raw, "late", "later", "z", "--", "a", "b", "c"], parsed: {args:["early", "early", ...args, "late", "later", "z"] , flags, dashdash: ["a", "b", "c"]}},
-    // // add a -- without following arguments
-    // {raw: [...raw, "--"], parsed: GenericParsingError},
   ];
 }
 

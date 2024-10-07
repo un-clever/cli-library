@@ -2,13 +2,13 @@
 // examples for Readme
 import {
   booleanFlag,
-  type CliArgs,
   command,
   type CommandFn,
   type Flagset,
   type FlagsetReturn,
   numberFlag,
   optional,
+  type ParsedArgs,
   required,
   runCommand,
   stringFlag,
@@ -111,7 +111,7 @@ const flags: Flagset<Flags> = {
 };
 
 const myImpelementation: CommandFn<Flags> = async (
-  parsedCli: CliArgs<Flags>,
+  parsedCli: ParsedArgs<Flags>,
   std: StandardOutputs,
 ) => {
   const { flags } = parsedCli;
