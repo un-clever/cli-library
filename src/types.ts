@@ -318,10 +318,8 @@ export type CommandFn<VV> = (
 /**
  * Command is the functional interface to a CLI program
  */
-export interface Command /*<VV>*/ {
+export interface Command {
   describe: () => string;
   help: () => string;
   run: (rawArguments: string[], std: StandardOutputs) => Promise<number>;
-  // parse: FlagsetParseFn<VV>;
-  // execute: CommandFn<VV>;
 }
