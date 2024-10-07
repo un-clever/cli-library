@@ -6,10 +6,11 @@ import type {
   CommandFn,
   Flagset,
   FlagsetParseFn,
-  StringOutput,
+  StandardOutputs,
 } from "../types.ts";
 import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
 import { Buffer } from "@std/io";
+import { standardizeOutputs } from "../output.ts";
 
 const testFlagset = getTestFlagset();
 const { one } = testFlagset;
@@ -19,8 +20,8 @@ describe("we can make a simple command", () => {
   const flags = { one };
   type Params = CliArgs<CommandType>;
 
-  async function run(params: Params, write: StringOutput): Promise<number> {
-    await write(JSON.stringify(params));
+  async function run(params: Params, std: StandardOutputs): Promise<number> {
+    await std.outs(JSON.stringify(params));
     return 0;
   }
 
@@ -45,7 +46,11 @@ describe("we can make a simple command", () => {
       `test command\n\n--help: show comand help\n--one: your optional string argument\n`,
     );
     assertEquals(cmd.parse(args), expectedParams);
-    const status = await runCommand(cmd, args, output);
+    const status = await runCommand(
+      cmd,
+      args,
+      standardizeOutputs(output, output),
+    );
     assertEquals(status, 0);
     const decoder = new TextDecoder(); //...and here's grabbing that output
     assertEquals(JSON.parse(decoder.decode(output.bytes())), expectedParams);
