@@ -4,6 +4,7 @@ import type {
   Command,
   CommandFn,
   Flagset,
+  StandardOutputs,
   StringOutput,
   Writer,
 } from "./types.ts";
@@ -34,17 +35,15 @@ export async function runCommand<VV>(
   // TODO: add name here or in command object, which may become names path in multicommand
   cmd: Command<VV>,
   args: string[],
-  output: Writer,
+  std: StandardOutputs,
 ): Promise<number> {
-  const write = makeStringOutput(output);
-
   try {
     const params = cmd.parse(args);
-    const result = await cmd.execute(params, write);
+    const result = await cmd.execute(params, std);
     return result;
   } catch (err) {
-    await write(cmd.help());
-    await write("\n" + GetHelp(err));
+    await std.err(cmd.help());
+    await std.err("\n" + GetHelp(err));
     return 999;
   }
 }

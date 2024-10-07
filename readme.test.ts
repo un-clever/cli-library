@@ -15,6 +15,8 @@ import {
   type StringOutput,
 } from "@un-clever/cli-library";
 import { assertEquals } from "testlib";
+import { standardizeOutputs } from "./src/output.ts";
+import type { StandardOutputs } from "./src/types.ts";
 
 // TODO: make a simpler API: run(handler, flags, description="myfilename")
 /**
@@ -25,13 +27,13 @@ const status1 = await runCommand(
   command({
     description: "hello command",
     flags: { who: required("who", "who to say hello to", stringFlag, "World") },
-    run: async (args: { flags: { who: string } }, output) => {
-      await output(`Hello, ${args.flags.who}!`);
+    run: async (args: { flags: { who: string } }, std) => {
+      await std.out(`Hello, ${args.flags.who}!`);
       return 0;
     },
   }),
   Deno.args,
-  Deno.stdout,
+  standardizeOutputs(Deno.stdout, Deno.stderr),
 );
 
 assertEquals(status1, 0);
@@ -53,9 +55,9 @@ type HelloFlags = FlagsetReturn<typeof helloFlags>;
 // and returns an integer status code
 async function helloHandler(
   cliArgs: { flags: HelloFlags },
-  output: StringOutput,
+  std: StandardOutputs,
 ) {
-  await output(JSON.stringify(cliArgs));
+  await std.out(JSON.stringify(cliArgs));
   return 0; // The SHELL's idea of success!
 }
 
@@ -68,7 +70,11 @@ const helloCommand = command({
   run: helloHandler,
 });
 
-const status2 = await runCommand(helloCommand, ["--who", "Abe"], Deno.stdout);
+const status2 = await runCommand(
+  helloCommand,
+  ["--who", "Abe"],
+  standardizeOutputs(Deno.stdout, Deno.stderr),
+);
 
 assertEquals(status2, 0);
 
@@ -77,7 +83,11 @@ assertEquals(status2, 0);
  */
 
 // then we run the command
-await runCommand(helloCommand, Deno.args, Deno.stdout);
+await runCommand(
+  helloCommand,
+  Deno.args,
+  standardizeOutputs(Deno.stdout, Deno.stderr),
+);
 
 // or, if we prefer, we can start with the expected type and typecheck our flags
 //
@@ -103,10 +113,10 @@ const flags: Flagset<Flags> = {
 
 const myImpelementation: CommandFn<Flags> = async (
   parsedCli: CliArgs<Flags>,
-  write: StringOutput,
+  std: StandardOutputs,
 ) => {
   const { flags } = parsedCli;
-  await write(`
+  await std.out(`
     If I were a real command, I would ${
     flags.verbose ? "be VERY" : "not be"
   } noisy.
@@ -121,4 +131,8 @@ const myCommand = command({
   run: myImpelementation,
 });
 
-await runCommand(myCommand, Deno.args, Deno.stdout);
+await runCommand(
+  myCommand,
+  Deno.args,
+  standardizeOutputs(Deno.stdout, Deno.stderr),
+);

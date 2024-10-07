@@ -40,6 +40,25 @@ export interface Writer {
 }
 
 /**
+ * StringWrite is any async command that can take a string and output it
+ * somewhere, typically stdout.
+ * @deprecated use Output instead
+ */
+export type StringOutput = (msg: string) => Promise<number>; // writer interface
+
+export type Output = (message: string) => Promise<void>;
+
+/**
+ * CLI's have to interact with terminals and piping. Splitting program output
+ * from error output solves [The Semi-Predicate Problem](https://en.wikipedia.org/wiki/Semipredicate_problem)
+ * in an elegant and standard way. See also
+ */
+export type StandardOutputs = {
+  out: Output; // write to the standard output
+  err: Output;
+};
+
+/**
  * Utility to extract a union type of the strings from a string array constant.
  *
  * # Examples:
@@ -276,17 +295,11 @@ export interface CliArgs<VV> {
 export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
 
 /**
- * StringWrite is any async command that can take a string and output it
- * somewhere, typically stdout.
- */
-export type StringOutput = (msg: string) => Promise<number>; // writer interface
-
-/**
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
   params: CliArgs<VV>,
-  write: StringOutput,
+  write: StandardOutputs,
 ) => Promise<number>;
 
 /**
