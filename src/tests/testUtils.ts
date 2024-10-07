@@ -1,21 +1,21 @@
 import { booleanFlag, numberFlag, stringFlag } from "../flags.ts";
 import { intFlag } from "../extras/intFlag.ts";
 import type {
-  CliArgs,
   FlagsetParseFn,
   OptionalFlag,
+  ParsedArgs,
   RequiredFlag,
 } from "../types.ts";
 import { assertEquals, assertThrows, it } from "testlib";
 
 export interface ArgsExample {
   raw: string[];
-  parsed: Error | Omit<CliArgs<unknown>, "flags">;
+  parsed: Error | Omit<ParsedArgs<unknown>, "flags">;
 }
 
 export interface FlagsetExample<VV> {
   raw: string[];
-  parsed: Error | CliArgs<VV>;
+  parsed: Error | ParsedArgs<VV>;
 }
 
 export function testmanyArgExamples(
@@ -30,8 +30,8 @@ export function testmanyArgExamples(
       });
     } else {
       it(`parses args ${testTitle}`, () => {
-        const { args, dashdash } = parse(eg.raw);
-        assertEquals({ args, dashdash }, eg.parsed);
+        const { args } = parse(eg.raw);
+        assertEquals({ args }, eg.parsed);
       });
     }
   }
@@ -50,8 +50,8 @@ export function testmanyFlagsetExamples<VV>(
       });
     } else {
       it(`parses args ${testTitle}`, () => {
-        const { args, flags, dashdash } = parse(eg.raw);
-        assertEquals({ args, flags, dashdash }, eg.parsed);
+        const { args, flags } = parse(eg.raw);
+        assertEquals({ args, flags }, eg.parsed);
       });
     }
   }

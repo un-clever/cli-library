@@ -278,24 +278,11 @@ type FlagsetRequiredProps<FF> = {
 };
 
 /**
- * CliArgs represents the results of successfully parsing a full set of
+ * ParsedArgs represents the results of successfully parsing a full set of
  * command-line arguments.
- *
- * `.dashdash` is here to represent the convention of some shell commands to use
- * `--` to signal that arguments after `--` should not be passed through "raw"
- * or interpreted in a special way. And example of this is using `git` to check
- * out a particular file from a commit (branch, tag, sha), e.g.:
- *
- * `git checkout my-other-branch -- some_file.txt
- *
- * This doesn't mean your CLI has to allow such handling. Some parsers may
- * choose to handle -- differently, ignoring or failing, but this structure
- * makes space for those args to be returned.
- * @deprecated injecting without dashdash anticipating it can be a flag
  */
-export interface CliArgs<VV> {
+export interface ParsedArgs<VV> {
   args: string[]; // positional args
-  dashdash: string[]; // args after --, useful mostly for commands that call another command
   flags: VV;
 }
 
@@ -304,7 +291,7 @@ export interface CliArgs<VV> {
  * structure taking into account positional arguments optional, required, and
  * default flags,
  */
-export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
+export type FlagsetParseFn<VV> = (args: string[]) => ParsedArgs<VV>;
 
 /**
  * CommandFn is a function which implements (executes a command).

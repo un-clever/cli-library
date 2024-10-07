@@ -2,10 +2,10 @@
 import { command } from "../command.ts";
 import { getTestFlagset } from "./testUtils.ts";
 import type {
-  CliArgs,
   CommandFn,
   Flagset,
   FlagsetParseFn,
+  ParsedArgs,
   StandardOutputs,
 } from "../types.ts";
 import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
@@ -18,7 +18,6 @@ const { one } = testFlagset;
 describe("we can make a simple command", () => {
   type CommandType = { one?: string };
   const flags = { one };
-  type Params = CliArgs<CommandType>;
 
   async function run(
     flags: CommandType,
@@ -36,8 +35,7 @@ describe("we can make a simple command", () => {
 
   it("seems to work", async () => {
     const args = ["a", "b", "--one", "c"];
-    // TODO remove Partial<> after removing dashdash from standard parser
-    const expectedParams: Partial<Params> = {
+    const expectedParams: ParsedArgs<CommandType> = {
       flags: { one: "c" },
       args: ["a", "b"],
     };

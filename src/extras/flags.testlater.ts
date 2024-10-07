@@ -46,3 +46,30 @@ describe("test flag mini parsers", () => {
     });
   }
 });
+
+// export function makeDashDashCase(
+//   insertBefore: number,
+//   eg: ArgsExample,
+// ): ArgsExample {
+//   if (insertBefore >= eg.raw.length) { // dashdash at end causes error
+//     const raw = [...eg.raw, "--"];
+//     return { raw, parsed: GenericParsingError };
+//   }
+//   const args = eg.raw.slice(0, insertBefore);
+//   const dashdash = eg.raw.slice(insertBefore);
+//   const raw = [...args, "--", ...dashdash];
+//   return ({ raw, parsed: { args, dashdash } });
+// }
+
+// export function makeDashDashCases(insertBefore: number) {
+//   return (eg: ArgsExample) => makeDashDashCase(insertBefore, eg);
+// }
+
+// export const dashDashCases: ArgsExample[] = [
+//   ...simpleArgsCases.map(makeDashDashCases(0)),
+//   ...simpleArgsCases.map(makeDashDashCases(1)),
+//   ...simpleArgsCases.map(makeDashDashCases(2)),
+//   ...simpleArgsCases.map(makeDashDashCases(5)),
+//   ...simpleArgsCases.map(makeDashDashCases(9)),
+//   ...simpleArgsCases.map(makeDashDashCases(11)),
+// ];
