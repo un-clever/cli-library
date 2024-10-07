@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { command, runCommand } from "../command.ts";
+import { command } from "../command.ts";
 import { getTestFlagset } from "./testUtils.ts";
 import type {
   CliArgs,
@@ -20,8 +20,12 @@ describe("we can make a simple command", () => {
   const flags = { one };
   type Params = CliArgs<CommandType>;
 
-  async function run(params: Params, std: StandardOutputs): Promise<number> {
-    await std.outs(JSON.stringify(params));
+  async function run(
+    flags: CommandType,
+    args: string[],
+    std: StandardOutputs,
+  ): Promise<number> {
+    await std.outs(JSON.stringify({ flags, args }));
     return 0;
   }
 
@@ -32,22 +36,20 @@ describe("we can make a simple command", () => {
 
   it("seems to work", async () => {
     const args = ["a", "b", "--one", "c"];
-    const expectedParams: Params = {
+    // TODO remove Partial<> after removing dashdash from standard parser
+    const expectedParams: Partial<Params> = {
       flags: { one: "c" },
       args: ["a", "b"],
-      dashdash: [],
     };
     const description = "test command";
     const output = new Buffer(); // one way to trap command output...
-    const cmd = command({ description, flags, run });
+    const cmd = command(description, flags, run);
     assertEquals(cmd.describe(), description);
     assertEquals(
       cmd.help(),
       `test command\n\n--help: show comand help\n--one: your optional string argument\n`,
     );
-    assertEquals(cmd.parse(args), expectedParams);
-    const status = await runCommand(
-      cmd,
+    const status = await cmd.run(
       args,
       standardizeOutputs(output, output),
     );
