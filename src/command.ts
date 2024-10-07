@@ -9,30 +9,42 @@ import type {
 } from "./types.ts";
 
 export function command<VV>(
+  name: string,
   description: string,
   flagset: Flagset<VV>,
   handler: CommandFn<VV>,
 ): Command {
-  const describe = () => description;
-  const help = (): string => `${description}\n\n${getFlagsetHelp(flagset)}`;
+  const describe = () => `${name}: ${description}`;
+  const help = (path?: string[]): string =>
+    `${path ? path.join(" ") + " " : ""}${describe()}\n\n${
+      getFlagsetHelp(flagset)
+    }`;
+  function helpDeep(path: string[]) {
+    return { path: [...path, name], children: flagset };
+  }
   async function run(
     rawArguments: string[],
     std: StandardOutputs,
   ): Promise<number> {
-    const errln = (msg: string) => std.errs(msg + "\n"); // "error + line"
+    const errorLine = (msg: string) => std.errs(msg + "\n"); // "error + line"
     try {
       const parse = getFlagsetParser<VV>(flagset, true);
       const { flags, args } = parse(rawArguments);
-      return await handler(flags, args, std);
+      return await handler(
+        flags,
+        args,
+        std,
+      );
     } catch (err) {
-      errln(GetHelp(err));
-      errln("run with --help flag for more info");
+      errorLine(GetHelp(err));
+      errorLine("run with --help flag for more info");
       return 1001;
     }
   }
   return {
-    help,
     describe,
+    help,
+    helpDeep,
     run,
   };
 }
@@ -44,27 +56,29 @@ export function multiCommand(
 ): Command {
   const describe = () => `${name}: ${description}`;
   const help = () => [describe, ...Object.keys(commands)].join("\n");
+  function helpDeep(path: string[]) {
+    return { path: [...path, name], children: commands };
+  }
+
   async function run(
     rawArguments: string[],
-    std: StandardOutputs,
+    std: StandardOutputs, // allow for deep running
   ): Promise<number> {
-    const errln = (msg: string) => std.errs(msg + "\n"); // "error + line"
+    const errorLine = (msg: string) => std.errs(msg + "\n"); // "error + line"
     try {
       const subcmd = rawArguments[0];
       if (subcmd && subcmd in commands) {
-        // TODO push subcmd into command path
-        // maybe run should be runSub(["path1"], args, log)
         const cmd = commands[subcmd];
         return await cmd.run(rawArguments.slice(1), std);
       }
-      await errln(`unrecognized subcommand: '${subcmd}`);
-      await errln(help());
+      await errorLine(`unrecognized subcommand: '${subcmd}`);
+      await errorLine(help());
       return 1002;
     } catch (err) {
-      await errln(help());
-      await errln(GetHelp(err));
+      await errorLine(help());
+      await errorLine(GetHelp(err));
       return 1001;
     }
   }
-  return { describe, help, run };
+  return { describe, help, helpDeep, run };
 }

@@ -300,7 +300,6 @@ export type CommandFn<VV> = (
   flags: VV,
   args: string[],
   std: StandardOutputs,
-  parent?: Command, // containing parent so help commands can know a peers
 ) => Promise<number>;
 
 /**
@@ -311,12 +310,10 @@ export interface Command {
   help: (path?: string[]) => string;
   helpDeep: (
     path: string[],
-  ) => { name: string; children: CommandMap | Flagset<unknown> };
+  ) => { path: string[]; children: CommandMap | Flagset<unknown> };
   run: (
     rawArguments: string[],
     std: StandardOutputs,
-    path?: string[], // allow for deep running
-    parent?: Command,
   ) => Promise<number>;
 }
 
