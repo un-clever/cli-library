@@ -12,7 +12,7 @@ export function standardizeOutputs(
     while (n < data.length) n += await w.write(data.subarray(n));
   }
   return {
-    out: (s: string) => writeAllString(outputStream, s),
-    err: (s: string) => writeAllString(errorStream, s),
+    outs: (s: string) => writeAllString(outputStream, s),
+    errs: (s: string) => writeAllString(errorStream, s),
   };
 }

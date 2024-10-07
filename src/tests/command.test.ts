@@ -21,7 +21,7 @@ describe("we can make a simple command", () => {
   type Params = CliArgs<CommandType>;
 
   async function run(params: Params, std: StandardOutputs): Promise<number> {
-    await std.out(JSON.stringify(params));
+    await std.outs(JSON.stringify(params));
     return 0;
   }
 
