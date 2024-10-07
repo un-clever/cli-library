@@ -291,6 +291,7 @@ type FlagsetRequiredProps<FF> = {
  * This doesn't mean your CLI has to allow such handling. Some parsers may
  * choose to handle -- differently, ignoring or failing, but this structure
  * makes space for those args to be returned.
+ * @deprecated injecting without dashdash anticipating it can be a flag
  */
 export interface CliArgs<VV> {
   args: string[]; // positional args
@@ -309,16 +310,18 @@ export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
-  params: CliArgs<VV>,
-  write: StandardOutputs,
+  flags: VV,
+  args: string[],
+  std: StandardOutputs,
 ) => Promise<number>;
 
 /**
  * Command is the functional interface to a CLI program
  */
-export interface Command<VV> {
+export interface Command /*<VV>*/ {
   describe: () => string;
   help: () => string;
-  parse: FlagsetParseFn<VV>;
-  execute: CommandFn<VV>;
+  run: (rawArguments: string[], std: StandardOutputs) => Promise<number>;
+  // parse: FlagsetParseFn<VV>;
+  // execute: CommandFn<VV>;
 }
