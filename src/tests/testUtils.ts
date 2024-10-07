@@ -30,8 +30,8 @@ export function testmanyArgExamples(
       });
     } else {
       it(`parses args ${testTitle}`, () => {
-        const { args, dashdash } = parse(eg.raw);
-        assertEquals({ args, dashdash }, eg.parsed);
+        const { args } = parse(eg.raw);
+        assertEquals({ args }, eg.parsed);
       });
     }
   }
@@ -50,8 +50,8 @@ export function testmanyFlagsetExamples<VV>(
       });
     } else {
       it(`parses args ${testTitle}`, () => {
-        const { args, flags, dashdash } = parse(eg.raw);
-        assertEquals({ args, flags, dashdash }, eg.parsed);
+        const { args, flags } = parse(eg.raw);
+        assertEquals({ args, flags }, eg.parsed);
       });
     }
   }

@@ -295,7 +295,7 @@ type FlagsetRequiredProps<FF> = {
  */
 export interface CliArgs<VV> {
   args: string[]; // positional args
-  dashdash: string[]; // args after --, useful mostly for commands that call another command
+  // dashdash: string[]; // args after --, useful mostly for commands that call another command
   flags: VV;
 }
 

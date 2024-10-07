@@ -145,11 +145,11 @@ describe.skip("the enumFlag defines flag parses that accept only certain strings
 
   // deno-fmt-ignore  (to keep the table concise)
   const enumFlagsExamples: FlagsetExample<enumReturn>[] = [
-    ...fuzzedExample<enumReturn>({ raw: [], parsed: { args: [], flags: { code: "four" }, dashdash: [] }}),
-    ...fuzzedExample<enumReturn>({ raw: ["--code", "one"], parsed: { args: [], flags: { code: "one" }, dashdash: [] }}),
-    ...fuzzedExample<enumReturn>({ raw: ["--code", "two"], parsed: { args: [], flags: { code: "two" }, dashdash: [] }}),
-    ...fuzzedExample<enumReturn>({ raw: ["--code", "three"], parsed: { args: [], flags: { code: "three" }, dashdash: [] }}),
-    ...fuzzedExample<enumReturn>({ raw: ["--code", "four"], parsed: { args: [], flags: { code: "four" }, dashdash: [] }}),
+    ...fuzzedExample<enumReturn>({ raw: [], parsed: { args: [], flags: { code: "four" }}}),
+    ...fuzzedExample<enumReturn>({ raw: ["--code", "one"], parsed: { args: [], flags: { code: "one" }}}),
+    ...fuzzedExample<enumReturn>({ raw: ["--code", "two"], parsed: { args: [], flags: { code: "two" }}}),
+    ...fuzzedExample<enumReturn>({ raw: ["--code", "three"], parsed: { args: [], flags: { code: "three" }}}),
+    ...fuzzedExample<enumReturn>({ raw: ["--code", "four"], parsed: { args: [], flags: { code: "four" }}}),
     ...fuzzedExample<enumReturn>({ raw: ["--code", "five"], parsed: new Error()}),
     ...fuzzedExample<enumReturn>({ raw: ["--code"], parsed: new Error()}),
   ];

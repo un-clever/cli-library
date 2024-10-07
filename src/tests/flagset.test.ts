@@ -3,7 +3,6 @@ import { getFlagsetHelp, getFlagsetParser } from "../flagset.ts";
 import {
   booleanFlagset,
   booleanFlagsetCases,
-  dashDashCases,
   defaultingNumericFlagset,
   defaultingNumericFlagsetCases,
   defaultingStringFlagset,
@@ -24,17 +23,17 @@ import { assertEquals } from "@std/assert/equals";
 describe("we can parse simple positional arguments", () => {
   testmanyArgExamples(getFlagsetParser<unknown>({}), simpleArgsCases);
 });
-describe("we can parse positional args with a --", () => {
-  testmanyArgExamples(getFlagsetParser<unknown>({}), dashDashCases);
-});
-describe("we can disallow -- in the args", () => {
-  const parse = getFlagsetParser<unknown>({}, false);
-  it("can always prohibit dashdash in the args", () => {
-    for (const c of dashDashCases) {
-      assertThrows(() => parse(c.raw));
-    }
-  });
-});
+// describe("we can parse positional args with a --", () => {
+//   testmanyArgExamples(getFlagsetParser<unknown>({}), dashDashCases);
+// });
+// describe("we can disallow -- in the args", () => {
+//   const parse = getFlagsetParser<unknown>({}, false);
+//   it("can always prohibit dashdash in the args", () => {
+//     for (const c of dashDashCases) {
+//       assertThrows(() => parse(c.raw));
+//     }
+//   });
+// });
 describe("we can parse boolean (default-false) flags", () => {
   testmanyFlagsetExamples(
     "booleanFlag",

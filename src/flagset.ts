@@ -20,6 +20,7 @@ export function auditFlagset<VV>(fs: Flagset<VV>): string[] {
     if (k === "help") {
       problems.push(`help is processed especially; don't a help flag`);
     }
+    // only dashdash can be ""? nah, let dev have freedom
   }
   return problems;
 }
@@ -33,50 +34,50 @@ class FlagsParser1<VV> {
 
   constructor(private flagset: Flagset<VV>, readonly allowDashdash = true) {}
 
-  parse(args: string[]): CliArgs<VV> {
+  parse(args: string[]): { flags: VV; args: string[] } {
     // re-init mutable props
     this.partialFlags = {};
     this.args = [];
-    this.dashdash = [];
+    // this.dashdash = [];
     // we will be incrementing i in the loop body
     for (let i = 0; i < args.length;) {
       const arg = args[i++];
       if (["--help", "-h"].includes(arg)) {
         throw new ParsingError("help requested", "", "help");
-      } else if (arg === "--") {
-        // NOTE: we used to make dashdash optional, but now we just parse it and fail if not allowed
-        i = this.gulpDashDash(i, args);
+        // } else if (arg === "--") {
+        //   // NOTE: we used to make dashdash optional, but now we just parse it and fail if not allowed
+        //   i = this.gulpDashDash(i, args);
       } else if (arg.startsWith("--")) {
         i = this.handleFlag(arg.slice(2), i, args);
       } else {
         this.args.push(arg);
       }
     }
-    if (!this.allowDashdash && this.dashdash) {
-      throw new ParsingError(
-        '"--" not allowed',
-        "this command doesn't allow passthrough args after a '--'",
-        "--",
-      );
-    }
+    // if (!this.allowDashdash && this.dashdash) {
+    //   throw new ParsingError(
+    //     '"--" not allowed',
+    //     "this command doesn't allow passthrough args after a '--'",
+    //     "--",
+    //   );
+    // }
     return {
       flags: this.confirmedFlags(this.partialFlags),
       args: this.args,
-      dashdash: this.dashdash,
+      // dashdash: this.dashdash,
     };
   }
 
-  gulpDashDash(start: number, args: string[]): number {
-    if (start < args.length) {
-      this.dashdash = args.slice(start);
-      return args.length; // end the loop
-    }
-    throw new ParsingError(
-      "no args found after '--'",
-      "", // The special flag '--' passes all the following args to another program. If there are none, oming the '--'.",
-      "--",
-    );
-  }
+  // gulpDashDash(start: number, args: string[]): number {
+  //   if (start < args.length) {
+  //     this.dashdash = args.slice(start);
+  //     return args.length; // end the loop
+  //   }
+  //   throw new ParsingError(
+  //     "no args found after '--'",
+  //     "", // The special flag '--' passes all the following args to another program. If there are none, oming the '--'.",
+  //     "--",
+  //   );
+  // }
 
   handleFlag(flagnameOrDie: string, start: number, args: string[]): number {
     if (flagnameOrDie in this.flagset) {
