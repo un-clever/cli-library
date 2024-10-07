@@ -1,13 +1,7 @@
 import { GetHelp } from "./errors.ts";
 import { getFlagsetHelp, getFlagsetParser } from "./flagset.ts";
-import type {
-  Command,
-  CommandFn,
-  CommandMap,
-  Flagset,
-  PrintFn,
-  Writer,
-} from "./types.ts";
+import type { Writer } from "./output.ts";
+import type { Command, CommandFn, CommandMap, Flagset } from "./types.ts";
 
 /**
  * Turn a handler and flags into a simple (leaf) command
@@ -43,13 +37,13 @@ export function command<VV>(
   return { describe, help, run };
 }
 
-export function makeLogger(output: Writer): PrintFn {
-  const encoder = new TextEncoder();
-  // handle the rest later
-  // maybe function or entries or k:fn
-  return (msg: string, ..._rest: unknown[]) =>
-    output.write(encoder.encode(msg));
-}
+// export function makeLogger(output: Writer): PrintFn {
+//   const encoder = new TextEncoder();
+//   // handle the rest later
+//   // maybe function or entries or k:fn
+//   return (msg: string, ..._rest: unknown[]) =>
+//     output.write(encoder.encode(msg));
+// }
 
 export function makeAsyncLoggerFancy(
   standardOutput = Deno.stdout as Writer,

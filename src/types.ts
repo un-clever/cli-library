@@ -35,18 +35,7 @@
  * Fn: function
  */
 
-/**
- * copied verbatim from @std/io to get our lib runtime deps down to zero
- */
-export interface Writer {
-  write(p: Uint8Array): Promise<number>;
-}
-
-/**
- * StringWrite is any async command that can take a string and output it
- * somewhere, typically stdout.
- */
-export type PrintFn = (msg: string, ...rest: unknown[]) => Promise<number>; // writer interface
+import type { Writer } from "./output.ts";
 
 /**
  * Utility to extract a union type of the strings from a string array constant.

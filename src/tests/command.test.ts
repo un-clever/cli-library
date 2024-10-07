@@ -1,19 +1,12 @@
 // deno-lint-ignore-file no-unused-vars
-import { command, makeAsyncLoggerFancy, makeLogger } from "../command.ts";
+import { command } from "../command.ts";
 import { getTestFlagset } from "./testUtils.ts";
-import type {
-  CliArgs,
-  CommandFn,
-  Flagset,
-  FlagsetParser,
-  Logger,
-  PrintFn,
-} from "../types.ts";
+import type { CliArgs, CommandFn, Flagset, Logger } from "../types.ts";
 import {
   assertEquals,
   assertType,
   describe,
-  Has,
+  type Has,
   type IsExact,
   it,
 } from "testlib";
