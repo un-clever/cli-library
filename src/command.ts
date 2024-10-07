@@ -55,7 +55,7 @@ export function multiCommand(
   commands: CommandMap,
 ): Command {
   const describe = () => `${name}: ${description}`;
-  const help = () => [describe, ...Object.keys(commands)].join("\n");
+  const help = () => [describe(), ...Object.keys(commands)].join("\n");
   function helpDeep(path: string[]) {
     return { path: [...path, name], children: commands };
   }
