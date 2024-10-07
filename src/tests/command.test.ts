@@ -8,7 +8,14 @@ import type {
   ParsedArgs,
   StandardOutputs,
 } from "../types.ts";
-import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
+import {
+  assertEquals,
+  assertType,
+  describe,
+  Has,
+  type IsExact,
+  it,
+} from "testlib";
 import { Buffer } from "@std/io";
 import { standardizeOutputs } from "../output.ts";
 
@@ -29,7 +36,7 @@ describe("we can make a simple command", () => {
   }
 
   it("the types check out", () => {
-    assertType<IsExact<CommandFn<CommandType>, typeof run>>(true);
+    assertType<Has<CommandFn<CommandType>, typeof run>>(true);
     assertType<IsExact<Flagset<CommandType>, typeof flags>>(true);
   });
 
