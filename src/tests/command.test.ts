@@ -89,7 +89,15 @@ describe("we can make a multicommand", () => {
       "multi1: a command with subcommands\none\ntwo",
     );
   });
-  it.skip("shows that help on the commandline", () => {});
+  it("shows that help on the commandline", async () => {
+    const { status, output, errOutput } = await captureRun(
+      multiOne,
+      ["--help"],
+    );
+    assertEquals(status, 0),
+      assertEquals(output, "help"),
+      assertEquals(errOutput, "");
+  });
   it.skip("shows subcommand 1 help", () => {});
   it.skip("shows subcommand 2 help", () => {});
   it.skip("shows subcommand 1 output", () => {});
