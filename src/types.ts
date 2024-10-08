@@ -284,8 +284,10 @@ type FlagsetRequiredProps<FF> = {
 export interface ParsedArgs<VV> {
   args: string[]; // positional args
   flags: VV; // if exit code exists, this may be partial or invalid
-  exitCode?: number; // if exists, means exit with code (0=clean)
+  exitCode?: number; // if exists, means exit with code (0=clean), flags and args undefined (likely invalid)
 }
+
+export type HelpFn = (path?: string[]) => string;
 
 /**
  * FlagsetParseFn supports a CLI by converting the raw args into a parsed
