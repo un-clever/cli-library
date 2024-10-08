@@ -32,8 +32,8 @@ export function getTestOutputs(): StandardOutputs & Capturer {
 export async function testCommand(
   cmd: Command,
   rawargs: string[],
-): Promise<CapturedOutput> {
+): Promise<CapturedOutput & { status: number }> {
   const outputs = getTestOutputs();
-  await cmd.run(rawargs, outputs);
-  return outputs.getCapture();
+  const status = await cmd.run(rawargs, outputs);
+  return { ...outputs.getCapture(), status };
 }

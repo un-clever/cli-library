@@ -18,6 +18,7 @@ import {
 } from "testlib";
 import { Buffer } from "@std/io";
 import { standardizeOutputs } from "../output.ts";
+import { testCommand } from "../extras/outputHelpersDeno.ts";
 
 const testFlagset = getTestFlagset();
 const { one, dos, three } = testFlagset;
@@ -49,19 +50,14 @@ describe("we can make a simple command", () => {
       flags: { one: "c" },
       args: ["a", "b"],
     };
-    const output = new Buffer(); // one way to trap command output...
     assertEquals(commandOne.describe(), `${nameOne}: ${descOne}`);
     assertEquals(
       commandOne.help(),
       `${nameOne}: ${descOne}\n\n--help: show comand help\n--one: your optional string argument\n`,
     );
-    const status = await commandOne.run(
-      args,
-      standardizeOutputs(output, output),
-    );
+    const { status, output } = await testCommand(commandOne, args);
     assertEquals(status, 0);
-    const decoder = new TextDecoder(); //...and here's grabbing that output
-    assertEquals(JSON.parse(decoder.decode(output.bytes())), expectedParams);
+    assertEquals(JSON.parse(output), expectedParams);
   });
 });
 
