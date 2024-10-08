@@ -1,6 +1,10 @@
-/**
- * A simple implementation of a command line interface definer
- */
+enum _draftExitCodes {
+  NO_ERROR,
+  UNRECOGNIZED_SUBCOMMAND = 1000,
+  UNRECOGNIZED_FLAG,
+  INVALID_FLAG_ARGS,
+  UNKNOWN_ERROR = 1500,
+}
 
 /**
  * ParsingError gives us a way to throw errors
