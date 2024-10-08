@@ -18,7 +18,7 @@ import {
 } from "testlib";
 import { Buffer } from "@std/io";
 import { standardizeOutputs } from "../output.ts";
-import { testCommand } from "../extras/outputHelpersDeno.ts";
+import { captureRun } from "../extras/outputHelpersDeno.ts";
 
 const testFlagset = getTestFlagset();
 const { one, dos, three } = testFlagset;
@@ -55,7 +55,7 @@ describe("we can make a simple command", () => {
       commandOne.help(),
       `${nameOne}: ${descOne}\n\n--help: show comand help\n--one: your optional string argument\n`,
     );
-    const { status, output } = await testCommand(commandOne, args);
+    const { status, output } = await captureRun(commandOne, args);
     assertEquals(status, 0);
     assertEquals(JSON.parse(output), expectedParams);
   });

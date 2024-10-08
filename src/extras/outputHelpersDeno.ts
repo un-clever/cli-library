@@ -15,7 +15,7 @@ export type Capturer = {
   getCapture(): CapturedOutput;
 };
 
-export function getTestOutputs(): StandardOutputs & Capturer {
+export function makeTestOutputs(): StandardOutputs & Capturer {
   const decoder = new TextDecoder();
   const outbuf = new Buffer();
   const errbuf = new Buffer();
@@ -29,11 +29,16 @@ export function getTestOutputs(): StandardOutputs & Capturer {
   return { outs, errs, getCapture };
 }
 
-export async function testCommand(
+/**
+ * @param cmd
+ * @param rawargs
+ * @returns
+ */
+export async function captureRun(
   cmd: Command,
   rawargs: string[],
 ): Promise<CapturedOutput & { status: number }> {
-  const outputs = getTestOutputs();
+  const outputs = makeTestOutputs();
   const status = await cmd.run(rawargs, outputs);
   return { ...outputs.getCapture(), status };
 }
