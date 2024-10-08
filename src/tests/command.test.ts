@@ -56,8 +56,19 @@ describe("we can make a simple command", () => {
       `${nameOne}: ${descOne}\n\n--help: show comand help\n--one: your optional string argument\n`,
     );
     const { status, output } = await captureRun(commandOne, args);
-    assertEquals(status, 0);
     assertEquals(JSON.parse(output), expectedParams);
+    assertEquals(status, 0);
+  });
+  it("shows help correctly", async () => {
+    const { status, output, errOutput } = await captureRun(commandOne, [
+      "--help",
+    ]);
+    assertEquals(output, "");
+    assertEquals(
+      errOutput,
+      `${nameOne}: ${descOne}\n\n--help: show comand help\n--one: your optional string argument\n`,
+    );
+    assertEquals(status, 0);
   });
 });
 
@@ -89,17 +100,39 @@ describe("we can make a multicommand", () => {
       "multi1: a command with subcommands\none\ntwo",
     );
   });
+
   it("shows that help on the commandline", async () => {
     const { status, output, errOutput } = await captureRun(
       multiOne,
       ["--help"],
     );
-    assertEquals(status, 0),
-      assertEquals(output, "help"),
-      assertEquals(errOutput, "");
+    assertEquals(status, 0);
+    assertEquals(output, "multi1: a command with subcommands\none\ntwo");
+    assertEquals(errOutput, "");
   });
-  it.skip("shows subcommand 1 help", () => {});
+
+  it("shows subcommand 1 help", async () => {
+    const { status, output, errOutput } = await captureRun(
+      multiOne,
+      ["one", "--help"],
+    );
+    assertEquals(output, "");
+    assertEquals(
+      errOutput,
+      "Parsing error: help requested\nFlag: help\n\nrun with --help flag for more info\n",
+    );
+    assertEquals(status, 1001);
+  });
+
   it.skip("shows subcommand 2 help", () => {});
-  it.skip("shows subcommand 1 output", () => {});
+  it("shows subcommand 1 output", async () => {
+    const { status, output, errOutput } = await captureRun(
+      multiOne,
+      ["one", "a", "b", "--one", "c"],
+    );
+    assertEquals(JSON.parse(output), { flags: { one: "c" }, args: ["a", "b"] });
+    assertEquals(errOutput, "");
+    assertEquals(status, 0);
+  });
   it.skip("shows subcommand 2 output", () => {});
 });

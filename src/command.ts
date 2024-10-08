@@ -67,6 +67,10 @@ export function multiCommand(
     const errorLine = (msg: string) => std.errs(msg + "\n"); // "error + line"
     try {
       const subcmd = rawArguments[0];
+      if (subcmd === "--help") {
+        std.outs(help());
+        return 0;
+      }
       if (subcmd && subcmd in commands) {
         const cmd = commands[subcmd];
         return await cmd.run(rawArguments.slice(1), std);

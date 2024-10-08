@@ -18,7 +18,7 @@ export function auditFlagset<VV>(fs: Flagset<VV>): string[] {
       problems.push(`flag key ("${k}") !== flag.name ("${flag.name}")`);
     }
     if (k === "help") {
-      problems.push(`help is processed especially; don't a help flag`);
+      problems.push(`help is processed especially; don't create a --help flag`);
     }
     // only dashdash can be ""? nah, let dev have freedom
   }
@@ -42,7 +42,7 @@ class FlagsParser1<VV> {
     // we will be incrementing i in the loop body
     for (let i = 0; i < args.length;) {
       const arg = args[i++];
-      if (["--help", "-h"].includes(arg)) {
+      if (["--help"].includes(arg)) {
         throw new ParsingError("help requested", "", "help");
       } else if (arg.startsWith("--")) {
         i = this.handleFlag(arg.slice(2), i, args);
