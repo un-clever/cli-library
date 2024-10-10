@@ -44,7 +44,7 @@ type FlagValidateFn<V> = (candidate: V, command?: unknown) => Promise<string[]>;
 type FlagsetParseFn<VV> = (
   flagset: Flagset<VV>,
   args: Args,
-) => { partialFlags: Partial<VV>; args: Args };
+) => { parsedFlags: Partial<VV>; parsedArgs: Args };
 
 /**
  * FlagsetConfigFn represents any alternative configuration source, such as environment
@@ -71,12 +71,13 @@ type FlagsetValidateFn<VV> = (
   candidate: Partial<VV>,
   args: Args,
   flagset: Flagset<VV>,
-) => Promise<{ flags: VV; args: Args }>;
+) => Promise<{ validFlags: VV; validArgs: Args }>;
 
 type LeafHandler<VV> = (
   flags: VV,
   args: Args,
   std: StandardOutputs,
+  path: string[],
   command: LeafCommand<VV>,
   root?: MultiCommand,
 ) => Status;
@@ -107,6 +108,7 @@ type TraverseFn = (cmd: Command, raw: Args) => {
   path: string[]; // command path so far
   remaining: Args; // remaining raw args
   leaf: LeafCommand<unknown>; // this might have been swapped for Help
+  help: boolean;
 };
 
 function dummy(...rest: unknown[]): unknown {
@@ -117,7 +119,39 @@ function isMulticommand(cmd: Command): cmd is MultiCommand {
   return "subcommands" in cmd;
 }
 
-async function runLeaf<VV>(cmd: LeafCommand<VV>, path: string[], raw: Args);
+async function runLeaf<VV>(
+  cmd: LeafCommand<VV>,
+  path: string[],
+  raw: Args,
+  std: StandardOutputs,
+  extraSources: FlagsetConfigFn[] = [],
+  root?: MultiCommand,
+): Status {
+  // PROBLEM: how to move to Generics now?
+  // could I pass leaf into a generic function?
+  const { parsedFlags, parsedArgs } = (dummy as FlagsetParseFn<VV>)(
+    cmd.flagset,
+    raw,
+  );
+  const enrichedFlags = await (dummy as FlagsetEnrichFn<VV>)(
+    parsedFlags,
+    cmd.flagset,
+    extraSources,
+  );
+  const { validFlags, validArgs } = await (dummy as FlagsetValidateFn<VV>)(
+    enrichedFlags,
+    parsedArgs,
+    cmd.flagset,
+  );
+  return await cmd.handler(
+    validFlags,
+    validArgs,
+    std,
+    path,
+    cmd,
+    root,
+  );
+}
 
 /**
  * The basic idea here is to separate concerns that were bundled into the Flag parser:
@@ -141,33 +175,22 @@ async function runCommand(
   extraSources: FlagsetConfigFn[] = [],
 ): Status {
   try {
-    const { path, remaining, leaf } = (dummy as TraverseFn)(cmd, raw);
+    const { path, remaining, leaf, help } = (dummy as TraverseFn)(cmd, raw);
     // if simple help requested, print and exit
-    // PROBLEM: how to move to Generics now?
-    // could I pass leaf into a generic function?
-    const { parsedFlags, parsedArgs } = (dummy as FlagsetParseFn)(
-      leaf.flagset,
-      remaining,
-    );
-    const enrichedFlags = await (dummy as FlagsetEnrichFn)(
-      parsedFlags,
-      leaf.flagset,
-      extraSources,
-    );
-    const { validFlags, validArgs } = await (dummy as FlagsetValidateFn)(
-      enrichedFlags,
-      parsedArgs,
-      leaf.flagset,
-    );
-    const root = isMulticommand(cmd) ? cmd : undefined;
-    const status = await leaf.handler(
-      validFlags,
-      validArgs,
-      std,
+    if (help) {
+      // this works except in case where help is a subcommand,
+      // not --help on a leaf command
+      await dummy(leaf, path, remaining);
+      return ParserExitCodes.NO_ERROR;
+    }
+    return await runLeaf(
       leaf,
-      root,
+      path,
+      remaining,
+      std,
+      extraSources,
+      isMulticommand(cmd) ? cmd : undefined,
     );
-    return status;
   } catch (err) {
     console.error(err.message);
     return ParserExitCodes.UNKNOWN_ERROR;
