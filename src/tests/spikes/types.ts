@@ -25,6 +25,7 @@ import { ParserExitCodes } from "../../errors.ts";
 import type { Flagset, StandardOutputs } from "../../types.ts";
 
 export type Args = string[];
+export type SubcommandPath = string[];
 export type Status = Promise<number>; // cliu status code
 
 // maybe use the prefix for Flag and no prefix means Flagset

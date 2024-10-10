@@ -4,6 +4,7 @@ export enum ParserExitCodes {
   HELP_AND_EXIT, // the parser says exit, but nothing's wrong
   JUST_EXIT, // exit with a zero code, don't run the command
   UNRECOGNIZED_SUBCOMMAND,
+  MISSING_SUBCOMMAND,
   UNRECOGNIZED_FLAG,
   MISSING_REQUIRED_FLAG,
   INVALID_FLAG_ARGS,
