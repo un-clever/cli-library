@@ -1,12 +1,33 @@
-import { GetHelp } from "./errors.ts";
+import { GetHelp, ParserExitCodes, ParsingError } from "./errors.ts";
 import { getFlagsetHelp, getFlagsetParser } from "./flagset.ts";
 import type {
   Command,
   CommandFn,
   CommandMap,
   Flagset,
+  HelpFn,
   StandardOutputs,
 } from "./types.ts";
+
+async function handleCommandException(
+  err: Error,
+  std: StandardOutputs,
+  help: HelpFn,
+): Promise<number> {
+  if (err instanceof ParsingError) {
+    if (err.code === ParserExitCodes.HELP_AND_EXIT) {
+      await std.outs(help());
+      return ParserExitCodes.NO_ERROR;
+    }
+    if (err.code === ParserExitCodes.JUST_EXIT) {
+      return ParserExitCodes.NO_ERROR;
+    }
+    await std.errs(help());
+    return err.code;
+  }
+  await std.errs(GetHelp(err));
+  return ParserExitCodes.UNKNOWN_ERROR;
+}
 
 export function command<VV>(
   name: string,
@@ -26,7 +47,6 @@ export function command<VV>(
     rawArguments: string[],
     std: StandardOutputs,
   ): Promise<number> {
-    const errorLine = (msg: string) => std.errs(msg + "\n"); // "error + line"
     try {
       const parse = getFlagsetParser<VV>(flagset, true);
       const { flags, args } = parse(rawArguments);
@@ -36,9 +56,7 @@ export function command<VV>(
         std,
       );
     } catch (err) {
-      errorLine(GetHelp(err));
-      errorLine("run with --help flag for more info");
-      return 1001;
+      return handleCommandException(err, std, help);
     }
   }
   return {
@@ -64,24 +82,28 @@ export function multiCommand(
     rawArguments: string[],
     std: StandardOutputs, // allow for deep running
   ): Promise<number> {
-    const errorLine = (msg: string) => std.errs(msg + "\n"); // "error + line"
     try {
       const subcmd = rawArguments[0];
       if (subcmd === "--help") {
-        std.outs(help());
-        return 0;
+        throw new ParsingError(
+          "help request",
+          ParserExitCodes.HELP_AND_EXIT,
+          "",
+          "",
+        );
       }
       if (subcmd && subcmd in commands) {
         const cmd = commands[subcmd];
         return await cmd.run(rawArguments.slice(1), std);
       }
-      await errorLine(`unrecognized subcommand: '${subcmd}`);
-      await errorLine(help());
-      return 1002;
+      throw new ParsingError(
+        "unrecognized subcommand",
+        ParserExitCodes.UNRECOGNIZED_SUBCOMMAND,
+        "",
+        subcmd,
+      );
     } catch (err) {
-      await errorLine(help());
-      await errorLine(GetHelp(err));
-      return 1001;
+      return handleCommandException(err, std, help);
     }
   }
   return { describe, help, helpDeep, run };

@@ -16,8 +16,6 @@ import {
   type IsExact,
   it,
 } from "testlib";
-import { Buffer } from "@std/io";
-import { standardizeOutputs } from "../output.ts";
 import { captureRun } from "../extras/outputHelpersDeno.ts";
 
 const testFlagset = getTestFlagset();
@@ -37,6 +35,8 @@ async function handleOne(
   return 0;
 }
 const commandOne = command(nameOne, descOne, flagsOne, handleOne);
+const helpOne =
+  "command1: test command\n\n--help: show comand help\n--one: your optional string argument\n";
 
 describe("we can make a simple command", () => {
   it("the types check out", () => {
@@ -63,11 +63,8 @@ describe("we can make a simple command", () => {
     const { status, output, errOutput } = await captureRun(commandOne, [
       "--help",
     ]);
-    assertEquals(output, "");
-    assertEquals(
-      errOutput,
-      `${nameOne}: ${descOne}\n\n--help: show comand help\n--one: your optional string argument\n`,
-    );
+    assertEquals(output, helpOne);
+    assertEquals(errOutput, "");
     assertEquals(status, 0);
   });
 });
@@ -116,12 +113,12 @@ describe("we can make a multicommand", () => {
       multiOne,
       ["one", "--help"],
     );
-    assertEquals(output, "");
+    // assertEquals(output, "");
     assertEquals(
-      errOutput,
-      "Parsing error: help requested\nFlag: help\n\nrun with --help flag for more info\n",
+      output,
+      helpOne,
     );
-    assertEquals(status, 1001);
+    assertEquals(status, 0);
   });
 
   it.skip("shows subcommand 2 help", () => {});

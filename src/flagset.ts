@@ -1,5 +1,5 @@
 // code for using flagsets to parse command lines and generate help
-import { ParsingError } from "./errors.ts";
+import { ParserExitCodes, ParsingError } from "./errors.ts";
 import type { Flagset, FlagsetParseFn, ParsedArgs } from "./types.ts";
 
 export function getFlagsetParser<VV>(
@@ -43,7 +43,12 @@ class FlagsParser1<VV> {
     for (let i = 0; i < args.length;) {
       const arg = args[i++];
       if (["--help"].includes(arg)) {
-        throw new ParsingError("help requested", "", "help");
+        throw new ParsingError(
+          "help requested",
+          ParserExitCodes.HELP_AND_EXIT,
+          "",
+          "help",
+        );
       } else if (arg.startsWith("--")) {
         i = this.handleFlag(arg.slice(2), i, args);
       } else {
@@ -68,15 +73,20 @@ class FlagsParser1<VV> {
       }
       throw new ParsingError(
         "missing arg",
-        `the arguments '${
-          args.slice(start)
-        } didn't provide a valid argument for the flag`,
+        ParserExitCodes.INVALID_FLAG_ARGS,
+        `the arguments '${args.slice(start)} didn't provide a valid value for`,
         flagnameOrDie,
       );
     }
-    throw new ParsingError("unrecognized flag", "", flagnameOrDie);
+    throw new ParsingError(
+      "unrecognized flag",
+      ParserExitCodes.UNRECOGNIZED_FLAG,
+      "",
+      flagnameOrDie,
+    );
   }
 
+  // TODO: could this be pushed up into the comand?
   confirmedFlags(flags: Partial<VV>): VV {
     for (const k in this.flagset) {
       const flag = this.flagset[k];
@@ -90,13 +100,19 @@ class FlagsParser1<VV> {
         } else if (flag.default !== undefined) {
           this.partialFlags[k] = flag.default;
         } else if (flag.required) {
-          throw new ParsingError("missing required flag", "", k);
+          throw new ParsingError(
+            "missing required flag",
+            ParserExitCodes.MISSING_REQUIRED_FLAG,
+            "",
+            k,
+          );
         }
       }
       const value = this.partialFlags[k];
       if (!flag.parser.validate || flag.parser.validate(value)) continue;
       throw new ParsingError(
         "invalid value",
+        ParserExitCodes.INVALID_FLAG_ARGS,
         `the value '${value}' didn't parse a valid type for this flag`,
         k,
       );
