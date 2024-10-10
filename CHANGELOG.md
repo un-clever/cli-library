@@ -3,15 +3,16 @@ All notable changes to this project will be documented in this file. See [conven
 
 - - -
 ## v0.9.0 - 2024-10-10
-#### Documentation
-- notes from some Rust CLI libraries - (22cbae8) - Brad Olson
+
+This version features an incomplete but working multicommand. It also begins a spike testing a different approach.
+
 #### Features
-- **(green)** rename testCommand to captureRun - (cd9ac23) - Brad Olson
-- **(green)** remove dashdashing from flagset parser BREAKING - (596f2be) - Brad Olson
-- **(green)** BREAKING remove Command.parse and simplify CommandFn args - (6859422) - Brad Olson
-- **(green)** BREAKING standardize outputs... - (f4387cf) - Brad Olson
-- **(green)** BREAKING standardize outputs... - (4abdbd2) - Brad Olson
-- add testCommand helper to capture output - (c28be4e) - Brad Olson
+- add captureRun helper to capture output - (cd9ac23) - Brad Olson
+- BREAKING remove dashdashing from flagset parser  - (596f2be) - Brad Olson
+- BREAKING remove Command.parse and simplify CommandFn args - (6859422) - Brad Olson
+- BREAKING standardize outputs... - (f4387cf) - Brad Olson
+#### Documentation
+- **spikes** `src/tests/spikes/newparser.ts` looks at a different approach
 
 - - -
 
