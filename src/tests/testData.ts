@@ -1,82 +1,46 @@
 // Data useful for testing CLI implementations
 import { numberFlag } from "../flags.ts";
 import { booleanFlag, optional, required, stringFlag } from "../flags.ts";
-import type { CliArgs, Flagset } from "../types.ts";
+import type { Flagset, ParsedArgs } from "../types.ts";
 import type { ArgsExample, FlagsetExample } from "./testUtils.ts";
 
 export const GenericParsingError = new Error("missing args after --");
 
 // deno-fmt-ignore  (to keep the table concise)
 export const simpleArgsCases: ArgsExample[] = [
-  {raw: [], parsed: {args:[], dashdash:[]}},
-  {raw: ["a"], parsed: {args:["a"], dashdash:[]}},
-  {raw: ["a","b"], parsed: {args:["a","b"], dashdash:[]}},
-  {raw: ["a","b","c"], parsed: {args:["a","b","c"], dashdash:[]}},
-  {raw: ["a","b","c","d"], parsed: {args:["a","b","c","d"], dashdash:[]}},
-  {raw: ["a","b","c","d","e"], parsed: {args:["a","b","c","d","e"], dashdash:[]}},
-  {raw: ["a","b","c","d","e","f"], parsed: {args:["a","b","c","d","e","f"], dashdash:[]}},
-  {raw: ["a","b","c","d","e","f","g"], parsed: {args:["a","b","c","d","e","f","g"], dashdash:[]}},
-  {raw: ["a","b","c","d","e","f","g","h"], parsed: {args:["a","b","c","d","e","f","g","h"], dashdash:[]}},
-  {raw: ["a","b","c","d","e","f","g","h","i"], parsed: {args:["a","b","c","d","e","f","g","h","i"], dashdash:[]}},
-  {raw: ["a","b","c","d","e","f","g","h","i","j"], parsed: {args:["a","b","c","d","e","f","g","h","i","j"], dashdash:[]}},
+  {raw: [], parsed: {args:[]}},
+  {raw: ["a"], parsed: {args:["a"]}},
+  {raw: ["a","b"], parsed: {args:["a","b"]}},
+  {raw: ["a","b","c"], parsed: {args:["a","b","c"]}},
+  {raw: ["a","b","c","d"], parsed: {args:["a","b","c","d"]}},
+  {raw: ["a","b","c","d","e"], parsed: {args:["a","b","c","d","e"]}},
+  {raw: ["a","b","c","d","e","f"], parsed: {args:["a","b","c","d","e","f"]}},
+  {raw: ["a","b","c","d","e","f","g"], parsed: {args:["a","b","c","d","e","f","g"]}},
+  {raw: ["a","b","c","d","e","f","g","h"], parsed: {args:["a","b","c","d","e","f","g","h"]}},
+  {raw: ["a","b","c","d","e","f","g","h","i"], parsed: {args:["a","b","c","d","e","f","g","h","i"]}},
+  {raw: ["a","b","c","d","e","f","g","h","i","j"], parsed: {args:["a","b","c","d","e","f","g","h","i","j"]}},
 ];
 
-export function makeDashDashCase(
-  insertBefore: number,
-  eg: ArgsExample,
-): ArgsExample {
-  if (insertBefore >= eg.raw.length) { // dashdash at end causes error
-    const raw = [...eg.raw, "--"];
-    return { raw, parsed: GenericParsingError };
-  }
-  const args = eg.raw.slice(0, insertBefore);
-  const dashdash = eg.raw.slice(insertBefore);
-  const raw = [...args, "--", ...dashdash];
-  return ({ raw, parsed: { args, dashdash } });
-}
-
-export function makeDashDashCases(insertBefore: number) {
-  return (eg: ArgsExample) => makeDashDashCase(insertBefore, eg);
-}
-
-export const dashDashCases: ArgsExample[] = [
-  ...simpleArgsCases.map(makeDashDashCases(0)),
-  ...simpleArgsCases.map(makeDashDashCases(1)),
-  ...simpleArgsCases.map(makeDashDashCases(2)),
-  ...simpleArgsCases.map(makeDashDashCases(5)),
-  ...simpleArgsCases.map(makeDashDashCases(9)),
-  ...simpleArgsCases.map(makeDashDashCases(11)),
-];
-
-const emptyParse: CliArgs<unknown> = { args: [], flags: {}, dashdash: [] };
+const emptyParse: ParsedArgs<unknown> = { args: [], flags: {} };
 
 export function fuzzedExample<VV>(
   eg: FlagsetExample<VV>,
 ): FlagsetExample<VV>[] {
   const { raw, parsed } = eg;
   if (parsed instanceof Error) return [eg];
-  const { args, flags, dashdash } = parsed;
-  if (dashdash.length > 0) {
-    throw new Error("TEST CODING ERROR: fuzzer can't handle dashdash'ed tests");
-  }
+  const { args, flags } = parsed;
   // deno-fmt-ignore  (to keep the table concise)
   return [
     eg, // original
     // inject a positional arg before
-    {raw: ["early", ...raw], parsed: {args:["early", ...args] ,flags, dashdash}},
+    {raw: ["early", ...raw], parsed: {args:["early", ...args] ,flags}},
     // inject a positional arg after
-    {raw: [...raw, "late"], parsed: {args:[...args, "late"] ,flags, dashdash}},
+    {raw: [...raw, "late"], parsed: {args:[...args, "late"] ,flags}},
     // inject positionals before and after
-    {raw: ["early", ...raw, "late"], parsed: {args:["early", ...args, "late"] ,flags, dashdash}},
+    {raw: ["early", ...raw, "late"], parsed: {args:["early", ...args, "late"] ,flags}},
     // add an unrecognized flag before and after
     {raw: ["--some-unrecognized-flag", ...raw], parsed: GenericParsingError},
     {raw: [...raw, "--some-unrecognized-flag"], parsed: GenericParsingError},
-    // add some passthrough arguments
-    {raw: [...raw, "--", "a", "b", "c"], parsed: {args, flags, dashdash: ["a", "b", "c"]}},
-    // add some passthrough arguments AND positionals
-    {raw: ["early", "early", ...raw, "late", "later", "z", "--", "a", "b", "c"], parsed: {args:["early", "early", ...args, "late", "later", "z"] , flags, dashdash: ["a", "b", "c"]}},
-    // add a -- without following arguments
-    {raw: [...raw, "--"], parsed: GenericParsingError},
   ];
 }
 
@@ -152,11 +116,11 @@ export const requiredNumericFlagset: Flagset<requiredNumericFlagsetType> = {
 };
 // deno-fmt-ignore  (to keep the table concise)
 export const requiredNumericFlagsetCases: FlagsetExample<requiredNumericFlagsetType>[] = [
-  ...fuzzedExample({raw: ["--count", "5.4"], parsed: {args:[], flags:{count: 5.4}, dashdash: []}}),
-  ...fuzzedExample({raw: ["--count", "-2000.345"], parsed: {args:[], flags:{count: -2000.345}, dashdash: []}}),
-  ...fuzzedExample({raw: ["--count", "-2"], parsed: {args:[], flags:{count: -2}, dashdash: []}}),
+  ...fuzzedExample({raw: ["--count", "5.4"], parsed: {args:[], flags:{count: 5.4}}}),
+  ...fuzzedExample({raw: ["--count", "-2000.345"], parsed: {args:[], flags:{count: -2000.345}}}),
+  ...fuzzedExample({raw: ["--count", "-2"], parsed: {args:[], flags:{count: -2}}}),
   // NOTE: we'll grab numbers off the front of any string, just like parseFloat, use a validator if you want more
-  ...fuzzedExample({raw: ["--count", "12abcd"], parsed: {args:[], flags:{count: 12}, dashdash: []}}),
+  ...fuzzedExample({raw: ["--count", "12abcd"], parsed: {args:[], flags:{count: 12}}}),
   // EXPECTED ERRORS
   { raw: ["--count"], parsed: GenericParsingError }, // missing arg
   { raw: ["--cnt", "5"], parsed: GenericParsingError }, // unrecognized flag
@@ -174,8 +138,8 @@ export const defaultingNumericFlagset: Flagset<defaultingNumericFlagsetType> = {
 };
 // deno-fmt-ignore  (to keep the table concise)
 export const defaultingNumericFlagsetCases: FlagsetExample<defaultingNumericFlagsetType>[] = [
-  ...fuzzedExample({raw: ["--count", "31.55"], parsed: {args:[], flags:{count: 31.55}, dashdash: []}}),
-  ...fuzzedExample({raw: [], parsed: {args:[], flags:{count: -99.5}, dashdash: []}}),
+  ...fuzzedExample({raw: ["--count", "31.55"], parsed: {args:[], flags:{count: 31.55}}}),
+  ...fuzzedExample({raw: [], parsed: {args:[], flags:{count: -99.5}}}),
   // EXPECTED ERRORS
   { raw: ["--cnt", "5"], parsed: GenericParsingError }, // unrecognized flag
   {raw: ["--count"], parsed: GenericParsingError}, // flag present, arg missing
@@ -192,9 +156,9 @@ export const optionalNumericFlagset: Flagset<optionalNumericFlagsetType> = {
 };
 // deno-fmt-ignore  (to keep the table concise)
 export const optionalNumericFlagsetCases: FlagsetExample<optionalNumericFlagsetType>[] = [
-  ...fuzzedExample({raw: [], parsed: {args:[], flags:{}, dashdash: []}}),
-  ...fuzzedExample({raw: ["--count", "5.4"], parsed: {args:[], flags:{count: 5.4}, dashdash: []}}),
-  ...fuzzedExample({raw: ["--count", "12abcd"], parsed: {args:[], flags:{count: 12}, dashdash: []}}),
+  ...fuzzedExample({raw: [], parsed: {args:[], flags:{}}}),
+  ...fuzzedExample({raw: ["--count", "5.4"], parsed: {args:[], flags:{count: 5.4}}}),
+  ...fuzzedExample({raw: ["--count", "12abcd"], parsed: {args:[], flags:{count: 12}}}),
   // EXPECTED ERRORS
   { raw: ["--count"], parsed: GenericParsingError }, // missing arg
   { raw: ["--cnt", "5"], parsed: GenericParsingError }, // unrecognized flag

@@ -40,6 +40,36 @@ export interface Writer {
 }
 
 /**
+ * OutsFn ("Out String Function") is any async command that can take a string
+ * and output it somewhere, typically stdout.
+ */
+export type OutsFn = (message: string) => Promise<void>;
+
+/**
+ * CLI's have to interact with terminals and piping. Splitting program output
+ * from error output solves [The
+ * Semi-PredicateProblem](https://en.wikipedia.org/wiki/Semipredicate_problem)
+ * in an elegant and standard way. See also the [Wikipedia entry on Standard
+ * Streams](https://en.wikipedia.org/wiki/Standard_streams), especially the
+ * section for Standard Error.
+ *
+ * Yet runtimes, OS's, and compiled libraries are notorious for inconsistent
+ * handling of these. Injecting this simple structure into each command tries
+ * to sidestep most of those inconsistencies and encourage (or at least
+ * not discourage) best practices.
+ */
+export type StandardOutputs = {
+  /**
+   * outs: "output String" writes a string to an app's main output stream
+   */
+  outs: OutsFn;
+  /**
+   * errs: "error String" writes a string to an app's error stream
+   */
+  errs: OutsFn;
+};
+
+/**
  * Utility to extract a union type of the strings from a string array constant.
  *
  * # Examples:
@@ -248,53 +278,46 @@ type FlagsetRequiredProps<FF> = {
 };
 
 /**
- * CliArgs represents the results of successfully parsing a full set of
+ * ParsedArgs represents the results of successfully parsing a full set of
  * command-line arguments.
- *
- * `.dashdash` is here to represent the convention of some shell commands to use
- * `--` to signal that arguments after `--` should not be passed through "raw"
- * or interpreted in a special way. And example of this is using `git` to check
- * out a particular file from a commit (branch, tag, sha), e.g.:
- *
- * `git checkout my-other-branch -- some_file.txt
- *
- * This doesn't mean your CLI has to allow such handling. Some parsers may
- * choose to handle -- differently, ignoring or failing, but this structure
- * makes space for those args to be returned.
  */
-export interface CliArgs<VV> {
+export interface ParsedArgs<VV> {
   args: string[]; // positional args
-  dashdash: string[]; // args after --, useful mostly for commands that call another command
-  flags: VV;
+  flags: VV; // if exit code exists, this may be partial or invalid
+  exitCode?: number; // if exists, means exit with code (0=clean), flags and args undefined (likely invalid)
 }
+
+export type HelpFn = (path?: string[]) => string;
 
 /**
  * FlagsetParseFn supports a CLI by converting the raw args into a parsed
  * structure taking into account positional arguments optional, required, and
  * default flags,
  */
-export type FlagsetParseFn<VV> = (args: string[]) => CliArgs<VV>;
-
-/**
- * StringWrite is any async command that can take a string and output it
- * somewhere, typically stdout.
- */
-export type StringOutput = (msg: string) => Promise<number>; // writer interface
+export type FlagsetParseFn<VV> = (args: string[]) => ParsedArgs<VV>;
 
 /**
  * CommandFn is a function which implements (executes a command).
  */
 export type CommandFn<VV> = (
-  params: CliArgs<VV>,
-  write: StringOutput,
+  flags: VV,
+  args: string[],
+  std: StandardOutputs,
 ) => Promise<number>;
 
 /**
  * Command is the functional interface to a CLI program
  */
-export interface Command<VV> {
+export interface Command {
   describe: () => string;
-  help: () => string;
-  parse: FlagsetParseFn<VV>;
-  execute: CommandFn<VV>;
+  help: (path?: string[]) => string;
+  helpDeep: (
+    path: string[],
+  ) => { path: string[]; children: CommandMap | Flagset<unknown> };
+  run: (
+    rawArguments: string[],
+    std: StandardOutputs,
+  ) => Promise<number>;
 }
+
+export type CommandMap = Record<string, Command>;

@@ -1,6 +1,6 @@
 // code for using flagsets to parse command lines and generate help
-import { ParsingError } from "./errors.ts";
-import type { CliArgs, Flagset, FlagsetParseFn } from "./types.ts";
+import { ParserExitCodes, ParsingError } from "./errors.ts";
+import type { Flagset, FlagsetParseFn, ParsedArgs } from "./types.ts";
 
 export function getFlagsetParser<VV>(
   flagset: Flagset<VV>,
@@ -18,8 +18,9 @@ export function auditFlagset<VV>(fs: Flagset<VV>): string[] {
       problems.push(`flag key ("${k}") !== flag.name ("${flag.name}")`);
     }
     if (k === "help") {
-      problems.push(`help is processed especially; don't a help flag`);
+      problems.push(`help is processed especially; don't create a --help flag`);
     }
+    // only dashdash can be ""? nah, let dev have freedom
   }
   return problems;
 }
@@ -33,49 +34,32 @@ class FlagsParser1<VV> {
 
   constructor(private flagset: Flagset<VV>, readonly allowDashdash = true) {}
 
-  parse(args: string[]): CliArgs<VV> {
+  parse(args: string[]): ParsedArgs<VV> {
     // re-init mutable props
     this.partialFlags = {};
     this.args = [];
-    this.dashdash = [];
+    // this.dashdash = [];
     // we will be incrementing i in the loop body
     for (let i = 0; i < args.length;) {
       const arg = args[i++];
-      if (["--help", "-h"].includes(arg)) {
-        throw new ParsingError("help requested", "", "help");
-      } else if (arg === "--") {
-        // NOTE: we used to make dashdash optional, but now we just parse it and fail if not allowed
-        i = this.gulpDashDash(i, args);
+      if (["--help"].includes(arg)) {
+        throw new ParsingError(
+          "help requested",
+          ParserExitCodes.HELP_AND_EXIT,
+          "",
+          "help",
+        );
       } else if (arg.startsWith("--")) {
         i = this.handleFlag(arg.slice(2), i, args);
       } else {
         this.args.push(arg);
       }
     }
-    if (!this.allowDashdash && this.dashdash) {
-      throw new ParsingError(
-        '"--" not allowed',
-        "this command doesn't allow passthrough args after a '--'",
-        "--",
-      );
-    }
     return {
       flags: this.confirmedFlags(this.partialFlags),
       args: this.args,
-      dashdash: this.dashdash,
+      // dashdash: this.dashdash,
     };
-  }
-
-  gulpDashDash(start: number, args: string[]): number {
-    if (start < args.length) {
-      this.dashdash = args.slice(start);
-      return args.length; // end the loop
-    }
-    throw new ParsingError(
-      "no args found after '--'",
-      "", // The special flag '--' passes all the following args to another program. If there are none, oming the '--'.",
-      "--",
-    );
   }
 
   handleFlag(flagnameOrDie: string, start: number, args: string[]): number {
@@ -89,35 +73,46 @@ class FlagsParser1<VV> {
       }
       throw new ParsingError(
         "missing arg",
-        `the arguments '${
-          args.slice(start)
-        } didn't provide a valid argument for the flag`,
+        ParserExitCodes.INVALID_FLAG_ARGS,
+        `the arguments '${args.slice(start)} didn't provide a valid value for`,
         flagnameOrDie,
       );
     }
-    throw new ParsingError("unrecognized flag", "", flagnameOrDie);
+    throw new ParsingError(
+      "unrecognized flag",
+      ParserExitCodes.UNRECOGNIZED_FLAG,
+      "",
+      flagnameOrDie,
+    );
   }
 
+  // TODO: could this be pushed up into the comand?
   confirmedFlags(flags: Partial<VV>): VV {
     for (const k in this.flagset) {
       const flag = this.flagset[k];
 
       // handle required and default values
       if (!this.partialFlags[k]) {
-        // NOTE: parser defaults always take precedence because flag logic
+        // NOTE: flag parser defaults always take precedence because flag logic
         // depends on them
         if (flag.parser.default !== undefined) {
           this.partialFlags[k] = flag.parser.default;
         } else if (flag.default !== undefined) {
           this.partialFlags[k] = flag.default;
         } else if (flag.required) {
-          throw new ParsingError("missing required flag", "", k);
+          throw new ParsingError(
+            "missing required flag",
+            ParserExitCodes.MISSING_REQUIRED_FLAG,
+            "",
+            k,
+          );
         }
       }
       const value = this.partialFlags[k];
       if (!flag.parser.validate || flag.parser.validate(value)) continue;
       throw new ParsingError(
         "invalid value",
+        ParserExitCodes.INVALID_FLAG_ARGS,
         `the value '${value}' didn't parse a valid type for this flag`,
         k,
       );

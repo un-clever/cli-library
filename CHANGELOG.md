@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.9.0 - 2024-10-10 BREAKING
+
+This version features an incomplete but working multicommand. It also begins a spike testing a different approach.
+
+#### Features
+- add captureRun helper to capture output - (cd9ac23) - Brad Olson
+- BREAKING remove dashdashing from flagset parser  - (596f2be) - Brad Olson
+- BREAKING remove Command.parse and simplify CommandFn args - (6859422) - Brad Olson
+- BREAKING standardize outputs... - (f4387cf) - Brad Olson
+#### Documentation
+- **spikes** `src/tests/spikes/newparser.ts` looks at a different approach
+
+- - -
+
 ## v0.8.2 - 2024-10-02
 #### Documentation
 - **(green)** get initial README.md doctests working - (cb3ac1c) - Brad Olson

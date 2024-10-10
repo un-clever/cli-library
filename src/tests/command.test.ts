@@ -1,53 +1,135 @@
 // deno-lint-ignore-file no-unused-vars
-import { command, runCommand } from "../command.ts";
+import { command, multiCommand } from "../command.ts";
 import { getTestFlagset } from "./testUtils.ts";
 import type {
-  CliArgs,
   CommandFn,
   Flagset,
   FlagsetParseFn,
-  StringOutput,
+  ParsedArgs,
+  StandardOutputs,
 } from "../types.ts";
-import { assertEquals, assertType, describe, type IsExact, it } from "testlib";
-import { Buffer } from "@std/io";
+import {
+  assertEquals,
+  assertType,
+  describe,
+  Has,
+  type IsExact,
+  it,
+} from "testlib";
+import { captureRun } from "../extras/outputHelpersDeno.ts";
 
 const testFlagset = getTestFlagset();
-const { one } = testFlagset;
+const { one, dos, three } = testFlagset;
+
+// define a simple command: commandOne
+const nameOne = "command1";
+const descOne = "test command";
+type FlagsTypeOne = { one?: string };
+const flagsOne = { one };
+async function handleOne(
+  flags: FlagsTypeOne,
+  args: string[],
+  std: StandardOutputs,
+): Promise<number> {
+  await std.outs(JSON.stringify({ flags, args }));
+  return 0;
+}
+const commandOne = command(nameOne, descOne, flagsOne, handleOne);
+const helpOne =
+  "command1: test command\n\n--help: show comand help\n--one: your optional string argument\n";
 
 describe("we can make a simple command", () => {
-  type CommandType = { one?: string };
-  const flags = { one };
-  type Params = CliArgs<CommandType>;
-
-  async function run(params: Params, write: StringOutput): Promise<number> {
-    await write(JSON.stringify(params));
-    return 0;
-  }
-
   it("the types check out", () => {
-    assertType<IsExact<CommandFn<CommandType>, typeof run>>(true);
-    assertType<IsExact<Flagset<CommandType>, typeof flags>>(true);
+    assertType<Has<CommandFn<FlagsTypeOne>, typeof handleOne>>(true);
+    assertType<IsExact<Flagset<FlagsTypeOne>, typeof flagsOne>>(true);
   });
 
   it("seems to work", async () => {
     const args = ["a", "b", "--one", "c"];
-    const expectedParams: Params = {
+    const expectedParams: ParsedArgs<FlagsTypeOne> = {
       flags: { one: "c" },
       args: ["a", "b"],
-      dashdash: [],
     };
-    const description = "test command";
-    const output = new Buffer(); // one way to trap command output...
-    const cmd = command({ description, flags, run });
-    assertEquals(cmd.describe(), description);
+    assertEquals(commandOne.describe(), `${nameOne}: ${descOne}`);
     assertEquals(
-      cmd.help(),
-      `test command\n\n--help: show comand help\n--one: your optional string argument\n`,
+      commandOne.help(),
+      `${nameOne}: ${descOne}\n\n--help: show comand help\n--one: your optional string argument\n`,
     );
-    assertEquals(cmd.parse(args), expectedParams);
-    const status = await runCommand(cmd, args, output);
+    const { status, output } = await captureRun(commandOne, args);
+    assertEquals(JSON.parse(output), expectedParams);
     assertEquals(status, 0);
-    const decoder = new TextDecoder(); //...and here's grabbing that output
-    assertEquals(JSON.parse(decoder.decode(output.bytes())), expectedParams);
   });
+  it("shows help correctly", async () => {
+    const { status, output, errOutput } = await captureRun(commandOne, [
+      "--help",
+    ]);
+    assertEquals(output, helpOne);
+    assertEquals(errOutput, "");
+    assertEquals(status, 0);
+  });
+});
+
+// define a simple command: commandTwo
+const nameTwo = "command2";
+const descTwo = "another test command";
+type FlagsTypeTwo = { dos: string; three?: boolean };
+const flagsTwo: Flagset<FlagsTypeTwo> = { dos, three };
+async function handleTwo(
+  flags: FlagsTypeTwo,
+  args: string[],
+  std: StandardOutputs,
+): Promise<number> {
+  await std.outs(JSON.stringify({ flags, args }));
+  return 0;
+}
+const commandTwo = command(nameOne, descOne, flagsOne, handleOne);
+
+// We can join them into a multicommand
+const multiOne = multiCommand("multi1", "a command with subcommands", {
+  one: commandOne,
+  two: commandTwo,
+});
+
+describe("we can make a multicommand", () => {
+  it("has top-level help", () => {
+    assertEquals(
+      multiOne.help(),
+      "multi1: a command with subcommands\none\ntwo",
+    );
+  });
+
+  it("shows that help on the commandline", async () => {
+    const { status, output, errOutput } = await captureRun(
+      multiOne,
+      ["--help"],
+    );
+    assertEquals(status, 0);
+    assertEquals(output, "multi1: a command with subcommands\none\ntwo");
+    assertEquals(errOutput, "");
+  });
+
+  it("shows subcommand 1 help", async () => {
+    const { status, output, errOutput } = await captureRun(
+      multiOne,
+      ["one", "--help"],
+    );
+    // assertEquals(output, "");
+    assertEquals(
+      output,
+      helpOne,
+    );
+    assertEquals(status, 0);
+  });
+
+  it.skip("shows subcommand 2 help", () => {});
+  it("shows subcommand 1 output", async () => {
+    const { status, output, errOutput } = await captureRun(
+      multiOne,
+      ["one", "a", "b", "--one", "c"],
+    );
+    assertEquals(JSON.parse(output), { flags: { one: "c" }, args: ["a", "b"] });
+    assertEquals(errOutput, "");
+    assertEquals(status, 0);
+  });
+  it.skip("shows subcommand 2 output", () => {});
 });
