@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
-## v0.9.0 - 2024-10-10
+## v0.9.0 - 2024-10-10 BREAKING
 
 This version features an incomplete but working multicommand. It also begins a spike testing a different approach.
 
