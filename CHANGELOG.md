@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.9.0 - 2024-10-10
+#### Documentation
+- notes from some Rust CLI libraries - (22cbae8) - Brad Olson
+#### Features
+- **(green)** rename testCommand to captureRun - (cd9ac23) - Brad Olson
+- **(green)** remove dashdashing from flagset parser BREAKING - (596f2be) - Brad Olson
+- **(green)** BREAKING remove Command.parse and simplify CommandFn args - (6859422) - Brad Olson
+- **(green)** BREAKING standardize outputs... - (f4387cf) - Brad Olson
+- **(green)** BREAKING standardize outputs... - (4abdbd2) - Brad Olson
+- add testCommand helper to capture output - (c28be4e) - Brad Olson
+
+- - -
+
 ## v0.8.2 - 2024-10-02
 #### Documentation
 - **(green)** get initial README.md doctests working - (cb3ac1c) - Brad Olson
