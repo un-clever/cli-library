@@ -21,19 +21,21 @@
  * - Run the command
  * - Report errors and exit.
  */
-import { command } from "../../command.ts";
 import { ParserExitCodes } from "../../errors.ts";
 import type { Flagset, StandardOutputs } from "../../types.ts";
 
-type Args = string[];
-type Status = Promise<number>; // cliu status code
+export type Args = string[];
+export type Status = Promise<number>; // cliu status code
 
 // maybe use the prefix for Flag and no prefix means Flagset
 // no messages means continue, anything else means abort with message
-type FlagValidateFn<V> = (candidate: V, command?: unknown) => Promise<string[]>;
+export type FlagValidateFn<V> = (
+  candidate: V,
+  command?: unknown,
+) => Promise<string[]>;
 
 /**
- * FlagsetParseFn is a function that parses flag
+ * ParseFn is a function that parses flag
  * @param flagset the flag definitions to parse structured args (VV) from raw
  * set of command line args.
  * @param args the raw args that will be parsed
@@ -41,39 +43,39 @@ type FlagValidateFn<V> = (candidate: V, command?: unknown) => Promise<string[]>;
  * other sources, "args", the remaining positional args
  * @throws ParsingError if there's missing or invalid args, unrecognized flags
  */
-type FlagsetParseFn<VV> = (
+export type ParseFn<VV> = (
   flagset: Flagset<VV>,
   args: Args,
 ) => { parsedFlags: Partial<VV>; parsedArgs: Args };
 
 /**
- * FlagsetConfigFn represents any alternative configuration source, such as environment
+ * ConfigFn represents any alternative configuration source, such as environment
  * variables, configuration files, even configuration servers.
  */
-type FlagsetConfigFn = (key: string) => Promise<Args>;
+export type ConfigFn = (key: string) => Promise<Args>;
 
 /**
- * FlagsetEnrichFn take the partial structured flag value parsed from some command-line argument,
+ * EnrichFn take the partial structured flag value parsed from some command-line argument,
  * grabs values from any alternate config source and defaults
  */
-type FlagsetEnrichFn<VV> = (
+export type EnrichFn<VV> = (
   candidate: Partial<VV>,
   flagset: Flagset<VV>,
-  sources: FlagsetConfigFn[],
+  sources: ConfigFn[],
 ) => Promise<Partial<VV>>;
 
 /**
- * FlagsetValidateFn makes sure all required arguments are present then runs any extra
+ * ValidateFn makes sure all required arguments are present then runs any extra
  * validation a flag type may require. This may invoke confirmation, authorization,
  * or other checks.
  */
-type FlagsetValidateFn<VV> = (
+export type ValidateFn<VV> = (
   candidate: Partial<VV>,
   args: Args,
   flagset: Flagset<VV>,
 ) => Promise<{ validFlags: VV; validArgs: Args }>;
 
-type LeafHandler<VV> = (
+export type LeafHandler<VV> = (
   flags: VV,
   args: Args,
   std: StandardOutputs,
@@ -82,29 +84,29 @@ type LeafHandler<VV> = (
   root?: MultiCommand,
 ) => Status;
 
-interface BaseCommand {
+export interface BaseCommand {
   name: string;
   description: string; // short, one line
   instructions: string; // longer help, Markdown
 }
 
-interface LeafCommand<VV> extends BaseCommand {
+export interface LeafCommand<VV> extends BaseCommand {
   flagset: Flagset<VV>;
   argset: string[]; // documentation for positional args TODO format for optional and rest?
   handler: LeafHandler<VV>;
 }
 
-type Subcommands = {
+export type Subcommands = {
   [name: string]: Command;
 };
 
-interface MultiCommand extends BaseCommand {
+export interface MultiCommand extends BaseCommand {
   subcommands: Subcommands;
 }
 
-type Command = LeafCommand<unknown> | MultiCommand;
+export type Command = LeafCommand<unknown> | MultiCommand;
 
-type TraverseFn = (cmd: Command, raw: Args) => {
+export type TraverseFn = (cmd: Command, raw: Args) => {
   path: string[]; // command path so far
   remaining: Args; // remaining raw args
   leaf: LeafCommand<unknown>; // this might have been swapped for Help
@@ -124,21 +126,21 @@ async function runLeaf<VV>(
   path: string[],
   raw: Args,
   std: StandardOutputs,
-  extraSources: FlagsetConfigFn[] = [],
+  extraSources: ConfigFn[] = [],
   root?: MultiCommand,
 ): Status {
   // PROBLEM: how to move to Generics now?
   // could I pass leaf into a generic function?
-  const { parsedFlags, parsedArgs } = (dummy as FlagsetParseFn<VV>)(
+  const { parsedFlags, parsedArgs } = (dummy as ParseFn<VV>)(
     cmd.flagset,
     raw,
   );
-  const enrichedFlags = await (dummy as FlagsetEnrichFn<VV>)(
+  const enrichedFlags = await (dummy as EnrichFn<VV>)(
     parsedFlags,
     cmd.flagset,
     extraSources,
   );
-  const { validFlags, validArgs } = await (dummy as FlagsetValidateFn<VV>)(
+  const { validFlags, validArgs } = await (dummy as ValidateFn<VV>)(
     enrichedFlags,
     parsedArgs,
     cmd.flagset,
@@ -172,7 +174,7 @@ async function runCommand(
   cmd: Command,
   raw: Args,
   std: StandardOutputs,
-  extraSources: FlagsetConfigFn[] = [],
+  extraSources: ConfigFn[] = [],
 ): Status {
   try {
     const { path, remaining, leaf, help } = (dummy as TraverseFn)(cmd, raw);
