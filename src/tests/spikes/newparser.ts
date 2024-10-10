@@ -21,6 +21,8 @@
  * - Run the command
  * - Report errors and exit.
  */
+import { command } from "../../command.ts";
+import { ParserExitCodes } from "../../errors.ts";
 import type { Flagset, StandardOutputs } from "../../types.ts";
 
 type Args = string[];
@@ -36,15 +38,13 @@ type FlagValidateFn<V> = (candidate: V, command?: unknown) => Promise<string[]>;
  * set of command line args.
  * @param args the raw args that will be parsed
  * @returns "flags", a partial VV that may need to fill in missing values from
- * other sources, "args", the remaining positional args, and, potentially,
- * "help" which means flags and args are in an indeterminate state and the
- * CLI explicitly requested help
+ * other sources, "args", the remaining positional args
  * @throws ParsingError if there's missing or invalid args, unrecognized flags
  */
 type FlagsetParseFn<VV> = (
   flagset: Flagset<VV>,
   args: Args,
-) => { flags: Partial<VV>; args: Args; help?: boolean };
+) => { partialFlags: Partial<VV>; args: Args };
 
 /**
  * FlagsetConfigFn represents any alternative configuration source, such as environment
@@ -74,11 +74,11 @@ type FlagsetValidateFn<VV> = (
 ) => Promise<{ flags: VV; args: Args }>;
 
 type LeafHandler<VV> = (
-  flagset: Flagset<VV>,
+  flags: VV,
+  args: Args,
   std: StandardOutputs,
-  raw: Args,
   command: LeafCommand<VV>,
-  // parent: unknown,
+  root?: MultiCommand,
 ) => Status;
 
 interface BaseCommand {
@@ -102,3 +102,74 @@ interface MultiCommand extends BaseCommand {
 }
 
 type Command = LeafCommand<unknown> | MultiCommand;
+
+type TraverseFn = (cmd: Command, raw: Args) => {
+  path: string[]; // command path so far
+  remaining: Args; // remaining raw args
+  leaf: LeafCommand<unknown>; // this might have been swapped for Help
+};
+
+function dummy(...rest: unknown[]): unknown {
+  return rest;
+}
+
+function isMulticommand(cmd: Command): cmd is MultiCommand {
+  return "subcommands" in cmd;
+}
+
+async function runLeaf<VV>(cmd: LeafCommand<VV>, path: string[], raw: Args);
+
+/**
+ * The basic idea here is to separate concerns that were bundled into the Flag parser:
+ *  - Traverse: detecting help or the executable command to be run.
+ *  - Parse: parse the args into a partial structure and remaining positionals ()
+ *  - Enrich: fill in the partial structure from defaults and other sources.
+ *  - Validate: ensure no missing required args and handle any flag-particular pre-run concerns
+ *
+ * After that, it runs the command as before, except that we are withing a closure that can
+ * send the root command and particular command to the runner.
+ * @param cmd
+ * @param raw
+ * @param std
+ * @param extraSources
+ * @returns
+ */
+async function runCommand(
+  cmd: Command,
+  raw: Args,
+  std: StandardOutputs,
+  extraSources: FlagsetConfigFn[] = [],
+): Status {
+  try {
+    const { path, remaining, leaf } = (dummy as TraverseFn)(cmd, raw);
+    // if simple help requested, print and exit
+    // PROBLEM: how to move to Generics now?
+    // could I pass leaf into a generic function?
+    const { parsedFlags, parsedArgs } = (dummy as FlagsetParseFn)(
+      leaf.flagset,
+      remaining,
+    );
+    const enrichedFlags = await (dummy as FlagsetEnrichFn)(
+      parsedFlags,
+      leaf.flagset,
+      extraSources,
+    );
+    const { validFlags, validArgs } = await (dummy as FlagsetValidateFn)(
+      enrichedFlags,
+      parsedArgs,
+      leaf.flagset,
+    );
+    const root = isMulticommand(cmd) ? cmd : undefined;
+    const status = await leaf.handler(
+      validFlags,
+      validArgs,
+      std,
+      leaf,
+      root,
+    );
+    return status;
+  } catch (err) {
+    console.error(err.message);
+    return ParserExitCodes.UNKNOWN_ERROR;
+  }
+}
