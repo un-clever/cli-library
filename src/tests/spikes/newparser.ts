@@ -184,9 +184,9 @@ export async function runCommand(
       return ParserExitCodes.NO_ERROR;
     } else {
       const { parsedArgs, parsedFlags } = parseFlags(leaf.flagset, leafArgs);
-      // Enrich
-      // Validate
-      // run
+      // Enrich(parsedFlags)
+      // Validate(enrichedFlags, parsedArgs)
+      // run(flags, args)
       // return await runLeaf(
       //   leaf,
       //   path,
