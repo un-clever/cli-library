@@ -171,31 +171,3 @@ async function runLeaf<VV>(
  * @param extraSources
  * @returns
  */
-async function runCommand(
-  cmd: Command,
-  raw: Args,
-  std: StandardOutputs,
-  extraSources: ConfigFn[] = [],
-): Status {
-  try {
-    const { path, remaining, leaf, help } = (dummy as TraverseFn)(cmd, raw);
-    // if simple help requested, print and exit
-    if (help) {
-      // this works except in case where help is a subcommand,
-      // not --help on a leaf command
-      await dummy(leaf, path, remaining);
-      return ParserExitCodes.NO_ERROR;
-    }
-    return await runLeaf(
-      leaf,
-      path,
-      remaining,
-      std,
-      extraSources,
-      isMulticommand(cmd) ? cmd : undefined,
-    );
-  } catch (err) {
-    console.error(err.message);
-    return ParserExitCodes.UNKNOWN_ERROR;
-  }
-}
