@@ -1,4 +1,4 @@
-import { assertThrows, describe, it } from "testlib";
+import { assertEquals, assertThrows, describe, it } from "testlib";
 import { getFlagsetHelp, getFlagsetParser } from "../flagset.ts";
 import {
   booleanFlagset,
@@ -18,7 +18,6 @@ import {
   simpleArgsCases,
 } from "./testData.ts";
 import { testmanyArgExamples, testmanyFlagsetExamples } from "./testUtils.ts";
-import { assertEquals } from "@std/assert/equals";
 
 describe("we can parse simple positional arguments", () => {
   testmanyArgExamples(getFlagsetParser<unknown>({}), simpleArgsCases);
