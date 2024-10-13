@@ -1,7 +1,10 @@
 import { assertEquals, describe, it } from "testlib";
 import {
+  haltify,
   type pipeableAtoA,
+  PipeableBtoB,
   pipeAtoA,
+  pipeBtoB,
   pipeFor2,
   pipeReducer,
   pipeReducer2,
@@ -49,11 +52,12 @@ describe("simple piper", () => {
   for (const t of testcases) {
     const [pipes, expected] = t;
     it("tests " + expected + " with all the implementations", async () => {
-      // const b = await pipeAtoA(...pipes)("fred");
+      const pipesB: PipeableBtoB<string>[] = pipes.map(haltify);
       assertEquals(await pipeAtoA(...pipes)("fred"), expected);
       assertEquals(await pipeFor2(...pipes)("fred"), expected);
       assertEquals(await pipeReducer(...pipes)("fred"), expected);
       assertEquals(await pipeReducer2(...pipes)("fred"), expected);
+      assertEquals((await pipeBtoB(...pipesB)("fred"))[0], expected);
     });
   }
 
@@ -69,5 +73,23 @@ describe("simple piper", () => {
         "only the first transformation should have run, and the result should be in the error message",
       );
     }
+  });
+
+  const haltableUc = haltify(strUC);
+  const haltableRev = haltify(strRev);
+  const haltableBanana = haltify(banana);
+
+  it("has a big brother that handles bailing out early", async () => {
+    assertEquals((await pipeBtoB()("fred"))[0], "fred");
+    assertEquals(await haltableUc("fred"), ["FRED"]);
+    assertEquals(await haltableRev("fred"), ["derf"]);
+    assertEquals(await haltableBanana("fred"), ["fredbanana"]);
+    assertEquals((await pipeBtoB(haltableUc)("fred"))[0], "FRED");
+    assertEquals((await pipeBtoB(haltableRev)("fred"))[0], "derf");
+    assertEquals((await pipeBtoB(haltableBanana)("fred"))[0], "fredbanana");
+    assertEquals(
+      (await pipeBtoB(haltableRev, haltableBanana)("fred"))[0],
+      "derfbanana",
+    );
   });
 });
