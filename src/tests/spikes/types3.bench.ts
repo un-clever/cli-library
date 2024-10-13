@@ -1,5 +1,12 @@
 import { banana, strRev, strUC } from "./types3.test.ts";
-import { pipeAtoA, pipeFor2, pipeReducer, pipeReducer2 } from "./types3.ts";
+import {
+  haltify,
+  pipeAtoA,
+  pipeBtoB,
+  pipeFor2,
+  pipeReducer,
+  pipeReducer2,
+} from "./types3.ts";
 
 const pipes = [
   strRev,
@@ -59,6 +66,7 @@ const forPiper = pipeAtoA(...pipes);
 const forPiper2 = pipeFor2(...pipes);
 const redPiper = pipeReducer(...pipes);
 const redPiper2 = pipeReducer2(...pipes);
+const haltablePiper = pipeBtoB(...pipes.map(haltify));
 
 Deno.bench("hard-coded piper", async () => {
   // await strRev(banana(await strUC(await strRev("fred"))));
@@ -179,6 +187,11 @@ Deno.bench("for loop 2 piper", async () => {
 Deno.bench("reduce  piper", async () => {
   await redPiper("fred");
 });
+
 Deno.bench("reduce  piper 2", async () => {
   await redPiper2("fred");
+});
+
+Deno.bench("haltable  piper ", async () => {
+  await haltablePiper("fred");
 });
