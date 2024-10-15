@@ -10,7 +10,7 @@ import type {
 } from "./types.ts";
 
 async function handleCommandException(
-  err: Error,
+  err: unknown,
   std: StandardOutputs,
   help: HelpFn,
 ): Promise<number> {
@@ -25,7 +25,10 @@ async function handleCommandException(
     await std.errs(help());
     return err.code;
   }
-  await std.errs(GetHelp(err));
+  // probably should just check for .message
+  if (err instanceof Error) {
+    await std.errs(GetHelp(err));
+  }
   return ParserExitCodes.UNKNOWN_ERROR;
 }
 

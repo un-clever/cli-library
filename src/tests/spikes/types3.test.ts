@@ -9,6 +9,7 @@ import {
   pipeReducer,
   pipeReducer2,
 } from "./types3.ts";
+import { assert } from "@std/assert/assert";
 
 export function strUC(a: string): Promise<string> {
   return new Promise<string>((resolve) =>
@@ -67,6 +68,7 @@ describe("simple piper", () => {
       const b = await fn("FRED");
       assertEquals(b, "never nope", "this shouldn't ever run");
     } catch (err) {
+      assert(err instanceof Error);
       assertEquals(
         err.message,
         "DERF",
