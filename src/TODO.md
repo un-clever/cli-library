@@ -11,4 +11,5 @@ The concept:
   - More unique errors with fields to match the reporting and
   - Main messages drawn off a language file
 
-RE-READ the root README.md before doing much more.
+RE-READ the root README.md before doing much more. Right now, it doesn't seem to add much clarity with the pipe,
+though it is nice that commands are a struct. For this lib, less elegant and easier to read befits un-clever.

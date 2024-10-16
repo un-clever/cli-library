@@ -40,10 +40,10 @@ export interface RunContext {
   path: SubcommandPath;
   args: RawArgs;
   argPos: number;
-  leaf?: LeafCommand<unknown>;
+  leaf?: LeafContext<unknown>;
 }
 
-export interface LeafContext<VV> extends RunContext {
+export interface LeafContext<VV> {
   command: LeafCommand<VV>;
   flagsP: Partial<VV>;
   flags?: VV;

@@ -11,7 +11,46 @@ import type {
 } from "./commandnewtypes.ts";
 import { ParserExitCodes, ParsingError } from "./errors.ts";
 import { hose } from "./hoses.ts";
+import { helpAsUnknown } from "./tests/spikes/helpCommand.ts";
 import type { StandardOutputs } from "./types.ts";
+
+/**
+ * run is the way to run any command, whether multi or simple
+ *
+ * TODO: clarify the protocol. What does a short-circuited pipe mean,
+ * that we should just return with the status code? What does an exception mean?
+ * And, how can I maximize clarity and DX after being away for awhile.
+ * Pipelines can read a little opaquely.
+ * @param root
+ * @param args
+ * @param std
+ * @returns
+ */
+export async function run(root: Command, args: RawArgs, std: StandardOutputs) {
+  // deno-fmt-ignore
+  const initialCtx = { done: false, exitCode: 0, std, root, path: [], args, argPos: 0 };
+  const ctx = await findLeafOrHelp(initialCtx);
+
+  // Couldn't  I just
+  // const ctx2 = hose<LeafContext<unknown>>([ // TODO Hose isn't un-clever
+  //   // findCommand,
+  //   // checkHelp,
+  //   parseFlags,
+  //   enrichFlags,
+  //   validateFlags,
+  //   runLeaf,
+  // ], haltIf)(ctx);
+
+  // maybe split the leaf stuff off into a flag parsing and handler running context
+  if (ctx.leaf) {
+    const finalContext = await runLeafOrHelp(
+      { ...ctx, command: ctx.leaf, flagsP: {} } as LeafContext<unknown>,
+    );
+    return finalContext.exitCode;
+  } else {
+    return ctx.exitCode;
+  }
+}
 
 export function isHelpFlag(a: string) {
   return ["-h", "--help"].includes(a);
@@ -48,27 +87,6 @@ async function runLeafOrHelp<VV>(ctx: LeafContext<VV>) {
     validateFlags,
     runLeaf,
   ], haltIf)(ctx);
-}
-
-export async function run(root: Command, args: RawArgs, std: StandardOutputs) {
-  const ctx = await findLeafOrHelp({
-    done: false,
-    exitCode: 0,
-    std,
-    root,
-    path: [],
-    args,
-    argPos: 0,
-  });
-
-  if (ctx.leaf) {
-    const finalContext = await runLeafOrHelp(
-      { ...ctx, command: ctx.leaf, flagsP: {} } as LeafContext<unknown>,
-    );
-    return finalContext.exitCode;
-  } else {
-    return ctx.exitCode;
-  }
 }
 
 function findLeafCommand(ctx: RunContext): RunContext {

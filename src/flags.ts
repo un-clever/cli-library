@@ -10,34 +10,6 @@ import type {
 export const FailedParse: ParseResult<any> = Object.freeze({ n: 0 });
 
 /**
- * checkFlagDefault audits the flag default value.
- *
- * If the parser has a default, it ALWAYS takes precedence over a flag default
- * because the parser is saying, "my logic depends on a particular thing
- * happening if this flag is absent"
- *
- * LATER: move this to the audit test helper
- * @param flagName string name of flag for error messsage
- * @param parser the FlagParser for the flag (which may have a default.)
- * @param flagDefault any default for this particular flag the developer may have provided
- * @returns
- */
-export function checkFlagDefault<V>(
-  flagName: string,
-  parser: FlagtypeDef<V>,
-  flagDefault?: V,
-): V | undefined {
-  const haveParserDefault = parser.default !== undefined;
-  const haveFlagDefault = flagDefault !== undefined;
-  if (haveParserDefault && haveFlagDefault) {
-    throw new Error(
-      `flag ${flagName} should not have default ${flagDefault} because it's parser has a mandatory default of ${parser.default}`,
-    );
-  } else if (haveParserDefault) return parser.default;
-  else return flagDefault;
-}
-
-/**
  * Create a required flag
  *
  * @param name - long form "slug of the flag", --<name> signals the flag
@@ -79,6 +51,34 @@ export function optional<V>(
     ...required(name, description, parser, defaultValue),
     required: false,
   };
+}
+
+/**
+ * checkFlagDefault audits the flag default value.
+ *
+ * If the parser has a default, it ALWAYS takes precedence over a flag default
+ * because the parser is saying, "my logic depends on a particular thing
+ * happening if this flag is absent"
+ *
+ * LATER: move this to the audit test helper
+ * @param flagName string name of flag for error messsage
+ * @param parser the FlagParser for the flag (which may have a default.)
+ * @param flagDefault any default for this particular flag the developer may have provided
+ * @returns
+ */
+export function checkFlagDefault<V>(
+  flagName: string,
+  parser: FlagtypeDef<V>,
+  flagDefault?: V,
+): V | undefined {
+  const haveParserDefault = parser.default !== undefined;
+  const haveFlagDefault = flagDefault !== undefined;
+  if (haveParserDefault && haveFlagDefault) {
+    throw new Error(
+      `flag ${flagName} should not have default ${flagDefault} because it's parser has a mandatory default of ${parser.default}`,
+    );
+  } else if (haveParserDefault) return parser.default;
+  else return flagDefault;
 }
 
 /**
