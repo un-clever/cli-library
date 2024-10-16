@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.10.0 - 2024-10-16
+#### Bug Fixes
+- **(green)** make compatible with Deno 2.0 - (59ef423) - Brad Olson
+#### Documentation
+- **(spike)** first draft on new approch to help spike... - (0dea3d5) - Brad Olson
+#### Features
+- **(green)** add hoses module - (ac6b99b) - Brad Olson
+#### Tests
+- **(green)** spike added a error-short-circuit pipe - (fa835dd) - Brad Olson
+- **(green)** spiked quick and dirty pipe function - (54aea02) - Brad Olson
+
+- - -
+
 ## v0.9.0 - 2024-10-10 BREAKING
 
 This version features an incomplete but working multicommand. It also begins a spike testing a different approach.
