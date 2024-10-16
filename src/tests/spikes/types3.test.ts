@@ -70,7 +70,7 @@ describe("simple piper", () => {
     } catch (err) {
       assert(err instanceof Error);
       assertEquals(
-        err.message,
+        (err as Error).message,
         "DERF",
         "only the first transformation should have run, and the result should be in the error message",
       );

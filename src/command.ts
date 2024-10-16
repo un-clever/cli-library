@@ -59,7 +59,7 @@ export function command<VV>(
         std,
       );
     } catch (err) {
-      return handleCommandException(err, std, help);
+      return handleCommandException(err as Error, std, help);
     }
   }
   return {
@@ -106,7 +106,7 @@ export function multiCommand(
         subcmd,
       );
     } catch (err) {
-      return handleCommandException(err, std, help);
+      return handleCommandException(err as Error, std, help);
     }
   }
   return { describe, help, helpDeep, run };
