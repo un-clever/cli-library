@@ -1,4 +1,3 @@
-# TODOs and notes
 # Rewrite for issue 34
 
 The concept:

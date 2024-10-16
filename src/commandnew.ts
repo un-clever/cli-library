@@ -1,8 +1,17 @@
-// reimplementing command with hoses
+// reimplementing command as a structural (not functional) interface
 
+import type {
+  Command,
+  LeafCommand,
+  LeafContext,
+  MultiCommand,
+  ParsedArgs,
+  RawArgs,
+  RunContext,
+} from "./commandnewtypes.ts";
 import { ParserExitCodes, ParsingError } from "./errors.ts";
 import { hose } from "./hoses.ts";
-import { Flagset, StandardOutputs } from "./types.ts";
+import type { StandardOutputs } from "./types.ts";
 
 export function isHelpFlag(a: string) {
   return ["-h", "--help"].includes(a);
@@ -41,7 +50,7 @@ async function runLeafOrHelp<VV>(ctx: LeafContext<VV>) {
   ], haltIf)(ctx);
 }
 
-export async function run(root: Command, args: Args, std: StandardOutputs) {
+export async function run(root: Command, args: RawArgs, std: StandardOutputs) {
   const ctx = await findLeafOrHelp({
     done: false,
     exitCode: 0,
@@ -111,7 +120,9 @@ function handleLongFlag<VV>(
     throw new ParsingError(
       "missing arg",
       ParserExitCodes.INVALID_FLAG_ARGS,
-      `the arguments '${args.slice(start)} didn't provide a valid value for`,
+      `the arguments '${
+        ctx.args.slice(ctx.argPos)
+      } didn't provide a valid value for`,
       flagname,
     );
   }
@@ -123,9 +134,16 @@ function handleLongFlag<VV>(
   );
 }
 
+function handleShortFlags<VV>(
+  _flagstring: string,
+  _ctx: LeafContext<VV>,
+): LeafContext<VV> {
+  throw new Error("short flags aren't implemented yet");
+}
+
 function parseFlags<VV>(ctx: LeafContext<VV>): LeafContext<VV> {
   let c = { ...ctx };
-  const args: Args = []; //parsed args
+  const args: ParsedArgs = []; //parsed args
   while (c.argPos < c.args.length) {
     if (haltIf(c)) return c;
     const arg = c.args[c.argPos++];

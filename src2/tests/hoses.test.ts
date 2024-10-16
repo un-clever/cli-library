@@ -1,16 +1,12 @@
-import { assertEquals, describe, it } from "testlib";
-import { hose, type HoseFn } from "../hoses.ts";
-
-export function adder(suffix: string) {
-  return (a: string) => a + suffix;
-}
+import { assertEquals, assertThrows, describe, it } from "testlib";
+import { hose, HoseFn } from "../hoses.ts";
+import { adder } from "./spikes/types3.test.ts";
 
 export function strUC(a: string): Promise<string> {
   return new Promise<string>((resolve) =>
     setTimeout(() => resolve(a.toUpperCase()), 0)
   );
 }
-
 export function strRev(a: string) {
   return new Promise<string>(
     (resolve) => setTimeout(() => resolve(a.split("").reverse().join("")), 0),
@@ -20,9 +16,7 @@ export function strRev(a: string) {
 export function suffixer(suffix: string) {
   return (a: string) => a + suffix;
 }
-
 export const banana = suffixer("banana");
-
 const siphon = suffixer("siphon");
 
 export function thrower(a: string) {

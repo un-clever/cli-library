@@ -2,9 +2,7 @@
 
 import { ParserExitCodes, ParsingError } from "./errors.ts";
 import { hose } from "./hoses.ts";
-import type { Flagset, StandardOutputs } from "./types.ts";
-
-export type Args = string[];
+import { Flagset, StandardOutputs } from "./types.ts";
 export type SubcommandPath = string[];
 export type Status = Promise<number>; // cli status code
 
@@ -14,14 +12,11 @@ export interface BaseCommand {
   instructions: string; // longer help, Markdown
 }
 
-export type LeafHandler<VV> = (
-  flags: VV,
-  args: Args,
-  std: StandardOutputs,
-  path: SubcommandPath,
-  command: LeafCommand<VV>,
-  root: Command, // might be same as .command if this is a simple CLI
-) => Status;
+export type Command = LeafCommand<unknown> | MultiCommand;
+
+export interface MultiCommand extends BaseCommand {
+  subcommands: Record<string, Command>;
+}
 
 export interface LeafCommand<VV> extends BaseCommand {
   flagset: Flagset<VV>;
@@ -29,12 +24,31 @@ export interface LeafCommand<VV> extends BaseCommand {
   handler: LeafHandler<VV>;
 }
 
-export interface MultiCommand extends BaseCommand {
-  subcommands: Record<string, Command>;
+export type LeafHandler<VV> = (
+  flags: VV,
+  args: RawArgs,
+  std: StandardOutputs,
+  path: SubcommandPath,
+  command: LeafCommand<VV>,
+  root: Command, // might be same as .command if this is a simple CLI
+) => Status;
+
+interface RunContext {
+  done: boolean;
+  exitCode: number; // if defined, stop and return this status
+  std: StandardOutputs;
+  root: Command; // might be a single or multi
+  path: SubcommandPath;
+  args: RawArgs;
+  argPos: number;
+  leaf?: LeafCommand<unknown>;
 }
 
-export type Command = LeafCommand<unknown> | MultiCommand;
-
+interface LeafContext<VV> extends RunContext {
+  command: LeafCommand<VV>;
+  flagsP: Partial<VV>;
+  flags?: VV;
+}
 export function isHelpFlag(a: string) {
   return ["-h", "--help"].includes(a);
 }
@@ -49,23 +63,6 @@ export function isMultiCommand(cmd: Command): cmd is MultiCommand {
 
 export function isLeafCommand(cmd: Command): cmd is LeafCommand<unknown> {
   return "flagset" in cmd;
-}
-
-interface RunContext {
-  done: boolean;
-  exitCode: number; // if defined, stop and return this status
-  std: StandardOutputs;
-  root: Command; // might be a single or multi
-  path: SubcommandPath;
-  args: Args;
-  argPos: number;
-  leaf?: LeafCommand<unknown>;
-}
-
-interface LeafContext<VV> extends RunContext {
-  command: LeafCommand<VV>;
-  flagsP: Partial<VV>;
-  flags?: VV;
 }
 
 function haltIf(ctx: RunContext) {
