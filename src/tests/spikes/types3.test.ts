@@ -68,7 +68,7 @@ describe("simple piper", () => {
       assertEquals(b, "never nope", "this shouldn't ever run");
     } catch (err) {
       assertEquals(
-        err.message,
+        (err as Error).message,
         "DERF",
         "only the first transformation should have run, and the result should be in the error message",
       );
